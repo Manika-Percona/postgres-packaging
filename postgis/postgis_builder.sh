@@ -153,12 +153,12 @@ get_sources(){
     #relax-test-timing-constraints.patch}
     git clone https://git.postgresql.org/git/pgrpms.git
     mkdir rpm
-    mv pgrpms/rpm/redhat/main/non-common/postgis33/main/* rpm/
+    mv pgrpms/rpm/redhat/main/non-common/postgis35/main/* rpm/
     rm -rf pgrpms
     cd rpm
-        rm -f postgis33.spec postgis33-3.3.0-gdalfpic.patch
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/17.5.2/postgis/rpm/percona-postgis33.spec
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/rpm/postgis33-3.3.0-gdalfpic.patch
+        rm -f postgis35.spec
+        wget https://raw.githubusercontent.com/percona/postgres-packaging/17.5.2/postgis/rpm/percona-postgis35.spec
+        #wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/rpm/postgis33-3.3.0-gdalfpic.patch
     cd ../
     cd ${WORKDIR}
     #
@@ -191,9 +191,9 @@ get_system(){
     return
 }
 install_gdal(){
-    wget http://download.osgeo.org/gdal/3.5.3/gdal-3.5.3.tar.gz -O $CURDIR/gdal-3.5.3.tar.gz
-    tar xvf $CURDIR/gdal-3.5.3.tar.gz -C $CURDIR
-    cd $CURDIR/gdal-3.5.3
+    wget http://download.osgeo.org/gdal/3.11.3/gdal-3.11.3.tar.gz -O $CURDIR/gdal-3.11.3.tar.gz
+    tar xvf $CURDIR/gdal-3.11.3.tar.gz -C $CURDIR
+    cd $CURDIR/gdal-3.11.3
     mkdir build
     cd build
     cmake -DGDAL_BUILD_OPTIONAL_DRIVERS=OFF -DOGR_BUILD_OPTIONAL_DRIVERS=OFF ..
@@ -203,26 +203,26 @@ install_gdal(){
 }
 
 install_sfcgal_el8(){
-    wget https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.4.1/SFCGAL-v1.4.1.tar.gz -O $CURDIR/SFCGAL-v1.4.1.tar.gz
-    tar xvf $CURDIR/SFCGAL-v1.4.1.tar.gz -C $CURDIR
-    cd $CURDIR/SFCGAL-v1.4.1
-    cmake -DCGAL_DIR=$CURDIR/CGAL-5.5.2 . && make --include-dir=$CURDIR/CGAL-5.5.2 && make install
+    wget https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.5.2/SFCGAL-v1.5.2.tar.gz -O $CURDIR/SFCGAL-v1.5.2.tar.gz
+    tar xvf $CURDIR/SFCGAL-v1.5.2.tar.gz -C $CURDIR
+    cd $CURDIR/SFCGAL-v1.5.2
+    cmake -DCGAL_DIR=$CURDIR/CGAL-5.6.2 . && make --include-dir=$CURDIR/CGAL-5.6.2 && make install
     chmod 777 /usr/local/lib64/libSFCGAL.*
     ln /usr/local/bin/sfcgal-config /usr/bin/sfcgal-config
 }
 
 install_cgal(){
-    wget https://github.com/CGAL/cgal/releases/download/v5.5.2/CGAL-5.5.2.tar.xz -O $CURDIR/CGAL-5.5.2.tar.xz
-    tar xf $CURDIR/CGAL-5.5.2.tar.xz -C $CURDIR
-    cd $CURDIR/CGAL-5.5.2
+    wget https://github.com/CGAL/cgal/releases/download/v5.6.2/CGAL-5.6.2.tar.xz -O $CURDIR/CGAL-5.6.2.tar.xz
+    tar xf $CURDIR/CGAL-5.6.2.tar.xz -C $CURDIR
+    cd $CURDIR/CGAL-5.6.2
     cmake .
     make install
 }
 
 install_sfcgal(){
-    wget https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.10/SFCGAL-v1.3.10.tar.gz -O $CURDIR/SFCGAL-v1.3.10.tar.gz
-    tar xvf $CURDIR/SFCGAL-v1.3.10.tar.gz -C $CURDIR
-    cd $CURDIR/SFCGAL-v1.3.10
+    wget https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.5.2/SFCGAL-v1.5.2.tar.gz -O $CURDIR/SFCGAL-v1.5.2.tar.gz
+    tar xvf $CURDIR/SFCGAL-v1.5.2.tar.gz -C $CURDIR
+    cd $CURDIR/SFCGAL-v1.5.2
     cmake . && make && make install
     chmod 777 /usr/local/lib/libSFCGAL.*
     cp /usr/local/lib/libSFCGAL.* /usr/lib/postgresql/${PG_MAJOR_VERSION}/lib
@@ -270,7 +270,9 @@ install_deps() {
          wget --no-check-certificate https://download.postgresql.org/pub/repos/yum/reporpms/EL-${RHEL}-${ARCH}/pgdg-redhat-repo-latest.noarch.rpm
          yum -y install pgdg-redhat-repo-latest.noarch.rpm
          yum -y install pgdg-srpm-macros
-         if [ x"$RHEL" = x9 ]; then
+         if [ x"$RHEL" = x10 ]; then
+            yum -y install SFCGAL SFCGAL-devel gdal311-devel proj95-devel geos313-devel
+         elif [ x"$RHEL" = x9 ]; then
             yum -y install SFCGAL SFCGAL-devel gdal311-devel proj95-devel
          else
             yum -y install SFCGAL SFCGAL-devel gdal38-devel proj95-devel
@@ -383,11 +385,11 @@ build_srpm(){
     #
     cp -av rpm/* rpmbuild/SOURCES
     cd rpmbuild/SOURCES
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/postgis-3.3.8.pdf
+    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/postgis-3.5.3.pdf
     #wget --no-check-certificate https://download.osgeo.org/postgis/docs/postgis-3.3.8.pdf
     #wget --no-check-certificate https://www.postgresql.org/files/documentation/pdf/12/postgresql-12-A4.pdf
     cd ../../
-    cp -av rpmbuild/SOURCES/percona-postgis33.spec rpmbuild/SPECS
+    cp -av rpmbuild/SOURCES/percona-postgis35.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     if [ -f /opt/rh/devtoolset-7/enable ]; then
@@ -396,7 +398,7 @@ build_srpm(){
     fi
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
         --define "version ${VERSION}" --define "pginstdir /usr/pgsql-${PG_MAJOR_VERSION}"  \
-        rpmbuild/SPECS/percona-postgis33.spec
+        rpmbuild/SPECS/percona-postgis35.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -581,7 +583,7 @@ PRODUCT=percona-postgis
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
 VERSION=${POSTGIS_VERSION}
-RELEASE='8'
+RELEASE='3'
 PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 PPG_VERSION=17.5
 PG_MAJOR_VERSION=$(echo $PPG_VERSION | cut -f1 -d'.')
