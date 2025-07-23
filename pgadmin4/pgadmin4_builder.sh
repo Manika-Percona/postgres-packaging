@@ -192,14 +192,19 @@ install_deps() {
         yum -y install wget
         add_percona_yum_repo
         yum clean all
-        yum install -y epel-release
         yum -y install centos-release-scl
         yum -y install curl
+        if [[ "${RHEL}" -eq 10 ]]; then
+            yum install oracle-epel-release-el10
+            dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+        else
+            yum -y install epel-release
+            dnf config-manager --set-enabled codeready-builder-for-rhel-${RHEL}-x86_64-rpms
+        fi
         RHEL=$(rpm --eval %rhel)
         if [ ${RHEL} -gt 7 ]; then
             yum config-manager --enable PowerTools AppStream BaseOS *epel
             dnf -qy module disable postgresql
-            dnf config-manager --set-enabled codeready-builder-for-rhel-${RHEL}-x86_64-rpms
             dnf clean all
             rm -r /var/cache/dnf
             dnf -y upgrade
