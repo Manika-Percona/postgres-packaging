@@ -15,6 +15,7 @@ on:
           - pg_cron
           - pg_gather
           - pg_repack
+          - pgadmin4
           - pgaudit
           - pgaudit_set_user
           - pgbackrest
