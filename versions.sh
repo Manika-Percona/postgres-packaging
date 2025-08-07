@@ -7,6 +7,7 @@ PG_MINOR=13
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
 PG_SRC_REPO="https://git.postgresql.org/git/postgresql.git"
+PG_SRC_REPO_DEB="https://salsa.debian.org/postgresql/postgresql.git"
 PG_SRC_BRANCH="REL_${PG_MAJOR}_${PG_MINOR}"
 PG_RPM_RELEASE='1'
 PG_DEB_RELEASE='1'
@@ -199,8 +200,17 @@ YDIFF_RPM_RELEASE='1'
 YDIFF_DEB_RELEASE='1'
 
 
-
 #Github Packaging Repo
 PKG_GIT_REPO=https://github.com/percona/postgres-packaging.git
 PKG_GIT_BRANCH=${PG_VERSION}
 PKG_PPG_REPO="ppg-${PG_VERSION}"
+PGRPMS_GIT_REPO=https://git.postgresql.org/git/pgrpms.git
+
+# Raw files URLs
+PKG_RAW_URL=https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}
+
+# PG files urls
+PG_RULES_FILE=$PKG_RAW_URL/postgres/rules
+PG_CONTROL_FILE=$PKG_RAW_URL/postgres/control
+PG_SPEC_FILE=$PKG_RAW_URL/postgres/percona-postgresql-${PG_VERSION}.spec
+LLVM_PATCH_FILE=$PKG_RAW_URL/postgres/llvm_static_linking.patch

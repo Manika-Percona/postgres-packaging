@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Versions and other variables
+source ./versions.sh
+
 usage () {
     cat <<EOF
 Usage: $0 [OPTIONS]
@@ -105,11 +108,12 @@ get_system(){
 
 get_tar(){
     TARBALL=$1
-    TARFILE=$(basename $(find $WORKDIR/$TARBALL -name 'etcd*.tar.gz' | sort | tail -n1))
+    COMPONENT=$2
+    TARFILE=$(basename $(find $WORKDIR/$TARBALL -name "$COMPONENT*.tar.gz" | sort | tail -n1))
 
     if [ -z $TARFILE ]
     then
-        TARFILE=$(basename $(find $CURDIR/$TARBALL -name 'etcd*.tar.gz' | sort | tail -n1))
+        TARFILE=$(basename $(find $CURDIR/$TARBALL -name "$COMPONENT*.tar.gz" | sort | tail -n1))
 	if [ -z $TARFILE ]
         then
             echo "There is no $TARBALL for build"
