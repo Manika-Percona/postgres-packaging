@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # postgresql-server
 PPG_PRODUCT=percona-postgresql
@@ -204,4 +204,3 @@ YDIFF_DEB_RELEASE='1'
 PKG_GIT_REPO=https://github.com/percona/postgres-packaging.git
 PKG_GIT_BRANCH=${PG_VERSION}
 PKG_PPG_REPO="ppg-${PG_VERSION}"
-VERSION_FILE=
