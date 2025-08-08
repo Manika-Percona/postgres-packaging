@@ -330,21 +330,22 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
+#RPM_RELEASE=1
+#DEB_RELEASE=1
 REVISION=0
-BRANCH="REL_15_14"
-REPO="https://git.postgresql.org/git/postgresql.git"
-PRODUCT=percona-postgresql
+#BRANCH="REL_15_14"
+#REPO="https://git.postgresql.org/git/postgresql.git"
+#PRODUCT=percona-postgresql
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='15'
-RELEASE='14'
-PG_VERSION=${VERSION}.${RELEASE}
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
+#VERSION='15'
+#RELEASE='14'
+#PG_VERSION=${VERSION}.${RELEASE}
+#PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
 check_workdir
 get_system
+
 #install_deps
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
