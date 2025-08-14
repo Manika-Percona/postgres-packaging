@@ -4,6 +4,8 @@
 source ../versions.sh
 # Common functions
 source ../common-functions.sh
+# Dependencies
+source ../install-deps.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -20,7 +22,7 @@ get_sources(){
     echo "VERSION=${PSM_VER}" >> percona-postgresql.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> percona-postgresql.properties
     echo "BUILD_ID=${BUILD_ID}" >> percona-postgresql.properties
-    git clone "$REPO"
+    git clone "$PG_SRC_REPO"
     retval=$?
     if [ $retval != 0 ]
     then
@@ -151,7 +153,7 @@ build_srpm(){
     mv part1.txt percona-postgresql-15.spec
     cd ${WORKDIR}
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "pgmajorversion 15" --define "pginstdir /usr/pgsql-15"  --define "pgpackageversion 15" \
+        --define "pgmajorversion ${PG_MAJOR}" --define "pginstdir /usr/pgsql-${PG_MAJOR}"  --define "pgpackageversion ${PG_MAJOR}" \
         rpmbuild/SPECS/percona-postgresql-15.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
@@ -200,7 +202,7 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "pgmajorversion 15" --define "pginstdir /usr/pgsql-15" --define "pgpackageversion 15" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "pgmajorversion ${PG_MAJOR}" --define "pginstdir /usr/pgsql-${PG_MAJOR}" --define "pgpackageversion ${PG_MAJOR}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -234,18 +236,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}-${VERSION}_${VERSION}.${RELEASE}.orig.tar.gz
+    mv ${TARFILE} ${PPG_PRODUCT_FULL}_${PG_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-postgresql-15 (${VERSION}.${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-postgresql-${PG_MAJOR} (${PG_VERSION}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     quilt refresh
-    dch -D unstable --force-distribution -v "${VERSION}.${RELEASE}-${DEB_RELEASE}" "Update to new Percona Platform for PostgreSQL version ${VERSION}.${RELEASE}-${DEB_RELEASE}"
+    dch -D unstable --force-distribution -v "${PG_VERSION}-${PG_DEB_RELEASE}" "Update to new Percona Platform for PostgreSQL version ${PG_VERSION}-${PG_DEB_RELEASE}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -289,8 +291,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}-${VERSION}.${RELEASE}
-    dch -m -D "${DEBIAN}" --force-distribution -v "2:${VERSION}.${RELEASE}-${DEB_RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PPG_PRODUCT_FULL}-${PG_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "2:${PG_VERSION}-${PG_DEB_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
         cd debian/
         wget https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh
@@ -298,7 +300,7 @@ build_deb(){
         echo "cat <<'CALLHOME' > /tmp/call-home.sh" >> percona-postgresql-15.postinst
         cat call-home.sh >> percona-postgresql-15.postinst
         echo "CALLHOME" >> percona-postgresql-15.postinst
-        echo "bash +x /tmp/call-home.sh -f \"PRODUCT_FAMILY_POSTGRESQL\" -v \"${PG_VERSION}-${DEB_RELEASE}\" -d \"PACKAGE\" || :" >> percona-postgresql-15.postinst
+        echo "bash +x /tmp/call-home.sh -f \"PRODUCT_FAMILY_POSTGRESQL\" -v \"${PG_VERSION}-${PG_DEB_RELEASE}\" -d \"PACKAGE\" || :" >> percona-postgresql-15.postinst
 	echo "chgrp percona-telemetry /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-15.postinst
         echo "chmod 664 /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-15.postinst
         echo "rm -rf /tmp/call-home.sh" >> percona-postgresql-15.postinst

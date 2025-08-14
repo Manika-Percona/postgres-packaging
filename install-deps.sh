@@ -5,13 +5,13 @@ source ./versions.sh
 
 COMPONENT=$1
 
-# postgresql
 if [ $( id -u ) -ne 0 ]; then
   echo "It is not possible to install dependencies. Please run as root"
   exit 1
 fi
 CURPLACE=$(pwd)
 
+# postgresql
 if [ "x$OS" = "xrpm" ]; then
   yum -y install wget
   yum clean all
@@ -71,3 +71,30 @@ else
     echo "waiting"
   done
 fi
+
+
+# postgresql-common
+    if [ "x$OS" = "xrpm" ]; then
+      yum -y install wget
+      yum clean all
+      RHEL=$(rpm --eval %rhel)
+      if [[ "${RHEL}" -eq 10 ]]; then
+        yum install oracle-epel-release-el10
+      else
+        yum -y install epel-release
+      fi
+      INSTALL_LIST="git patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed rpmdevtools wget perl-podlators sudo make"
+      yum -y install ${INSTALL_LIST}
+    else
+      apt-get update || true
+      apt-get -y install lsb-release
+      export DEBIAN=$(lsb_release -sc)
+      export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
+      apt-get -y install gnupg2
+      apt-get update || true
+      INSTALL_LIST="git wget debhelper libreadline-dev lsb-release rename devscripts sudo"
+      until DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}; do
+        sleep 1
+        echo "waiting"
+      done
+    fi
