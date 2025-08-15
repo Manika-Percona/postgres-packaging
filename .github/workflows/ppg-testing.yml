@@ -97,7 +97,7 @@ jobs:
 
       - name: Install Packages
         run: |
-          INSTALL_LIST="percona-postgresql${{ env.PG_MAJOR }} percona-postgresql${{ env.PG_MAJOR }}-all"
+          INSTALL_LIST="percona-postgresql percona-postgresql${{ env.PG_MAJOR }} percona-postgresql-all"
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             yum list available 'percona-postgresql*'
             yum -y install $INSTALL_LIST
