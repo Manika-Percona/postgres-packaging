@@ -2,6 +2,8 @@
 
 # Versions and other variables
 source ./versions.sh
+# Common functions
+source ../common-functions.sh
 
 COMPONENT=$1
 
