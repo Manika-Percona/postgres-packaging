@@ -92,6 +92,7 @@ jobs:
           fi
           percona-release disable all
           percona-release enable ${{ inputs.ppg-repo }} testing
+          dnf makecache
         shell: bash
 
       - name: Install Packages
