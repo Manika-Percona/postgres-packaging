@@ -37,7 +37,6 @@ on:
 jobs:
   test-package:
     runs-on: ubuntu-latest
-    needs: prepare
     container:
       image: ${{ inputs.platform }}
 
