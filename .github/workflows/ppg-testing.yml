@@ -45,7 +45,7 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             dnf makecache
-            dnf install -y wget vim redhat-lsb-core ca-certificates gcc gcc-c++ make
+            dnf install -y wget vim ca-certificates gcc gcc-c++ make
           else
             apt-get update
             apt-get install -y wget vim lsb-release ca-certificates build-essential
