@@ -67,7 +67,7 @@ jobs:
 
       - name: Get PG major version
         run: |
-          PG_MAJOR = "${{ inputs.ppg-repo }}" | cut -d'-' -f2 | cut -d'.' -f1
+          PG_MAJOR=$(echo "${{ inputs.ppg-repo }}" | cut -d'-' -f2 | cut -d'.' -f1)
           echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
         shell: bash
 
