@@ -1,0 +1,121 @@
+name: PG Packages Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      ppg-repo:
+        description: ppg repo to be tested
+        required: true
+        default: ppg-15.14
+        type: choice
+        options:
+          - ppg-17.6
+          - ppg-16.10
+          - ppg-15.14
+          - ppg-14.19
+          - ppg-13.22
+
+      platform:
+        description: platform to be tested on
+        required: true
+        default: oraclelinux:10
+        type: choice
+        options:
+            - oraclelinux:10
+            - oraclelinux:9
+            - oraclelinux:8
+            - ubuntu:noble
+            - ubuntu:jammy
+            - debian:bookworm
+            - debian:bullseye
+
+      debugging:
+        description: tmate session required
+        default: false
+        type: boolean
+        
+jobs:
+  test-package:
+    runs-on: ubuntu-latest
+    needs: prepare
+    container:
+      image: ${{ inputs.platform }}
+
+    steps:
+      - name: Install basic tools
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            sudo dnf makecache
+            sudo dnf install -y wget vim redhat-lsb-core ca-certificates gcc gcc-c++ make
+          else
+            sudo apt-get update
+            sudo apt-get install -y wget vim lsb-release ca-certificates build-essential
+          fi
+        shell: bash
+
+      - name: Check OS
+        run: cat /etc/os-release
+
+      - name: Get OS version
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            OS_VER=$(rpm --eval %rhel)
+          else
+            OS_VER="$(lsb_release -sc)"
+          fi
+          echo "OS_VER="$OS_VER"" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Get PG major version
+        run: |
+          PG_MAJOR = "${{ inputs.ppg-repo }}" | cut -d'-' -f2 | cut -d'.' -f1
+          echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
+        shell: bash
+
+      - name: OS Version
+        run: echo OS_VER = ${{ env.OS_VER }}
+
+      - name: Enable required repositories
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            dnf config-manager --set-enabled ol${{ env.OS_VER }}_codeready_builder
+          fi
+        shell: bash
+
+      - name: Enable ppg repository
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+          else
+            wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+            dpkg -i percona-release_latest.generic_all.deb
+            rm -f percona-release_latest.generic_all.deb
+          fi
+          percona-release disable all
+          percona-release enable ${{ inputs.ppg-repo }} testing
+        shell: bash
+
+      - name: Install Packages
+        run: |
+          INSTALL_LIST="percona-postgresql percona-postgresql-${{ env.PG_MAJOR }} percona-postgresql-all"
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            yum -y install $INSTALL_LIST
+          else
+            apt-get -y install $INSTALL_LIST
+          fi
+        shell: bash
+
+      - name: Postgresql Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-postgresql)"
+          else
+            echo "package version = $(dpkg -l | grep percona-postgresql)"
+          fi
+          echo "binary version = $(psql --version)"
+        shell: bash
+
+      - name: enable tmate debugging
+        if: inputs.debugging && failure()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
