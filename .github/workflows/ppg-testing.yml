@@ -86,15 +86,13 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-            percona-release disable all
-            percona-release enable ${{ inputs.ppg-repo }} testing
           else
             wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
             dpkg -i percona-release_latest.generic_all.deb
             rm -f percona-release_latest.generic_all.deb
-            percona-release disable all
-            percona-release enable ${{ inputs.ppg-repo }} testing
           fi
+          percona-release disable all
+          percona-release enable ${{ inputs.ppg-repo }} testing
         shell: bash
 
       - name: Install Packages
