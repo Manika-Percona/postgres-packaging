@@ -96,16 +96,15 @@ jobs:
 
       - name: Install Packages
         run: |
-          INSTALL_LIST="percona-postgresql${{ env.PG_MAJOR }}"
+          INSTALL_LIST="percona-postgresql-common percona-pgbackrest percona-pg_stat_monitor${{ env.PG_MAJOR }} percona-patroni percona-pgaudit${{ env.PG_MAJOR }}_set_user percona-pgbadger percona-pgbouncer percona-haproxy etcd*"
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
-            yum list available 'percona-postgresql*'
-            yum -y install $INSTALL_LIST
+            yum -y install percona-postgresql${{ env.PG_MAJOR }} percona-pg_repack${{ env.PG_MAJOR }} percona-pgaudit${{ env.PG_MAJOR }} percona-pgpool-II-pg${{ env.PG_MAJOR }} percona-postgis33_${{ env.PG_MAJOR }} percona-wal2json${{ env.PG_MAJOR }} percona-pg_gather percona-pgvector_${{ env.PG_MAJOR }} $INSTALL_LIST
           else
-            apt-get -y install $INSTALL_LIST
+            apt-get -y install percona-postgresql$-{{ env.PG_MAJOR }} percona-postgresql-{{ env.PG_MAJOR }}-repack percona-postgresql-{{ env.PG_MAJOR }}-pgaudit percona-pgpool2 percona-postgis percona-postgresql-{{ env.PG_MAJOR }}-wal2json percona-pg-gather percona-postgresql-{{ env.PG_MAJOR }}-pgvector $INSTALL_LIST
           fi
         shell: bash
 
-      - name: Postgresql Version Check
+      - name: postgresql Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-postgresql)"
@@ -113,6 +112,166 @@ jobs:
             echo "package version = $(dpkg -l | grep percona-postgresql)"
           fi
           echo "binary version = $(psql --version)"
+        shell: bash
+
+      - name: postgresql-common Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-postgresql-common)"
+          else
+            echo "package version = $(dpkg -l | grep percona-postgresql-common)"
+          fi
+          echo "binary version = $(pg_config --version)"
+        shell: bash
+
+      - name: pgbackrest Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgbackrest)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgbackrest)"
+          fi
+          echo "binary version = $(pgbackrest --version)"
+        shell: bash
+
+      - name: pg_stat_monitor Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pg_stat_monitor)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pg_stat_monitor)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pg_stat_monitor';"
+        shell: bash
+
+      - name: pg_repack Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pg_repack)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pg_repack)"
+          fi
+          echo "binary version = $(pg_repack --version)"
+        shell: bash
+
+      - name: pgaudit Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgaudit)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgaudit)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pgaudit';"
+        shell: bash
+
+      - name: patroni Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-patroni)"
+          else
+            echo "package version = $(dpkg -l | grep percona-patroni)"
+          fi
+          echo "binary version = $(patroni --version)"
+        shell: bash
+
+      - name: pgaudit_set_user Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgaudit_set_user)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgaudit_set_user)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pgaudit_set_user';"
+        shell: bash
+
+      - name: pgbadger Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgbadger)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgbadger)"
+          fi
+          echo "binary version = $(pgbadger --version)"
+        shell: bash
+
+      - name: pgbouncer Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgbouncer)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgbouncer)"
+          fi
+          echo "binary version = $(pgbouncer --version)"
+        shell: bash
+
+      - name: pgpool2 Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pgpool)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pgpool)"
+          fi
+          echo "binary version = $(pgpool --version)"
+        shell: bash
+
+      - name: postgis Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-postgis)"
+          else
+            echo "package version = $(dpkg -l | grep percona-postgis)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'postgis';"
+        shell: bash
+
+      - name: wal2json Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-wal2json)"
+          else
+            echo "package version = $(dpkg -l | grep percona-wal2json)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'wal2json';"
+        shell: bash
+
+      - name: haproxy Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-haproxy)"
+          else
+            echo "package version = $(dpkg -l | grep percona-haproxy)"
+          fi
+          echo "binary version = $(haproxy -v)"
+        shell: bash
+
+      - name: etcd Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-etcd)"
+          else
+            echo "package version = $(dpkg -l | grep percona-etcd)"
+          fi
+          echo "binary version = $(etcd --version)"
+        shell: bash
+
+      - name: pg_gather Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pg_gather)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pg-gather)"
+          fi
+          echo "binary version = $(pg_gather --version)"
+        shell: bash
+
+      - name: pg_vector Version Check
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            echo "package version = $(rpm -qa | grep percona-pg_vector)"
+          else
+            echo "package version = $(dpkg -l | grep percona-pg-vector)"
+          fi
+          psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pg_vector';"
         shell: bash
 
       - name: enable tmate debugging
