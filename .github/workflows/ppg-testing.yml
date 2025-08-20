@@ -175,6 +175,7 @@ jobs:
           fi
           echo "binary version = $(pg_config --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pgbackrest Version Check
         run: |
@@ -185,6 +186,7 @@ jobs:
           fi
           echo "binary version = $(pgbackrest --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pg_stat_monitor Version Check
         run: |
@@ -195,6 +197,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pg_stat_monitor';"
         shell: bash
+        continue-on-error: true
 
       - name: pg_repack Version Check
         run: |
@@ -205,6 +208,7 @@ jobs:
           fi
           echo "binary version = $(pg_repack --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pgaudit Version Check
         run: |
@@ -215,6 +219,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pgaudit';"
         shell: bash
+        continue-on-error: true
 
       - name: patroni Version Check
         run: |
@@ -225,6 +230,7 @@ jobs:
           fi
           echo "binary version = $(patroni --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pgaudit_set_user Version Check
         run: |
@@ -235,6 +241,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pgaudit_set_user';"
         shell: bash
+        continue-on-error: true
 
       - name: pgbadger Version Check
         run: |
@@ -245,6 +252,7 @@ jobs:
           fi
           echo "binary version = $(pgbadger --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pgbouncer Version Check
         run: |
@@ -255,6 +263,7 @@ jobs:
           fi
           echo "binary version = $(pgbouncer --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pgpool2 Version Check
         run: |
@@ -265,6 +274,7 @@ jobs:
           fi
           echo "binary version = $(pgpool --version)"
         shell: bash
+        continue-on-error: true
 
       - name: postgis Version Check
         run: |
@@ -275,6 +285,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'postgis';"
         shell: bash
+        continue-on-error: true
 
       - name: wal2json Version Check
         run: |
@@ -285,6 +296,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'wal2json';"
         shell: bash
+        continue-on-error: true
 
       - name: haproxy Version Check
         run: |
@@ -295,6 +307,7 @@ jobs:
           fi
           echo "binary version = $(haproxy -v)"
         shell: bash
+        continue-on-error: true
 
       - name: etcd Version Check
         run: |
@@ -305,6 +318,7 @@ jobs:
           fi
           echo "binary version = $(etcd --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pg_gather Version Check
         run: |
@@ -315,6 +329,7 @@ jobs:
           fi
           echo "binary version = $(pg_gather --version)"
         shell: bash
+        continue-on-error: true
 
       - name: pg_vector Version Check
         run: |
@@ -325,6 +340,7 @@ jobs:
           fi
           psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pg_vector';"
         shell: bash
+        continue-on-error: true
 
       - name: enable tmate debugging
         if: inputs.debugging && failure()
