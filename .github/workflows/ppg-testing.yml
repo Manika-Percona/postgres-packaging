@@ -139,7 +139,7 @@ jobs:
           REPACK="percona-postgresql-${{ env.PG_MAJOR }}-repack percona-postgresql-${{ env.PG_MAJOR }}-repack-dbgsym"
           PATRONI="percona-patroni percona-patroni-doc"
           PGSM="percona-pg-stat-monitor${{ env.PG_MAJOR }} percona-pg-stat-monitor${{ env.PG_MAJOR }}-dbgsym"
-          BADGER="percona-pgbadger"
+          PGBADGER="percona-pgbadger"
           PGBOUNCER="percona-pgbouncer percona-pgbouncer-dbgsym"
           PGPOOL="percona-pgpool2 libpgpool2"
           POSTGIS="percona-postgresql-${{ env.PG_MAJOR }}-postgis-3 percona-postgresql-${{ env.PG_MAJOR }}-postgis-3-scripts percona-postgresql-postgis-scripts percona-postgresql-postgis percona-postgis"
@@ -172,6 +172,7 @@ jobs:
           echo "binary version = $(psql --version)"
         shell: bash
 
+      # not verified
       - name: postgresql-common Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -195,6 +196,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: pg_stat_monitor Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -218,6 +220,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: pgaudit Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -241,6 +244,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: pgaudit_set_user Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -253,6 +257,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified, not installed
       - name: pgbadger Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -286,6 +291,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: postgis Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -298,6 +304,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: wal2json Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -332,6 +339,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: pg_gather Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -344,6 +352,7 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      # not verified
       - name: pg_vector Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
