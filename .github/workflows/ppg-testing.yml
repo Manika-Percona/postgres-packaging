@@ -86,6 +86,9 @@ jobs:
             else
               yum -y install epel-release
             fi
+            if [[ ${{ env.OS_VER }} == 8 ]]; then
+              dnf -y module disable postgresql
+            fi
           fi
         shell: bash
 
