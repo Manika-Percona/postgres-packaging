@@ -288,15 +288,14 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: wal2json Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-wal2json)"
-            rpm -qi percona-wal2json${{ env.PG_MAJOR }}
+            rpm -qi percona-wal2json${{ env.PG_MAJOR }} | grep ^Version
           else
             echo "package version = $(dpkg -l | grep percona-wal2json)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json
+            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json | grep ^Version
           fi
         shell: bash
         continue-on-error: true
