@@ -157,7 +157,7 @@ jobs:
         shell: bash
 
       - name: List extensions control files
-        run: ls -lrt /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/
+        run: ls -lrt /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/*.control
 
       - name: postgresql Version Check
         run: |
