@@ -166,7 +166,6 @@ jobs:
           echo "binary version = $(psql --version)"
         shell: bash
 
-      # not verified
       - name: postgresql-common Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -289,15 +288,15 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified, require server start
+      # not verified
       - name: wal2json Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-wal2json)"
-            rpm -qi percona-wal2json*
+            rpm -qi percona-wal2json${{ env.PG_MAJOR }}
           else
             echo "package version = $(dpkg -l | grep percona-wal2json)"
-            apt-cache policy percona-postgresql-*-wal2json
+            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json
           fi
         shell: bash
         continue-on-error: true
@@ -324,7 +323,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pg_gather Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
