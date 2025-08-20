@@ -156,9 +156,6 @@ jobs:
           fi
         shell: bash
 
-      - name: List extensions control files
-        run: ls -lrt /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/*.control
-
       - name: postgresql Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -236,7 +233,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pgaudit_set_user Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -244,11 +240,10 @@ jobs:
           else
             echo "package version = $(dpkg -l | grep set_user)"
           fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control #| grep 'version'
+          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control | grep 'version'
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pgbadger Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -279,7 +274,7 @@ jobs:
           else
             echo "package version = $(dpkg -l | grep percona-pgpool)"
           fi
-          echo "binary version = $(pgpool -V)"
+          pgpool --version
         shell: bash
         continue-on-error: true
 
@@ -333,7 +328,7 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg_gather)"
-            rpm -ql percona-pg-gather | grep bin
+            rpm -ql percona-pg_gather | grep bin
           else
             echo "package version = $(dpkg -l | grep percona-pg-gather)"
           fi
