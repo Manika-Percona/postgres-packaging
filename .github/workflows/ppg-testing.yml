@@ -209,7 +209,7 @@ jobs:
             cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_stat_monitor.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-pg-stat-monitor${{ env.PG_MAJOR }} | grep ^Version)"
-            apt-cache policy percona-pg-stat-monitor${{ env.PG_MAJOR }} | grep ^Installed
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/pg_stat_monitor.control | grep 'version'
           fi 
         shell: bash
         continue-on-error: true
@@ -233,7 +233,7 @@ jobs:
             cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pgaudit.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-pgaudit | grep ^Version)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-pgaudit | grep ^Installed
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/pgaudit.control | grep 'version'
           fi
         shell: bash
         continue-on-error: true
@@ -257,7 +257,7 @@ jobs:
             cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-pgaudit${{ env.PG_MAJOR }}-set-user | grep ^Version)"
-            apt-cache policy percona-pgaudit${{ env.PG_MAJOR }}-set-user | grep ^Installed
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/set_user.control | grep 'version'
           fi
         shell: bash
         continue-on-error: true
@@ -304,7 +304,7 @@ jobs:
             cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/postgis.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-postgis-3 | grep ^Version)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-postgis-3 | grep ^Installed
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/postgis-3.control | grep 'version'
           fi
         shell: bash
         continue-on-error: true
@@ -365,7 +365,7 @@ jobs:
             cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/vector.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-pgvector | grep ^Version)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-pgvector | grep ^Installed
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/vector.control | grep 'version'
           fi
         shell: bash
         continue-on-error: true
