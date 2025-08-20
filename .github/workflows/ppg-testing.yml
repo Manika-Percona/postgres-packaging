@@ -128,7 +128,7 @@ jobs:
           HAPROXY="percona-haproxy"
           echo "INSTALL_LIST="$PG $PG_COMMON $PPG_SERVER $AUDIT $PGBACKREST $REPACK $PATRONI $PGSM $PGBADGER $PGBOUNCER $PGPOOL $POSTGIS $WAL2JSON $PGGATHER $PGVECTOR $ETCD $HAPROXY"" >> $GITHUB_ENV
 
-      - name: Set DEB package names
+      - name: Set DEB install list
         if: ${{ !contains(inputs.platform, 'linux') }}
         run: | 
           PG="percona-postgresql percona-postgresql-${{ env.PG_MAJOR }} percona-postgresql-all percona-postgresql-contrib percona-postgresql-doc percona-postgresql-doc-${{ env.PG_MAJOR }} percona-postgresql-plperl-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-pltcl-${{ env.PG_MAJOR }} percona-postgresql-server-dev-${{ env.PG_MAJOR }} percona-postgresql-server-dev-all percona-postgresql-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plperl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-pltcl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym"
@@ -167,7 +167,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-postgresql)"
           else
-            echo "package version = $(dpkg -l | grep percona-postgresql)"
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }} | grep ^Version)"
           fi
           echo "binary version = $(psql --version)"
         shell: bash
@@ -178,8 +178,8 @@ jobs:
             echo "package version = $(rpm -qa | grep percona-postgresql-common)"
             rpm -qi percona-postgresql-common | grep ^Version
           else
-            echo "package version = $(dpkg -l | grep percona-postgresql-common)"
-            apt-cache policy percona-postgresql-common  | grep ^Version
+            echo "package version = $(dpkg -s percona-postgresql-common  | grep ^Version)"
+            apt-cache policy percona-postgresql-common  #| grep ^Version
           fi
         shell: bash
         continue-on-error: true
