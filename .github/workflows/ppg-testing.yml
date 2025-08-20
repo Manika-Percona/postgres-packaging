@@ -146,7 +146,7 @@ jobs:
           WAL2JSON="percona-postgresql-${{ env.PG_MAJOR }}-wal2json percona-postgresql-${{ env.PG_MAJOR }}-wal2json-dbgsym"
           PGGATHER="percona-pg-gather"
           PGVECTOR="percona-postgresql-${{ env.PG_MAJOR }}-pgvector"
-          ETCD="etcd"" >> $GITHUB_ENV
+          ETCD="etcd"
           HAPROXY="percona-haproxy"
           if [[ ${{ env.OS_VER }} == 12 ]]; then
               ETCD="etcd-server etcd-client"
