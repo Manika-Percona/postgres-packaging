@@ -162,11 +162,6 @@ jobs:
           fi
         shell: bash
 
-      - name: List extensions control files
-        run: |
-          cd /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/
-          ls -lrt *.control
-
       - name: postgresql Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -185,7 +180,7 @@ jobs:
             rpm -qi percona-postgresql-common | grep ^Version
           else
             echo "package version = $(dpkg -s percona-postgresql-common  | grep ^Version)"
-            apt-cache policy percona-postgresql-common | grep ^Installed
+            apt-cache policy percona-postgresql-common #| grep ^Installed
           fi
         shell: bash
         continue-on-error: true
@@ -201,7 +196,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pg_stat_monitor Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -225,7 +219,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pgaudit Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -249,7 +242,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pgaudit_set_user Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -262,7 +254,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified, not installed
       - name: pgbadger Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -296,7 +287,6 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: postgis Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -317,7 +307,7 @@ jobs:
             rpm -qi percona-wal2json${{ env.PG_MAJOR }} | grep ^Version
           else
             echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-wal2json | grep ^Version)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json | grep ^Installed
+            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json #| grep ^Installed
           fi
         shell: bash
         continue-on-error: true
@@ -352,12 +342,11 @@ jobs:
             rpm -qi percona-pg_gather | grep ^Version
           else
             echo "package version = $(dpkg -s percona-pg-gather | grep ^Version)"
-            apt-cache policy percona-pg-gather | grep ^Installed
+            apt-cache policy percona-pg-gather #| grep ^Installed
           fi
         shell: bash
         continue-on-error: true
 
-      # not verified
       - name: pg_vector Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
