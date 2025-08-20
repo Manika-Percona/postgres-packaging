@@ -81,6 +81,7 @@ jobs:
             dnf clean all
             rm -r /var/cache/dnf
             dnf -y upgrade
+            yum -y install python3-virtualenv python3-setuptools libyaml-devel gcc python3-psycopg2
           fi
         shell: bash
 
