@@ -78,6 +78,9 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             dnf config-manager --set-enabled ol${{ env.OS_VER }}_codeready_builder
+            dnf clean all
+            rm -r /var/cache/dnf
+            dnf -y upgrade
           fi
         shell: bash
 
