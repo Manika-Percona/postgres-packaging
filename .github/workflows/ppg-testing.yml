@@ -48,7 +48,7 @@ jobs:
             dnf install -y wget vim ca-certificates gcc gcc-c++ make perl-core
           else
             apt-get update
-            apt-get install -y wget vim lsb-release ca-certificates build-essential perl
+            apt-get install -y wget curl vim lsb-release ca-certificates build-essential perl
           fi
         shell: bash
 
