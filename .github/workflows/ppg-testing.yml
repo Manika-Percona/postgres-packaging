@@ -94,13 +94,59 @@ jobs:
           percona-release enable ${{ inputs.ppg-repo }} testing
         shell: bash
 
+      - name: Set RPM install list
+        if: ${{ contains(inputs.platform, 'linux') }}
+        run: | 
+          PG="percona-postgresql17 percona-postgresql17-contrib percona-postgresql17-debuginfo percona-postgresql17-devel percona-postgresql17-docs percona-postgresql17-libs percona-postgresql17-llvmjit percona-postgresql17-plpython3 percona-postgresql17-plperl percona-postgresql17-pltcl percona-postgresql17-server percona-postgresql17-test percona-postgresql17-contrib-debuginfo percona-postgresql17-debuginfo percona-postgresql17-debugsource percona-postgresql17-devel-debuginfo percona-postgresql17-libs-debuginfo percona-postgresql17-plperl-debuginfo percona-postgresql17-pltcl-debuginfo percona-postgresql17-plpython3-debuginfo percona-postgresql17-server-debuginfo"
+          PG-COMMON="percona-postgresql-common percona-postgresql-client-common"
+          PPG-SERVER="percona-ppg-server17 percona-ppg-server-ha17"
+          AUDIT="percona-pgaudit17 percona-pgaudit17_set_user"
+          PGBACKREST="percona-pgbackrest"
+          REPACK="percona-pg_repack17"
+          PATRONI="percona-patroni"
+          PGSM="percona-pg_stat_monitor17 percona-pg_stat_monitor17-debuginfo"
+          PGBADGER="percona-pgbadger"
+          PGBOUNCER="percona-pgbouncer"
+          PGPOOL="percona-pgpool-II-pg17 percona-pgpool-II-pg17-extensions"
+          POSTGIS="percona-postgis33_17 percona-postgis33_17-client percona-postgis33_17-client-debuginfo percona-postgis33_17-debuginfo percona-postgis33_17-devel percona-postgis33_17-docs percona-postgis33_17-gui percona-postgis33_17-gui-debuginfo percona-postgis33_17-llvmjit percona-postgis33_17-utils"
+          WAL2JSON="percona-wal2json17"
+          PGGATHER="percona-pg_gather"
+          PGVECTOR="percona-pgvector_17 percona-pgvector_17-debuginfo percona-pgvector_17-debugsource percona-pgvector_17-llvmjit"
+          ETCD="etcd python3-etcd"
+          HAPROXY="percona-haproxy"
+          echo "INSTALL_LIST="$PG $PG-COMMON $PPG-SERVER $AUDIT $PGBACKREST $REPACK $PATRONI $PGSM $PGBADGER $PGBOUNCER $PGPOOL $POSTGIS $WAL2JSON $PGGATHER $PGVECTOR $ETCD $HAPROXY"" >> $GITHUB_ENV
+
+      - name: Set DEB package names
+        if: ${{ !contains(inputs.platform, 'linux') }}
+        run: | 
+          PG="percona-postgresql percona-postgresql-17 percona-postgresql-all percona-postgresql-contrib percona-postgresql-doc percona-postgresql-doc-17 percona-postgresql-plperl-17 percona-postgresql-plpython3-17 percona-postgresql-pltcl-17 percona-postgresql-server-dev-17 percona-postgresql-server-dev-all percona-postgresql-17-dbgsym percona-postgresql-plperl-17-dbgsym percona-postgresql-plpython3-17-dbgsym percona-postgresql-pltcl-17-dbgsym percona-postgresql-plpython3-17 percona-postgresql-plpython3-17-dbgsym"
+          PG-COMMON="percona-postgresql-client percona-postgresql-client-17 percona-postgresql-common percona-postgresql-client-17-dbgsym postgresql-client-common postgresql-common"
+          PPG-SERVER="percona-ppg-server-17 percona-ppg-server-ha-17"
+          AUDIT="percona-postgresql-17-pgaudit percona-postgresql-17-pgaudit-dbgsym percona-pgaudit17-set-user percona-pgaudit17-set-user-dbgsym"
+          PGBACKREST="percona-pgbackrest percona-pgbackrest-doc percona-pgbackrest-dbgsym"
+          REPACK="percona-postgresql-17-repack percona-postgresql-17-repack-dbgsym"
+          PATRONI="percona-patroni percona-patroni-doc"
+          PGSM="percona-pg-stat-monitor17 percona-pg-stat-monitor17-dbgsym"
+          BADGER="percona-pgbadger"
+          PGBOUNCER="percona-pgbouncer percona-pgbouncer-dbgsym"
+          PGPOOL="percona-pgpool2 libpgpool2"
+          POSTGIS="percona-postgresql-17-postgis-3 percona-postgresql-17-postgis-3-scripts percona-postgresql-postgis-scripts percona-postgresql-postgis percona-postgis"
+          WAL2JSON="percona-postgresql-17-wal2json percona-postgresql-17-wal2json-dbgsym"
+          PGGATHER="percona-pg-gather"
+          PGVECTOR="percona-postgresql-17-pgvector"
+          ETCD="etcd"" >> $GITHUB_ENV
+          HAPROXY="percona-haproxy"
+          if [[ ${{ env.OS_VER }} == 12 ]]; then
+              ETCD="etcd-server etcd-client"
+          fi
+          echo "INSTALL_LIST="$PG $PG-COMMON $PPG-SERVER $AUDIT $PGBACKREST $REPACK $PATRONI $PGSM $PGBADGER $PGBOUNCER $PGPOOL $POSTGIS $WAL2JSON $PGGATHER $PGVECTOR $ETCD $HAPROXY"" >> $GITHUB_ENV
+
       - name: Install Packages
         run: |
-          INSTALL_LIST="percona-postgresql-common percona-pgbackrest percona-pg_stat_monitor${{ env.PG_MAJOR }} percona-patroni percona-pgaudit${{ env.PG_MAJOR }}_set_user percona-pgbadger percona-pgbouncer percona-haproxy etcd*"
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
-            yum -y install percona-postgresql${{ env.PG_MAJOR }} percona-pg_repack${{ env.PG_MAJOR }} percona-pgaudit${{ env.PG_MAJOR }} percona-pgpool-II-pg${{ env.PG_MAJOR }} percona-postgis33_${{ env.PG_MAJOR }} percona-wal2json${{ env.PG_MAJOR }} percona-pg_gather percona-pgvector_${{ env.PG_MAJOR }} $INSTALL_LIST
+            yum -y install ${{ env.INSTALL_LIST }}
           else
-            apt-get -y install percona-postgresql$-{{ env.PG_MAJOR }} percona-postgresql-{{ env.PG_MAJOR }}-repack percona-postgresql-{{ env.PG_MAJOR }}-pgaudit percona-pgpool2 percona-postgis percona-postgresql-{{ env.PG_MAJOR }}-wal2json percona-pg-gather percona-postgresql-{{ env.PG_MAJOR }}-pgvector $INSTALL_LIST
+            apt-get -y install ${{ env.INSTALL_LIST }}
           fi
         shell: bash
 
