@@ -244,8 +244,7 @@ jobs:
           else
             echo "package version = $(dpkg -l | grep percona-pgaudit_set_user)"
           fi
-          #psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pgaudit_set_user';"
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pgaudit_set_user.control #| grep 'version'
+          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control #| grep 'version'
         shell: bash
         continue-on-error: true
 
@@ -303,7 +302,6 @@ jobs:
           else
             echo "package version = $(dpkg -l | grep percona-wal2json)"
           fi
-          #psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'wal2json';"
           cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/wal2json.control #| grep 'version'
         shell: bash
         continue-on-error: true
@@ -350,8 +348,7 @@ jobs:
           else
             echo "package version = $(dpkg -l | grep percona-pgvector)"
           fi
-          #psql -U postgres -d postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'pg_vector';"
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_vector.control #| grep 'version'
+          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/vector.control #| grep 'version'
         shell: bash
         continue-on-error: true
 
