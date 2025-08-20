@@ -189,7 +189,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgbackrest)"
           else
-            echo "package version = $(dpkg -l | grep percona-pgbackrest)"
+            echo "package version = $(dpkg -s percona-pgbackrest)"
           fi
           echo "binary version = $(pgbackrest --version)"
         shell: bash
@@ -199,10 +199,11 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg_stat_monitor)"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_stat_monitor.control | grep 'version'
           else
-            echo "package version = $(dpkg -l | grep percona-pg_stat_monitor)"
-          fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_stat_monitor.control | grep 'version'
+            echo "package version = $(dpkg -s percona-pg-stat-monitor${{ env.PG_MAJOR }})"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg-stat-monitor.control | grep 'version'
+          fi 
         shell: bash
         continue-on-error: true
 
@@ -211,7 +212,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg_repack)"
           else
-            echo "package version = $(dpkg -l | grep percona-pg_repack)"
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-repack)"
           fi
           echo "binary version = $(pg_repack --version)"
         shell: bash
@@ -221,10 +222,10 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgaudit)"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pgaudit.control | grep 'version'
           else
-            echo "package version = $(dpkg -l | grep percona-pgaudit)"
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-pgaudit)"
           fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pgaudit.control | grep 'version'
         shell: bash
         continue-on-error: true
 
@@ -233,7 +234,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-patroni)"
           else
-            echo "package version = $(dpkg -l | grep percona-patroni)"
+            echo "package version = $(dpkg -s percona-patroni)"
           fi
           echo "binary version = $(patroni --version)"
         shell: bash
@@ -243,10 +244,10 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep set_user)"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control | grep 'version'
           else
-            echo "package version = $(dpkg -l | grep set_user)"
+            echo "package version = $(dpkg -s percona-pgaudit${{ env.PG_MAJOR }}-set-user)"
           fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/set_user.control | grep 'version'
         shell: bash
         continue-on-error: true
 
@@ -255,7 +256,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgbadger)"
           else
-            echo "package version = $(dpkg -l | grep percona-pgbadger)"
+            echo "package version = $(dpkg -s percona-pgbadger)"
           fi
           echo "binary version = $(pgbadger --version)"
         shell: bash
@@ -266,7 +267,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgbouncer)"
           else
-            echo "package version = $(dpkg -l | grep percona-pgbouncer)"
+            echo "package version = $(dpkg -s percona-pgbouncer)"
           fi
           echo "binary version = $(pgbouncer --version)"
         shell: bash
@@ -277,7 +278,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgpool)"
           else
-            echo "package version = $(dpkg -l | grep percona-pgpool)"
+            echo "package version = $(dpkg -s percona-pgpool2)"
           fi
           pgpool --version
         shell: bash
@@ -287,10 +288,10 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-postgis)"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/postgis.control | grep 'version'
           else
-            echo "package version = $(dpkg -l | grep percona-postgis)"
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-postgis-3)"
           fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/postgis.control | grep 'version'
         shell: bash
         continue-on-error: true
 
@@ -300,8 +301,8 @@ jobs:
             echo "package version = $(rpm -qa | grep percona-wal2json)"
             rpm -qi percona-wal2json${{ env.PG_MAJOR }} | grep ^Version
           else
-            echo "package version = $(dpkg -l | grep percona-wal2json)"
-            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json | grep ^Version
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-wal2json)"
+            apt-cache policy percona-postgresql-${{ env.PG_MAJOR }}-wal2json
           fi
         shell: bash
         continue-on-error: true
@@ -311,7 +312,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-haproxy)"
           else
-            echo "package version = $(dpkg -l | grep percona-haproxy)"
+            echo "package version = $(dpkg -s percona-haproxy)"
           fi
           echo "binary version = $(haproxy -v)"
         shell: bash
@@ -322,7 +323,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep etcd)"
           else
-            echo "package version = $(dpkg -l | grep etcd)"
+            echo "package version = $(dpkg -s etcd)"
           fi
           echo "binary version = $(etcd --version)"
         shell: bash
@@ -334,8 +335,8 @@ jobs:
             echo "package version = $(rpm -qa | grep percona-pg_gather)"
             rpm -qi percona-pg_gather | grep ^Version
           else
-            echo "package version = $(dpkg -l | grep percona-pg-gather)"
-            apt-cache policy percona-pg-gather  | grep ^Version
+            echo "package version = $(dpkg -s percona-pg-gather)"
+            apt-cache policy percona-pg-gather
           fi
         shell: bash
         continue-on-error: true
@@ -344,10 +345,10 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pgvector)"
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/vector.control | grep 'version'
           else
-            echo "package version = $(dpkg -l | grep percona-pgvector)"
+            echo "package version = $(dpkg -s percona-postgresql-${{ env.PG_MAJOR }}-pgvector)"
           fi
-          cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/vector.control | grep 'version'
         shell: bash
         continue-on-error: true
 
