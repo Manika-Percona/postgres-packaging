@@ -353,6 +353,11 @@ jobs:
         shell: bash
         continue-on-error: true
 
+      - name: List extensions control files
+        run: |
+          cd /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/
+          ls -lrt *.control
+
       - name: telemetry Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
