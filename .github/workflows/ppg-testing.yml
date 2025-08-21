@@ -194,7 +194,7 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg_stat_monitor)"
-            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_stat_monitor.control | grep 'version'
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/pg_stat_monitor.control #| grep 'version'
           else
             echo "package version = $(dpkg -s percona-pg-stat-monitor${{ env.PG_MAJOR }} | grep ^Version)"
             cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/pg_stat_monitor.control | grep 'version'
@@ -355,7 +355,7 @@ jobs:
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg-telemetry)"
-            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/percona_pg_telemetry.control | grep 'version'
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/percona_pg_telemetry.control #| grep 'version'
           else
             echo "package version = $(dpkg -s percona-pg-telemetry${{ env.PG_MAJOR }} | grep ^Version)"
             cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/percona_pg_telemetry.control | grep 'version'
