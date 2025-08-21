@@ -76,6 +76,7 @@ jobs:
 
       - name: Enable required repositories
         run: |
+          set -x
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             dnf config-manager --set-enabled ol${{ env.OS_VER }}_codeready_builder
             dnf clean all
@@ -88,6 +89,7 @@ jobs:
             fi
             if [[ ${{ env.OS_VER }} -eq 8 ]]; then
               dnf -y module disable postgresql
+              dnf config-manager --set-enabled codeready-builder-for-rhel-${{ env.OS_VER }}-rhui-rpms
             fi
           fi
         shell: bash
