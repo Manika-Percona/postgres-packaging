@@ -89,7 +89,9 @@ jobs:
             fi
             if [[ ${{ env.OS_VER }} -eq 8 ]]; then
               dnf -y module disable postgresql
-              dnf config-manager --set-enabled codeready-builder-for-rhel-${{ env.OS_VER }}-rhui-rpms
+              yum install dnf-plugins-core
+              dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+              #dnf config-manager --set-enabled codeready-builder-for-rhel-${{ env.OS_VER }}-rhui-rpms
             fi
           fi
         shell: bash
