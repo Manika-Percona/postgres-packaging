@@ -355,7 +355,7 @@ jobs:
 
       - name: List extensions control files
         run: |
-          cd /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/
+          cd /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/
           ls -lrt *.control
 
       - name: telemetry Version Check
