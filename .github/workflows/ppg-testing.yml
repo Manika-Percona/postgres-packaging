@@ -82,16 +82,11 @@ jobs:
             dnf clean all
             rm -r /var/cache/dnf
             dnf -y upgrade
-            if [[ ${{ env.OS_VER }} -eq 10 ]]; then
-              yum install oracle-epel-release-el${{ env.OS_VER }}
-            else
-              yum -y install epel-release
-            fi
             if [[ ${{ env.OS_VER }} -eq 8 ]]; then
               dnf -y module disable postgresql
-              yum install dnf-plugins-core
               dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-              #dnf config-manager --set-enabled codeready-builder-for-rhel-${{ env.OS_VER }}-rhui-rpms
+            else
+              yum install oracle-epel-release-el${{ env.OS_VER }}
             fi
           fi
         shell: bash
@@ -356,19 +351,14 @@ jobs:
         shell: bash
         continue-on-error: true
 
-      - name: List extensions control files
-        run: |
-          cd /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/
-          ls -lrt *.control
-
       - name: telemetry Version Check
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             echo "package version = $(rpm -qa | grep percona-pg-telemetry)"
-            rpm -qi percona-pg-telemetry | grep ^Version
+            cat /usr/pgsql-${{ env.PG_MAJOR }}/share/extension/percona_pg_telemetry.control | grep 'version'
           else
             echo "package version = $(dpkg -s percona-pg-telemetry${{ env.PG_MAJOR }} | grep ^Version)"
-            apt-cache policy percona-pg-telemetry${{ env.PG_MAJOR }} | grep -E '^\s*Installed:'
+            cat /usr/share/postgresql/${{ env.PG_MAJOR }}/extension/percona_pg_telemetry.control | grep 'version'
           fi
         shell: bash
         continue-on-error: true
