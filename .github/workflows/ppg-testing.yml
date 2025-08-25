@@ -147,7 +147,10 @@ jobs:
           ETCD="etcd"
           HAPROXY="percona-haproxy"
           echo "INSTALL_LIST="$PG $PG_COMMON $PPG_SERVER $AUDIT $PGBACKREST $REPACK $PATRONI $PGSM $PGBADGER $PGBOUNCER $PGPOOL $POSTGIS $WAL2JSON $PGGATHER $PGVECTOR $ETCD $HAPROXY"" >> $GITHUB_ENV
-
+          
+      - name: Debug code
+        run: dnf repoquery --whatprovides 'percona-postgresql16-server = 16.10-1.el10'
+        
       - name: Install Packages
         run: |
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
