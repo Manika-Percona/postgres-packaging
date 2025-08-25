@@ -150,6 +150,8 @@ jobs:
           
       - name: Debug code
         run: | 
+          dnf clean all
+          dnf makecache
           dnf repoquery --whatprovides 'percona-postgresql16-server = 16.10-1.el10'
           dnf repoquery -i percona-postgresql16-llvmjit
           dnf repoquery -i percona-postgresql16-server
