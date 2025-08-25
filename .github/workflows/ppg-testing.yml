@@ -148,11 +148,11 @@ jobs:
           HAPROXY="percona-haproxy"
           echo "INSTALL_LIST="$PG $PG_COMMON $PPG_SERVER $AUDIT $PGBACKREST $REPACK $PATRONI $PGSM $PGBADGER $PGBOUNCER $PGPOOL $POSTGIS $WAL2JSON $PGGATHER $PGVECTOR $ETCD $HAPROXY"" >> $GITHUB_ENV
           
-      - name: Debug code
-        run: | 
-          yum -y install percona-postgresql16-server
-          rpm -qa | grep percona-postgresql16-server
-          yum info percona-postgresql16-server percona-postgresql16-llvmjit
+      #- name: Debug code
+      #  run: | 
+      #    yum -y install percona-postgresql16-server
+      #    rpm -qa | grep percona-postgresql16-server
+      #    yum info percona-postgresql16-server percona-postgresql16-llvmjit
         
       - name: Install Packages
         run: |
