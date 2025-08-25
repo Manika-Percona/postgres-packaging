@@ -151,6 +151,8 @@ jobs:
       - name: Debug code
         run: | 
           yum -y install percona-postgresql16-server
+          rpm -qa | grep percona-postgresql16-server
+          yum info percona-postgresql16-server percona-postgresql16-llvmjit
         
       - name: Install Packages
         run: |
