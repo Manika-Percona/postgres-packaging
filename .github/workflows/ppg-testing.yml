@@ -159,6 +159,7 @@ jobs:
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
             yum -y install ${{ env.INSTALL_LIST }}
           else
+            apt-get update
             DEBIAN_FRONTEND=noninteractive apt-get -y install ${{ env.INSTALL_LIST }}
           fi
         shell: bash
