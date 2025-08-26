@@ -16,44 +16,53 @@ on:
           - ppg-13.22
 
 jobs:
-  test-docker-image:
+  test-amd-image:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Pull Percona PostgreSQL 15.14 image
+      - name: Get PG major version
         run: |
-          docker pull percona/percona-postgresql:15.14
+          PG_MAJOR=$(echo "${{ inputs.ppg-repo }}" | cut -d'-' -f2 | cut -d'.' -f1)
+          echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Pull PostgreSQL AMD image
+        run: |
+          docker pull perconalab/percona-distribution-postgresql:15.14-1-amd64
 
       - name: Run container in background
         run: |
-          docker run -d --name ppg15-test \
-            -e POSTGRES_PASSWORD=secret \
-            percona/percona-postgresql:15.14
+          docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d percona/percona-distribution-postgresql:15.14
 
       - name: Wait for PostgreSQL to start
         run: sleep 15
 
       - name: Check PostgreSQL version
         run: |
-          docker exec ppg15-test psql -U postgres -c "SELECT version();"
+          docker exec ppg-test psql -U postgres -c "SELECT version();"
 
       - name: Verify required packages and versions
         run: |
           REQUIRED_PACKAGES=(
-            postgresql15
-            postgresql15-contrib
-            postgresql15-server
-            postgresql15-libs
-            postgresql15-devel
+            percona-postgresql${{ env.PG_MAJOR }}
+            percona-postgresql${{ env.PG_MAJOR }}-contrib
+            percona-postgresql${{ env.PG_MAJOR }}-server
+            percona-postgresql${{ env.PG_MAJOR }}-libs
+            percona-postgresql-common
+            percona-postgresql-client-common
+            percona-pg_stat_monitor${{ env.PG_MAJOR }}
+            percona-pg_repack${{ env.PG_MAJOR }}
+            percona-pgaudit${{ env.PG_MAJOR }}
+            percona-pgaudit${{ env.PG_MAJOR }}_set_user
+            percona-pgbackrest
+            percona-pgvector_${{ env.PG_MAJOR }}
+            percona-wal2json${{ env.PG_MAJOR }}
           )
 
           echo "Checking required packages..."
           for pkg in "${REQUIRED_PACKAGES[@]}"; do
             echo "----- $pkg -----"
-            docker exec ppg15-test rpm -q $pkg || echo "$pkg not installed!"
+            docker exec ppg-test rpm -q $pkg || echo "$pkg not installed!"
           done
 
       - name: Stop container
