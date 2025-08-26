@@ -1,0 +1,62 @@
+name: PG Docker Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      ppg-repo:
+        description: ppg repo to be tested
+        required: true
+        default: ppg-15.14
+        type: choice
+        options:
+          - ppg-17.6
+          - ppg-16.10
+          - ppg-15.14
+          - ppg-14.19
+          - ppg-13.22
+
+jobs:
+  test-docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull Percona PostgreSQL 15.14 image
+        run: |
+          docker pull percona/percona-postgresql:15.14
+
+      - name: Run container in background
+        run: |
+          docker run -d --name ppg15-test \
+            -e POSTGRES_PASSWORD=secret \
+            percona/percona-postgresql:15.14
+
+      - name: Wait for PostgreSQL to start
+        run: sleep 15
+
+      - name: Check PostgreSQL version
+        run: |
+          docker exec ppg15-test psql -U postgres -c "SELECT version();"
+
+      - name: Verify required packages and versions
+        run: |
+          REQUIRED_PACKAGES=(
+            postgresql15
+            postgresql15-contrib
+            postgresql15-server
+            postgresql15-libs
+            postgresql15-devel
+          )
+
+          echo "Checking required packages..."
+          for pkg in "${REQUIRED_PACKAGES[@]}"; do
+            echo "----- $pkg -----"
+            docker exec ppg15-test rpm -q $pkg || echo "$pkg not installed!"
+          done
+
+      - name: Stop container
+        run: |
+          docker stop ppg15-test
+          docker rm ppg15-test
