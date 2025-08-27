@@ -59,6 +59,9 @@ jobs:
             echo "Container is not running!" && exit 1
           fi
 
+      - name: Check container logs
+        run: docker logs ppg-test
+
       - name: Check PostgreSQL version
         run: |
           docker exec ppg-test psql -U postgres -c "SELECT version();"
