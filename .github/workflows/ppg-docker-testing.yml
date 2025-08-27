@@ -55,8 +55,8 @@ jobs:
         run: |
           docker run --platform linux/arm64 --name ppg-test -e POSTGRES_PASSWORD=secret -d perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
-      - name: Wait for PostgreSQL to start
-        run: sleep 15
+      #- name: Wait for PostgreSQL to start
+      #  run: sleep 15
         
       - name: Verify container is running
         run: |
@@ -89,7 +89,6 @@ jobs:
 
           echo "Checking required packages..."
           for pkg in "${REQUIRED_PACKAGES[@]}"; do
-            echo
             echo "----- $pkg -----"
             docker exec ppg-test rpm -qi $pkg | grep ^Version || echo "$pkg not installed!"
           done
