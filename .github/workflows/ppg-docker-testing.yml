@@ -3,17 +3,26 @@ name: PG Docker Testing
 on:
   workflow_dispatch:
     inputs:
-      ppg-repo:
-        description: ppg repo to be tested
+      pg-version:
+        description: pg version for docker image
         required: true
-        default: ppg-15.14
+        default: 15.14
         type: choice
         options:
-          - ppg-17.6
-          - ppg-16.10
-          - ppg-15.14
-          - ppg-14.19
-          - ppg-13.22
+          - 17.6
+          - 16.10
+          - 15.14
+          - 14.19
+          - 13.22
+
+      arch:
+        description: architecture
+        required: true
+        default: amd64
+        type: choice
+        options:
+          - amd64
+          - arm64
 
 jobs:
   test-amd-image:
@@ -22,17 +31,17 @@ jobs:
     steps:
       - name: Get PG major version
         run: |
-          PG_MAJOR=$(echo "${{ inputs.ppg-repo }}" | cut -d'-' -f2 | cut -d'.' -f1)
+          PG_MAJOR=$(echo "${{ inputs.pg-version }}" | cut -d'.' -f1)
           echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
         shell: bash
 
       - name: Pull PostgreSQL AMD image
         run: |
-          docker pull perconalab/percona-distribution-postgresql:15.14-1-amd64
+          docker pull perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
       - name: Run container in background
         run: |
-          docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d percona/percona-distribution-postgresql:15.14
+          docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d percona/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
       - name: Wait for PostgreSQL to start
         run: sleep 15
@@ -67,5 +76,5 @@ jobs:
 
       - name: Stop container
         run: |
-          docker stop ppg15-test
-          docker rm ppg15-test
+          docker stop ppg-test
+          docker rm ppg-test
