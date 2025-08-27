@@ -89,7 +89,7 @@ jobs:
 
           echo "Checking required packages..."
           for pkg in "${REQUIRED_PACKAGES[@]}"; do
-            echo "/n----- $pkg -----"
+            echo -e "\n----- $pkg -----"
             docker exec ppg-test rpm -qi $pkg | grep ^Version || echo "$pkg not installed!"
           done
 
