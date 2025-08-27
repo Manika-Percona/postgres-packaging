@@ -39,16 +39,16 @@ jobs:
         run: |
           docker pull perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
-      - name: Prep for AMD container
-        if: ${{ contains(inputs.arch, 'amd64') }}
-        run: |
-          docker run --rm --privileged tonistiigi/binfmt --install all
-          docker run --rm --platform linux/arm64 alpine uname -m
-
       - name: Run AMD container
         if: ${{ contains(inputs.arch, 'amd64') }}
         run: |
           docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
+
+      - name: Prep for ARM container
+        if: ${{ contains(inputs.arch, 'arm64') }}
+        run: |
+          docker run --rm --privileged tonistiigi/binfmt --install all
+          docker run --rm --platform linux/arm64 alpine uname -m
 
       - name: Run ARM container
         if: ${{ contains(inputs.arch, 'arm64') }}
