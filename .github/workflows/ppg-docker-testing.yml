@@ -35,9 +35,15 @@ jobs:
           echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
         shell: bash
 
-      - name: Pull PostgreSQL image
+      - name: Pull Percona-PostgreSQL image
         run: |
           docker pull perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
+
+      - name: Prep for AMD container
+        if: ${{ contains(inputs.arch, 'amd64') }}
+        run: |
+          docker run --rm --privileged tonistiigi/binfmt --install all
+          docker run --rm --platform linux/arm64 alpine uname -m
 
       - name: Run AMD container
         if: ${{ contains(inputs.arch, 'amd64') }}
