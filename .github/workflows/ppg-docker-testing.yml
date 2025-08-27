@@ -39,9 +39,22 @@ jobs:
         run: |
           docker pull perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
-      - name: Run container in background
+      - name: Run AMD container
+        if: ${{ contains(inputs.arch, 'amd64') }}
         run: |
           docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
+
+      - name: Run ARM container
+        if: ${{ contains(inputs.arch, 'arm64') }}
+        run: |
+          docker run --platform linux/arm64 --name ppg-test -e POSTGRES_PASSWORD=secret -d perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
+
+      - name: Verify container is running
+        run: |
+          docker ps --filter "name=ppg-test" --format "table {{.Names}}\t{{.Status}}"
+          if [ "$(docker inspect -f '{{.State.Running}}' ppg-test)" != "true" ]; then
+            echo "Container is not running!" && exit 1
+          fi
 
       - name: Wait for PostgreSQL to start
         run: sleep 15
@@ -74,7 +87,8 @@ jobs:
             docker exec ppg-test rpm -q $pkg || echo "$pkg not installed!"
           done
 
-      - name: Stop container
+      - name: Clean Up
+        if: always()
         run: |
-          docker stop ppg-test
-          docker rm ppg-test
+          docker stop ppg-test || true
+          docker rm ppg-test || true
