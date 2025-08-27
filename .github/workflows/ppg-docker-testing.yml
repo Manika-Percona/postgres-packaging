@@ -35,7 +35,7 @@ jobs:
           echo "PG_MAJOR="$PG_MAJOR"" >> $GITHUB_ENV
         shell: bash
 
-      - name: Pull PostgreSQL AMD image
+      - name: Pull PostgreSQL image
         run: |
           docker pull perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
