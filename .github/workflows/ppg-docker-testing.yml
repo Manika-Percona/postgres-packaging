@@ -25,7 +25,7 @@ on:
           - arm64
 
 jobs:
-  test-amd-image:
+  test-image:
     runs-on: ubuntu-latest
 
     steps:
