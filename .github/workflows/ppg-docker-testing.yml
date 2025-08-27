@@ -41,7 +41,7 @@ jobs:
 
       - name: Run container in background
         run: |
-          docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d percona/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
+          docker run --name ppg-test -e POSTGRES_PASSWORD=secret -d perconalab/percona-distribution-postgresql:${{ inputs.pg-version }}-1-${{ inputs.arch }}
 
       - name: Wait for PostgreSQL to start
         run: sleep 15
