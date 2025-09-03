@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xe
 # Versions and other variables
-source ../versions.sh
+source ../versions.sh "postgresql"
 # Common functions
 source ../common-functions.sh
 
