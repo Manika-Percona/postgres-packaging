@@ -291,7 +291,7 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PPG_PRODUCT_FULL}-${PG_VERSION}
+    cd ${PPG_PRODUCT}-${PG_MAJOR}-${PG_VERSION}
     dch -m -D "${DEBIAN}" --force-distribution -v "2:${PG_VERSION}-${PG_DEB_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
         cd debian/

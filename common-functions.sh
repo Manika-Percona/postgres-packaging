@@ -77,7 +77,7 @@ check_workdir(){
 }
 
 add_percona_yum_repo(){
-    yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+    yum -y install 
     percona-release disable all
     percona-release enable ppg-${PG_VERSION} testing
     return
