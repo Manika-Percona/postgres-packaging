@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Versions and other variables
-source ./versions.sh
+source ../versions.sh
 
 usage () {
     cat <<EOF

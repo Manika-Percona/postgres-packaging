@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Versions and other variables
-source ./versions.sh
 # Common functions
 source ../common-functions.sh
 
