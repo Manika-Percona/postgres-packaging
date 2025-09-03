@@ -12,6 +12,7 @@ fi
 CURPLACE=$(pwd)
 
 # postgresql
+if [ "$COMPONENT" = "postgresql" ]; then
 if [ "x$OS" = "xrpm" ]; then
   yum -y install wget
   yum clean all
@@ -70,6 +71,7 @@ else
     sleep 1
     echo "waiting"
   done
+fi
 fi
 
 
