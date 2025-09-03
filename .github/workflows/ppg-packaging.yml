@@ -125,29 +125,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-files
-          path: ./${{ inputs.package }}
+          path: ./
 
-      #- name: Rename artifact directory
-      #  run: mv build-files ${{ inputs.package }}
+      - name: Create a working directory
+        run: mkdir ${{ inputs.package }}
+
+      - name: Copy build script in required directories
+        run: |
+          cp pkg-builder.sh ${{ inputs.package }}/
+        shell: bash
 
       - name: Update permissions of the build scripts
         run: |
           chmod 755 ${{ inputs.package }}/*
-          #chmod 755 common-functions.sh
-          #chmod 755 install-deps.sh
-          #chmod 755 versions.sh
+          chmod 755 common-functions.sh
+          chmod 755 install-deps.sh
+          chmod 755 versions.sh
         shell: bash
-
-      #- name: Create a working directory
-      #  run: mkdir ${{ inputs.package }}
-
-      #- name: Copy build scripts in required directories
-      #  run: |
-      #    cp pkg-builder.sh ${{ inputs.package }}/
-      #    cp common-functions.sh ${{ inputs.package }}/
-      #    cp install-deps.sh ${{ inputs.package }}/
-      #    cp versions.sh ${{ inputs.package }}/
-      #  shell: bash
 
       - name: Install dependencies
         if: inputs.install_deps
