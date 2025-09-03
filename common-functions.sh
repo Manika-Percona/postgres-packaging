@@ -77,14 +77,14 @@ check_workdir(){
 }
 
 add_percona_yum_repo(){
-    yum -y install 
+    yum -y install ${YUM_REPO}
     percona-release disable all
     percona-release enable ppg-${PG_VERSION} testing
     return
 }
 
 add_percona_apt_repo(){
-    wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+    wget ${APT_REPO}
     dpkg -i percona-release_latest.generic_all.deb
     rm -f percona-release_latest.generic_all.deb
     percona-release disable all

@@ -54,8 +54,8 @@ get_sources(){
             mv $file "percona-$file"
         done
 	rm -f rules control
-        wget $PG_RULES_FILE
-        wget $PG_CONTROL_FILE
+        wget ${PKG_RAW_URL}/postgres/rules
+        wget ${PKG_RAW_URL}/postgres/control
         sed -i "s/postgresql-$PG_MAJOR/percona-postgresql-$PG_MAJOR/" percona-postgresql-$PG_MAJOR.templates
 	echo "10" > compat
 	sed -i 's:focal-arm64-outline-atomics::' patches/series
@@ -66,8 +66,8 @@ get_sources(){
     rm -rf pgrpms
     cd rpm
         rm postgresql-$PG_MAJOR.spec
-        wget $PG_SPEC_FILE
-	wget $LLVM_PATCH_FILE
+        wget ${PKG_RAW_URL}/postgres/percona-postgresql-${PG_VERSION}.spec
+	wget ${PKG_RAW_URL}/postgres/llvm_static_linking.patch
     cd ../
     cd ${WORKDIR}
     #
@@ -129,7 +129,7 @@ build_srpm(){
     #
     cp -av rpm/* rpmbuild/SOURCES
     cd rpmbuild/SOURCES
-    wget --no-check-certificate https://www.postgresql.org/files/documentation/pdf/15/postgresql-15-A4.pdf
+    wget --no-check-certificate "${PG_DOC}"
     cd ../../
     cp -av rpmbuild/SOURCES/percona-postgresql-15.spec rpmbuild/SPECS
     #
@@ -138,7 +138,7 @@ build_srpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    wget https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh
+    wget "${TELEMETRY_AGENT}"
     mv call-home.sh rpmbuild/SOURCES
     cd ${WORKDIR}/rpmbuild/SPECS
     line_number=$(grep -n SOURCE999 percona-postgresql-15.spec | awk -F ':' '{print $1}')
@@ -295,7 +295,7 @@ build_deb(){
     dch -m -D "${DEBIAN}" --force-distribution -v "2:${PG_VERSION}-${PG_DEB_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
         cd debian/
-        wget https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh
+        wget "${TELEMETRY_AGENT}"
         sed -i 's:exit 0::' percona-postgresql-15.postinst
         echo "cat <<'CALLHOME' > /tmp/call-home.sh" >> percona-postgresql-15.postinst
         cat call-home.sh >> percona-postgresql-15.postinst

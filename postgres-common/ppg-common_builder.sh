@@ -52,14 +52,14 @@ get_sources(){
                 mv $file $newname; 
         done
             rm -rf rules control supported-versions 
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/control
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/maintscripts-functions.patch
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/percona-postgresql-common.templates.patch
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/rules
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/supported-versions
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/postgresql-common.install
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/refs/heads/${PG_VERSION}/postgres-common/percona-postgresql-common-dev.install
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/refs/heads/${PG_VERSION}/postgres-common/percona-postgresql-server-dev-all.install
+        wget ${PKG_RAW_URL}/postgres-common/control
+        wget ${PKG_RAW_URL}/postgres-common/maintscripts-functions.patch
+        wget ${PKG_RAW_URL}/postgres-common/percona-postgresql-common.templates.patch
+        wget ${PKG_RAW_URL}/postgres-common/rules
+        wget ${PKG_RAW_URL}/postgres-common/supported-versions
+        wget ${PKG_RAW_URL}/postgres-common/postgresql-common.install
+        wget ${PKG_RAW_URL}/postgres-common/percona-postgresql-common-dev.install
+        wget ${PKG_RAW_URL}/postgres-common/percona-postgresql-server-dev-all.install
         cp postgresql-common.tmpfiles postgresql-common.conf
         sudo chmod +x supported-versions
         patch -p0 < maintscripts-functions.patch
@@ -84,14 +84,14 @@ get_sources(){
         echo "dh_make_pgxs/dh_make_pgxs.1" >> percona-postgresql-server-dev-all.manpages
         echo "debhelper/dh_pgxs_test.1" >> percona-postgresql-server-dev-all.manpages
     cd ../
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/pgcommon.sh
+    wget ${PKG_RAW_URL}/postgres-common/pgcommon.sh
     sudo chmod +x pgcommon.sh
     cd rpm
         for file in $(ls | grep postgresql); do
             mv $file "percona-$file"
         done
         rm -rf percona-postgresql-common.spec
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/percona-postgresql-common.spec
+        wget ${PKG_RAW_URL}/postgres-common/percona-postgresql-common.spec
         if [ ${ARCH} = "aarch64" ]; then
             sed -e '4d' percona-postgresql-common.spec
         fi

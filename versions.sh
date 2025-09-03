@@ -12,6 +12,7 @@ PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PG_V
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
+APT_REPO="https://repo.percona.com/apt/percona-release_latest.generic_all.deb"
 
 
 
@@ -20,7 +21,7 @@ YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
 # versions
 PPG_PRODUCT=percona-postgresql
 PG_MAJOR=15
-PG_MINOR=13
+PG_MINOR=14
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
 PG_SRC_BRANCH="REL_${PG_MAJOR}_${PG_MINOR}"
@@ -28,12 +29,10 @@ PG_RPM_RELEASE='1'
 PG_DEB_RELEASE='1'
 
 # urls
-PG_RULES_FILE="$PKG_RAW_URL/postgres/rules"
-PG_CONTROL_FILE="$PKG_RAW_URL/postgres/control"
-PG_SPEC_FILE="$PKG_RAW_URL/postgres/percona-postgresql-${PG_VERSION}.spec"
-LLVM_PATCH_FILE="$PKG_RAW_URL/postgres/llvm_static_linking.patch"
 PG_SRC_REPO="https://git.postgresql.org/git/postgresql.git"
 PG_SRC_REPO_DEB="https://salsa.debian.org/postgresql/postgresql.git"
+PG_DOC="https://www.postgresql.org/files/documentation/pdf/${PG_MAJOR}/postgresql-${PG_MAJOR}-A4.pdf"
+TELEMETRY_AGENT="https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh"
 
 
 #-------------------------------------- postgresql-common --------------------------------------
@@ -42,9 +41,9 @@ PG_SRC_REPO_DEB="https://salsa.debian.org/postgresql/postgresql.git"
 PPG_COMMON_PRODUCT=percona-postgresql-common
 PPG_COMMON_MAJOR=280
 PPG_COMMON_MINOR='1'
-PPG_COMMON_PRODUCT_FULL=${PPG_COMMON_PRODUCT}-${PPG_COMMON_VERSION}
+PPG_COMMON_PRODUCT_FULL=${PPG_COMMON_PRODUCT}-${PPG_COMMON_MAJOR}
 PPG_COMMON_SRC_REPO="https://salsa.debian.org/postgresql/postgresql-common.git"
-PPG_COMMON_SRC_BRANCH="debian/${PPG_COMMON_VERSION}"
+PPG_COMMON_SRC_BRANCH="debian/${PPG_COMMON_MAJOR}"
 PPG_COMMON_RPM_RELEASE='1'
 PPG_COMMON_DEB_RELEASE='1'
 
