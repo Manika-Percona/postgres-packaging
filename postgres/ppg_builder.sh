@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -xe
 # Versions and other variables
 source ../versions.sh
 # Common functions
