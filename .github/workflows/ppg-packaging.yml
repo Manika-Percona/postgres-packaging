@@ -125,7 +125,7 @@ jobs:
           path: ./
 
       - name: Rename artifact directory
-        run: mv pkg ${{ inputs.package }}
+        run: mv build-files ${{ inputs.package }}
 
       - name: Update permissions of the build scripts
         run: |
