@@ -143,13 +143,13 @@ jobs:
       - name: Install dependencies
         if: inputs.install_deps
         run: |
+          set -xe
           cd ${{ inputs.package }}
           mkdir test
           if [[ "${{ inputs.package }}" = "llvm" ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 ${{ inputs.additional_options }}
           else
-            #./pkg-builder.sh --builddir=$(pwd)/test --branch=${{ inputs.branch }} --install_deps=1 ${{ inputs.additional_options }}
-            ../install-deps.sh "postgresql"
+            ./pkg-builder.sh --builddir=$(pwd)/test --branch=${{ inputs.branch }} --install_deps=1 ${{ inputs.additional_options }}
           fi
         shell: bash
 

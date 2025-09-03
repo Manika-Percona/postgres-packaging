@@ -4,8 +4,6 @@
 source ../versions.sh
 # Common functions
 source ../common-functions.sh
-# Dependencies
-#source ../install-deps.sh
 
 get_sources(){
     cd "${WORKDIR}"
