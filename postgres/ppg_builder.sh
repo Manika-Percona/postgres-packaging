@@ -64,7 +64,7 @@ get_sources(){
     rm -rf pgrpms
     cd rpm
         rm postgresql-$PG_MAJOR.spec
-        wget ${PKG_RAW_URL}/postgres/percona-postgresql-${PG_VERSION}.spec
+        wget ${PKG_RAW_URL}/postgres/percona-postgresql-${PG_MAJOR}.spec
 	wget ${PKG_RAW_URL}/postgres/llvm_static_linking.patch
     cd ../
     cd ${WORKDIR}
