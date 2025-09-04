@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Versions and other variables
-source ../versions.sh
+source ../versions.sh "postgresql-common"
 # Common functions
 source ../common-functions.sh
 
