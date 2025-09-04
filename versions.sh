@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
+PG_MAJOR=15
+PG_MINOR=14
+PG_VERSION=${PG_MAJOR}.${PG_MINOR}
+
 case "$1" in
     postgresql)
         # versions
         PPG_PRODUCT=percona-postgresql
-        PG_MAJOR=15
-        PG_MINOR=14
-        PG_VERSION=${PG_MAJOR}.${PG_MINOR}
         PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
         PG_SRC_BRANCH="REL_${PG_MAJOR}_${PG_MINOR}"
         PG_RPM_RELEASE='1'
@@ -293,7 +294,7 @@ case "$1" in
     ;;
 esac
 
-#-------------------------------------- COMMON VARIABLES --------------------------------------
+#-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
 PKG_GIT_REPO="https://github.com/percona/postgres-packaging.git"
