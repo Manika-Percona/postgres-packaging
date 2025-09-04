@@ -349,7 +349,6 @@ get_system
 #install_deps
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
-    return;
 else
     source ../install-deps.sh "postgresql"
 fi
