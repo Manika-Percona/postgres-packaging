@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -xe
 
-# Versions and other variables
-#source ../versions.sh
-
 usage () {
     cat <<EOF
 Usage: $0 [OPTIONS]

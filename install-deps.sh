@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Common functions
-source ../common-functions.sh
-
 COMPONENT=$1
 
 if [ $( id -u ) -ne 0 ]; then
@@ -76,6 +73,7 @@ fi
 
 
 # postgresql-common
+if [ "$COMPONENT" = "postgresql-common" ]; then
     if [ "x$OS" = "xrpm" ]; then
       yum -y install wget
       yum clean all
@@ -100,3 +98,4 @@ fi
         echo "waiting"
       done
     fi
+fi
