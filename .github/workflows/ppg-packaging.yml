@@ -66,6 +66,10 @@ on:
         description: additional build options if any
         required: false
 
+      postgres-run:
+        description: run number for postgres artifact
+        required: false
+
       debugging:
         description: tmate session required
         default: false
@@ -139,6 +143,12 @@ jobs:
           chmod 755 install-deps.sh
           chmod 755 versions.sh
         shell: bash
+
+      - name: Download and install postgres rpms from previous run artifact
+        if: ${{ inputs.package != 'postgres') }}
+        run: |
+          gh run download ${{ inputs.postgres-run }} -n postgres-rpm-archive -D ./postgres-rpms
+          dnf install -y postgres-rpms/*.rpm
 
       - name: Install dependencies
         if: inputs.install_deps
