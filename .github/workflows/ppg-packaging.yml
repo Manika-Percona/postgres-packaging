@@ -120,13 +120,7 @@ jobs:
       - name: Install build tools
         run: |
           yum install -y gcc make tar rpm-build rpmdevtools git
-          dnf install -y dnf-plugins-core
-          dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-          dnf install -y gh
           echo "Ready to build!"
-
-      - name: Authenticate GH CLI
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       - name: Get build script artifact
         uses: actions/download-artifact@v4
@@ -150,15 +144,12 @@ jobs:
           chmod 755 versions.sh
         shell: bash
 
-      - name: Checkout repo (needed for gh to work)
-        if: ${{ inputs.package != 'postgres' }}
-        uses: actions/checkout@v4
-
       - name: Download and install postgres rpms from previous run artifact
         if: ${{ inputs.package != 'postgres' }}
         run: |
-          gh run download ${{ inputs.postgres-run }} -n postgres-rpm-archive -D ./postgres-rpms
-          dnf install -y postgres-rpms/*.rpm
+          yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+          percona-release disable all
+          percona-release enable ppg-15.14 testing
 
       - name: Install dependencies
         if: inputs.install_deps

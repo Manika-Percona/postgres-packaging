@@ -4,8 +4,6 @@
 source ../versions.sh
 # Common functions
 source ../common-functions.sh
-# Dependencies
-source ../install-deps.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -337,9 +335,8 @@ get_system
 #install_deps
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
-    return;
 else
-    ../install-deps.sh "postgresql-common"
+    source ../install-deps.sh "postgresql-common"
 fi
 get_sources
 build_srpm
