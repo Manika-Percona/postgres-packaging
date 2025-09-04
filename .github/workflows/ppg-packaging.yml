@@ -119,7 +119,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          yum install -y gcc make tar rpm-build rpmdevtools git
+          yum install -y gcc make tar rpm-build rpmdevtools git gh
           echo "Ready to build!"
 
       - name: Get build script artifact
