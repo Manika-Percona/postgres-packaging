@@ -145,7 +145,7 @@ jobs:
         shell: bash
 
       - name: Download and install postgres rpms from previous run artifact
-        if: ${{ inputs.package != 'postgres') }}
+        if: ${{ inputs.package != 'postgres' }}
         run: |
           gh run download ${{ inputs.postgres-run }} -n postgres-rpm-archive -D ./postgres-rpms
           dnf install -y postgres-rpms/*.rpm
