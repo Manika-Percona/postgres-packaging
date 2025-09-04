@@ -140,7 +140,7 @@ jobs:
           chmod 755 versions.sh
         shell: bash
 
-      - name: Download and install postgres rpms from previous run artifact
+      - name: Enable ppg repo
         if: ${{ inputs.package != 'postgres' }}
         run: |
           yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
