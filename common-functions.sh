@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -xe
 
+shell_quote_string() {
+  echo "$1" | sed -e 's,\([^a-zA-Z0-9/_.=-]\),\\\1,g'
+}
+
 usage () {
     cat <<EOF
 Usage: $0 [OPTIONS]
@@ -18,10 +22,6 @@ Usage: $0 [OPTIONS]
 Example $0 --builddir=/tmp/BUILD --get_sources=1 --build_src_rpm=1 --build_rpm=1
 EOF
         exit 1
-}
-
-shell_quote_string() {
-  echo "$1" | sed -e 's,\([^a-zA-Z0-9/_.=-]\),\\\1,g'
 }
 
 append_arg_to_args () {
@@ -72,6 +72,11 @@ check_workdir(){
         fi
     fi
     return
+}
+
+switch_to_vault_repo() {
+    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
 }
 
 add_percona_yum_repo(){
