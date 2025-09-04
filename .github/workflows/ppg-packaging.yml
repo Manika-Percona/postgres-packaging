@@ -150,6 +150,10 @@ jobs:
           chmod 755 versions.sh
         shell: bash
 
+      - name: Checkout repo (needed for gh to work)
+        if: ${{ inputs.package != 'postgres' }}
+        uses: actions/checkout@v4
+
       - name: Download and install postgres rpms from previous run artifact
         if: ${{ inputs.package != 'postgres' }}
         run: |
