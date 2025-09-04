@@ -66,10 +66,6 @@ on:
         description: additional build options if any
         required: false
 
-      postgres-run:
-        description: run number for postgres artifact
-        required: false
-
       debugging:
         description: tmate session required
         default: false
