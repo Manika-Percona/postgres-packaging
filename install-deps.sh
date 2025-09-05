@@ -150,6 +150,6 @@ if [ "$COMPONENT" = "ydiff" ]; then
 fi
 
 # wal2json
-if [ "$COMPONENT" = "wal2json" ]; then
+#if [ "$COMPONENT" = "wal2json" ]; then
 
-fi
+#fi
