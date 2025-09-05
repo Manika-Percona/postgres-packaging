@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 
 COMPONENT=$1
 
