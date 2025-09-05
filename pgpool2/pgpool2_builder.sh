@@ -1,93 +1,9 @@
 #!/usr/bin/env bash
-
-shell_quote_string() {
-  echo "$1" | sed -e 's,\([^a-zA-Z0-9/_.=-]\),\\\1,g'
-}
-
-usage () {
-    cat <<EOF
-Usage: $0 [OPTIONS]
-    The following options may be given :
-        --builddir=DIR      Absolute path to the dir where all actions will be performed
-        --get_sources       Source will be downloaded from github
-        --build_src_rpm     If it is 1 src rpm will be built
-        --build_source_deb  If it is 1 source deb package will be built
-        --build_rpm         If it is 1 rpm will be built
-        --build_deb         If it is 1 deb will be built
-        --build_tarball     If it is 1 tarball will be built
-        --install_deps      Install build dependencies(root previlages are required)
-        --branch            Branch for build
-        --repo              Repo for build
-        --pp_branch         Branch for postgres-packaging repo
-        --pp_repo           Used postgres-packaging repo for build
-        --rpm_release       RPM version( default = 1)
-        --deb_release       DEB version( default = 1)
-        --pg_release        PPG version build on( default = 11)
-        --version           product version
-        --help) usage ;;
-Example $0 --builddir=/tmp/test --get_sources=1 --build_src_rpm=1 --build_rpm=1
-EOF
-        exit 1
-}
-
-append_arg_to_args () {
-  args="$args "$(shell_quote_string "$1")
-}
-
-parse_arguments() {
-    pick_args=
-    if test "$1" = PICK-ARGS-FROM-ARGV
-    then
-        pick_args=1
-        shift
-    fi
-
-    for arg do
-        val=$(echo "$arg" | sed -e 's;^--[^=]*=;;')
-        case "$arg" in
-            # these get passed explicitly to mysqld
-            --builddir=*) WORKDIR="$val" ;;
-            --build_src_rpm=*) SRPM="$val" ;;
-            --build_source_deb=*) SDEB="$val" ;;
-            --build_rpm=*) RPM="$val" ;;
-            --build_deb=*) DEB="$val" ;;
-            --get_sources=*) SOURCE="$val" ;;
-            --build_tarball=*) TARBALL="$val" ;;
-            --install_deps=*) INSTALL="$val" ;;
-            --branch=*) BRANCH="$val" ;;
-            --repo=*) REPO="$val" ;;
-            --pp_branch=*) BUILD_BRANCH="$val" ;;
-            --pp_repo=*) GIT_BUILD_REPO="$val" ;;
-            --rpm_release=*) RPM_RELEASE="$val" ;;
-            --deb_release=*) DEB_RELEASE="$val" ;;
-            --pg_release=*) PG_RELEASE="$val" ;;
-            --version=*) VERSION="$val" ;;
-            --help) usage ;;
-            *)
-              if test -n "$pick_args"
-              then
-                  append_arg_to_args "$arg"
-              fi
-              ;;
-        esac
-    done
-}
-
-check_workdir(){
-    if [ "x$WORKDIR" = "x$CURDIR" ]
-    then
-        echo >&2 "Current directory cannot be used for building!"
-        exit 1
-    else
-        if ! test -d "$WORKDIR"
-        then
-            echo >&2 "$WORKDIR is not a directory."
-            exit 1
-        fi
-    fi
-    return
-}
-
+set -xe
+# Versions and other variables
+source ../versions.sh "pgpool2"
+# Common functions
+source ../common-functions.sh
 
 set_changelog(){
     if [ -z $1 ]
@@ -244,22 +160,6 @@ EOT
     return
 }
 
-get_system(){
-    if [ -f /etc/redhat-release ]; then
-        GLIBC_VER_TMP="$(rpm glibc -qa --qf %{VERSION})"
-        export RHEL=$(rpm --eval %rhel)
-        export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-        export OS_NAME="el$RHEL"
-        export OS="rpm"
-    else
-        GLIBC_VER_TMP="$(dpkg-query -W -f='${Version}' libc6 | awk -F'-' '{print $1}')"
-        export ARCH=$(uname -m)
-        export OS_NAME="$(lsb_release -sc)"
-        export OS="deb"
-    fi
-    return
-}
-
 get_openjade_devel() {
     pushd /tmp
     apt-get update
@@ -279,131 +179,6 @@ get_openjade_devel() {
     fi
     sudo apt -y --allow-downgrades install ./openjade_1.4devel1-22_${ARCH}.deb ./libostyle-dev_1.4devel1-22_${ARCH}.deb ./libostyle1c2_1.4devel1-22_${ARCH}.deb
     popd
-}
-
-install_deps() {
-    if [ $INSTALL = 0 ]
-    then
-        echo "Dependencies will not be installed"
-        return;
-    fi
-    if [ $( id -u ) -ne 0 ]
-    then
-        echo "It is not possible to instal dependencies. Please run as root"
-        exit 1
-    fi
-    CURPLACE=$(pwd)
-    if [ "$OS" == "rpm" ]
-    then
-        if [[ "${RHEL}" -eq 10 ]]; then
-            yum install oracle-epel-release-el10
-            dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-        else
-            yum -y install epel-release
-        fi
-        yum -y install wget
-        yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-        percona-release enable ppg-${PG_RELEASE} testing
-        yum -y install git libtool bison flex byacc
-
-        PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_VER}-devel"
-        PKGLIST+=" git rpmdevtools vim wget"
-        PKGLIST+=" perl binutils gcc gcc-c++"
-        PKGLIST+=" git rpmdevtools wget gcc make autoconf"
-        PKGLIST+=" jade pam-devel openssl-devel docbook-dtds docbook-style-xsl openldap-devel docbook-style-dsssl libmemcached-devel libxslt"
-        
-	if [[ "${RHEL}" -eq 8 ]]; then
-            dnf config-manager --set-enabled powertools
-            dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-        fi
-        if [ $RHEL -eq 9 ]; then
-	   dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-            sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/oracle-linux-ol9.repo
-        fi	
-	if [[ "${RHEL}" -eq 8 ]]; then 
-            dnf -y module disable postgresql
-        elif [[ "${RHEL}" -eq 7 ]]; then
-            PKGLIST+=" llvm-toolset-7-clang llvm-toolset-7 llvm5.0-devel llvm-toolset-7-llvm-devel"
-            until yum -y install epel-release centos-release-scl; do
-                yum clean all
-                sleep 1
-                echo "waiting"
-            done
-            until yum -y makecache; do
-                yum clean all
-                sleep 1
-                echo "waiting"
-            done
-        fi
-        until yum -y install ${PKGLIST}; do
-            echo "waiting"
-            sleep 5
-        done
-    else
-        apt-get update
-        DEBIAN_FRONTEND=noninteractive apt-get -y install lsb-release gnupg git wget curl
-
-        wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
-        dpkg -i percona-release_latest.generic_all.deb
-        rm -f percona-release_latest.generic_all.deb
-        percona-release enable ppg-${PG_RELEASE} testing
-
-        PKGLIST="percona-postgresql-${PG_VER} percona-postgresql-common percona-postgresql-server-dev-all"
-
-        # ---- using a community version of postgresql
-        # wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        # echo "deb http://apt.postgresql.org/pub/repos/apt/ ${PG_RELEASE}"-pgdg main | sudo tee  /etc/apt/sources.list.d/pgdg.list
-        # PKGLIST="postgresql-${PG_RELEASE} postgresql-common postgresql-server-dev-all"
-
-        apt-get update
-
-        if [[ "${OS_NAME}" != "focal" ]]; then
-            LLVM_EXISTS=$(grep -c "apt.llvm.org" /etc/apt/sources.list)
-            if [ "${LLVM_EXISTS}" == 0 ]; then
-                wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-                echo "deb http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
-                echo "deb-src http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
-                apt-get update
-            fi
-        fi
-
-        PKGLIST+=" debconf devscripts dh-exec git wget libkrb5-dev libssl-dev"
-        PKGLIST+=" build-essential debconf debhelper devscripts dh-exec libxml-checker-perl"
-      # PKGLIST+=" libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev"
-        PKGLIST+=" chrpath docbook docbook-dsssl docbook-xml docbook-xsl flex libmemcached-dev libxml2-utils openjade opensp xsltproc"
-        PKGLIST+=" bison libldap-dev libpam0g-dev"
-
-        until DEBIAN_FRONTEND=noninteractive apt-get -y install ${PKGLIST}; do
-            sleep 5
-            echo "waiting"
-        done
-
-        cat /etc/apt/sources.list | grep ${OS_NAME}-backports
-        apt list --all-versions debhelper
-        apt-get -y install -t ${OS_NAME}-backports debhelper
-
-        get_openjade_devel
-    fi
-    return;
-}
-
-get_tar(){
-    TARBALL=$1
-    TARFILE=$(basename $(find $WORKDIR/$TARBALL -name 'percona-pgpool-II*.tar.gz' | sort | tail -n1))
-    if [ -z $TARFILE ]
-    then
-        TARFILE=$(basename $(find $CURDIR/$TARBALL -name 'percona-pgpool-II*.tar.gz' | sort | tail -n1))
-        if [ -z $TARFILE ]
-        then
-            echo "There is no $TARBALL for build"
-            exit 1
-        else
-            cp $CURDIR/$TARBALL/$TARFILE $WORKDIR/$TARFILE
-        fi
-    else
-        cp $WORKDIR/$TARBALL/$TARFILE $WORKDIR/$TARFILE
-    fi
-    return
 }
 
 get_deb_sources(){
@@ -438,7 +213,7 @@ build_srpm(){
         exit 1
     fi
     cd $WORKDIR
-    get_tar "source_tarball"
+    get_tar "source_tarball" "percona-pgpool-II"
     rm -fr rpmbuild
     ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'percona-pgpool-II*.tar.gz' | sort | tail -n1)
@@ -534,7 +309,7 @@ build_source_deb(){
         exit 1
     fi
     rm -rf percona-pgpool2*
-    get_tar "source_tarball"
+    get_tar "source_tarball" "percona-pgpool-II"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
     TARFILE=$(basename $(find . -name 'percona-pgpool-II*.tar.gz' | sort | tail -n1))
@@ -635,8 +410,13 @@ BUILD_BRANCH=${PG_RELEASE}
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
 PG_VER=$(echo ${PG_RELEASE} | awk -F'.' '{print $1}')
 check_workdir
-get_system
-install_deps
+get_system "pgpool2"
+#install_deps
+if [ $INSTALL = 0 ]; then
+    echo "Dependencies will not be installed"
+else
+    source ../install-deps.sh "pgpool2"
+fi
 get_sources
 build_srpm
 build_source_deb

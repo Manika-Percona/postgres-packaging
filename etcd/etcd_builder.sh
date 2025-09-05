@@ -1,95 +1,9 @@
 #!/usr/bin/env bash
-
-shell_quote_string() {
-  echo "$1" | sed -e 's,\([^a-zA-Z0-9/_.=-]\),\\\1,g'
-}
-
-usage () {
-    cat <<EOF
-Usage: $0 [OPTIONS]
-    The following options may be given :
-        --builddir=DIR      Absolute path to the dir where all actions will be performed
-        --get_sources       Source will be downloaded from github
-        --build_src_rpm     If it is set - src rpm will be built
-        --build_src_deb  If it is set - source deb package will be built
-        --build_rpm         If it is set - rpm will be built
-        --build_deb         If it is set - deb will be built
-        --etcd_version      etcd version
-        --install_deps      Install build dependencies(root privilages are required)
-        --pg_version        Packaging branch version
-        --repo              Repo for build
-        --help) usage ;;
-Example $0 --builddir=/tmp/BUILD --get_sources=1 --build_src_rpm=1 --build_rpm=1
-EOF
-        exit 1
-}
-
-append_arg_to_args () {
-  args="$args "$(shell_quote_string "$1")
-}
-
-parse_arguments() {
-    pick_args=
-    if test "$1" = PICK-ARGS-FROM-ARGV
-    then
-        pick_args=1
-        shift
-    fi
-
-    for arg do
-        val=$(echo "$arg" | sed -e 's;^--[^=]*=;;')
-        case "$arg" in
-            --builddir=*) WORKDIR="$val" ;;
-            --build_src_rpm=*) SRPM="$val" ;;
-            --build_src_deb=*) SDEB="$val" ;;
-            --build_rpm=*) RPM="$val" ;;
-            --build_deb=*) DEB="$val" ;;
-            --etcd_version=*) VERSION="$val" ;;
-            --get_sources=*) SOURCE="$val" ;;
-            --pg_version=*) PG_VERSION="$val" ;;
-            --repo=*) REPO="$val" ;;
-            --install_deps=*) INSTALL="$val" ;;
-            --help) usage ;;
-            *)
-              if test -n "$pick_args"
-              then
-                  append_arg_to_args "$arg"
-              fi
-              ;;
-        esac
-    done
-}
-
-check_workdir(){
-    if [ "x$WORKDIR" = "x$CURDIR" ]
-    then
-        echo >&2 "Current directory cannot be used for building!"
-        exit 1
-    else
-        if ! test -d "$WORKDIR"
-        then
-            echo >&2 "$WORKDIR is not a directory."
-            exit 1
-        fi
-    fi
-    return
-}
-
-add_percona_yum_repo(){
-    yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-    percona-release disable all
-    percona-release enable ppg-${PG_VERSION} testing
-    return
-}
-
-add_percona_apt_repo(){
-    wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
-    dpkg -i percona-release_latest.generic_all.deb
-    rm -f percona-release_latest.generic_all.deb
-    percona-release disable all
-    percona-release enable ppg-${PG_VERSION} testing
-    return
-}
+set -xe
+# Versions and other variables
+source ../versions.sh "etcd"
+# Common functions
+source ../common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -168,83 +82,6 @@ get_sources(){
     return
 }
 
-get_system(){
-    if [ -f /etc/redhat-release ]; then
-        RHEL=$(rpm --eval %rhel)
-        ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-        OS_NAME="el$RHEL"
-        OS="rpm"
-    else
-        ARCH=$(uname -m)
-        OS_NAME="$(lsb_release -sc)"
-        OS="deb"
-    fi
-    return
-}
-
-install_deps() {
-    if [ $INSTALL = 0 ]; then
-        echo "Dependencies will not be installed"
-        return;
-    fi
-    if [ $( id -u ) -ne 0 ]; then
-        echo "It is not possible to instal dependencies. Please run as root"
-        exit 1
-    fi
-    CURPLACE=$(pwd)
-
-    if [ "x$OS" = "xrpm" ]; then
-      RHEL=$(rpm --eval %rhel)
-      #add_percona_yum_repo
-      yum clean all
-      if [[ "${RHEL}" -eq 10 ]]; then
-        yum install oracle-epel-release-el10
-      else
-        yum -y install epel-release
-      fi
-      if [ ${RHEL} -gt 7 ]; then
-          #dnf -y module disable postgresql
-          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-          dnf clean all
-          rm -r /var/cache/dnf
-          dnf -y upgrade
-      fi
-      INSTALL_LIST="git vim wget go-toolset rpmdevtools python3-devel"
-      yum -y install ${INSTALL_LIST}
-
-    else
-      apt-get update || true
-      export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-      apt-get -y install lsb-release wget curl gnupg2
-      export DEBIAN=$(lsb_release -sc)
-      add_percona_apt_repo
-      apt-get update || true
-      INSTALL_LIST="git vim wget rpm dpkg-dev build-essential ccache cron debconf debhelper devscripts dh-exec curl dh-golang fakeroot golang-go"
-      DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
-    fi
-    return;
-}
-
-get_tar(){
-    TARBALL=$1
-    TARFILE=$(basename $(find $WORKDIR/$TARBALL -name 'etcd*.tar.gz' | sort | tail -n1))
-
-    if [ -z $TARFILE ]
-    then
-        TARFILE=$(basename $(find $CURDIR/$TARBALL -name 'etcd*.tar.gz' | sort | tail -n1))
-	if [ -z $TARFILE ]
-        then
-            echo "There is no $TARBALL for build"
-            exit 1
-        else
-            cp $CURDIR/$TARBALL/$TARFILE $WORKDIR/$TARFILE
-        fi
-    else
-        cp $WORKDIR/$TARBALL/$TARFILE $WORKDIR/$TARFILE
-    fi
-    return
-}
-
 get_deb_sources(){
     param=$1
     echo $param
@@ -277,7 +114,7 @@ build_srpm(){
         exit 1
     fi
     cd $WORKDIR
-    get_tar "source_tarball"
+    get_tar "source_tarball" "etcd"
     rm -fr rpmbuild
     #ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'etcd*.tar.gz' | sort | tail -n1)
@@ -366,7 +203,7 @@ build_source_deb(){
         exit 1
     fi
     rm -rf etcd*
-    get_tar "source_tarball"
+    get_tar "source_tarball" "etcd"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
     TARFILE=$(basename $(find . -name 'etcd*.tar.gz' | sort | tail -n1))
@@ -473,7 +310,12 @@ PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
 check_workdir
 get_system
-install_deps
+#install_deps
+if [ $INSTALL = 0 ]; then
+    echo "Dependencies will not be installed"
+else
+    source ../install-deps.sh "etcd"
+fi
 get_sources
 build_srpm
 build_source_deb

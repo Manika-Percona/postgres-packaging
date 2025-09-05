@@ -5,7 +5,7 @@ PG_MINOR=14
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
 case "$1" in
-    postgresql)
+    postgresql) # tested OK
         # versions
         PPG_PRODUCT=percona-postgresql
         PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
@@ -20,7 +20,7 @@ case "$1" in
         TELEMETRY_AGENT="https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh"
     ;;
 
-    postgresql-common)
+    postgresql-common) # tested OK
         # versions
         PPG_COMMON_PRODUCT=percona-postgresql-common
         PPG_COMMON_MAJOR=280
@@ -252,7 +252,7 @@ case "$1" in
     ;;
 
 
-    pysyncobj)
+    pysyncobj) # tested OK
         # versions
         PYSYNCOBJ_PRODUCT=python3-pysyncobj
         PYSYNCOBJ_VERSION=0.3.10
@@ -268,7 +268,7 @@ case "$1" in
     ;;
 
 
-    wal2json)
+    wal2json) # tested OK
         # versions
         WAL2JSON_PRODUCT=percona-wal2json
         WAL2JSON_VERSION=2.6
@@ -284,7 +284,7 @@ case "$1" in
     ;;
 
 
-    ydiff)
+    ydiff) # tested OK
         # versions
         YDIFF_PRODUCT=python3-ydiff
         YDIFF_VERSION=1.2

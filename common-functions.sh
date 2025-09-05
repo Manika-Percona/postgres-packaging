@@ -18,6 +18,7 @@ Usage: $0 [OPTIONS]
         --install_deps      Install build dependencies(root privilages are required)
         --branch            Branch for build
         --repo              Repo for build
+        --version           Packaging repo
         --help) usage ;;
 Example $0 --builddir=/tmp/BUILD --get_sources=1 --build_src_rpm=1 --build_rpm=1
 EOF
@@ -47,7 +48,15 @@ parse_arguments() {
             --get_sources=*) SOURCE="$val" ;;
             --branch=*) BRANCH="$val" ;;
             --repo=*) REPO="$val" ;;
+            --version=*) VERSION=$(echo $val|awk -F'-' '{print $2}') ;;
             --install_deps=*) INSTALL="$val" ;;
+            --postgis_branch=*) POSTGIS_BRANCH="$val" ;;
+            --repo=*) REPO="$val" ;;
+            --postgis_gitrepo=*) POSTGIS_GITREPO="$val" ;;
+            --version=*) VERSION=$(echo $val|awk -F'-' '{print $2}') ;;
+            --postgis_ver=*) POSTGIS_VERSION="$val" ;;
+            --rpm_release=*) RPM_RELEASE="$val" ;;
+            --deb_release=*) DEB_RELEASE="$val" ;;
             --help) usage ;;
             *)
               if test -n "$pick_args"
@@ -96,13 +105,22 @@ add_percona_apt_repo(){
 }
 
 get_system(){
+    COMPONENT=$1
     if [ -f /etc/redhat-release ]; then
+        if [ "$COMPONENT" = "pgpool2" ]; then
+            GLIBC_VER_TMP="$(rpm glibc -qa --qf %{VERSION})"
+        fi
         RHEL=$(rpm --eval %rhel)
         ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
         OS_NAME="el$RHEL"
         OS="rpm"
     else
+        if [ "$COMPONENT" = "pgpool2" ]; then
+            GLIBC_VER_TMP="$(dpkg-query -W -f='${Version}' libc6 | awk -F'-' '{print $1}')"
+        fi
         ARCH=$(uname -m)
+        apt-get -y update
+        apt-get -y install lsb-release
         OS_NAME="$(lsb_release -sc)"
         OS="deb"
     fi
