@@ -13,10 +13,8 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    #PRODUCT=percona-postgresql-common
-    echo "PRODUCT=${PPG_COMMON_PRODUCT}" > percona-postgresql.properties
 
-    #PRODUCT_FULL=${PRODUCT}-${VERSION}
+    echo "PRODUCT=${PPG_COMMON_PRODUCT}" > percona-postgresql.properties
     echo "PRODUCT_FULL=${PPG_COMMON_PRODUCT_FULL}" >> percona-postgresql.properties
     echo "VERSION=${PPG_COMMON_MAJOR}" >> percona-postgresql.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> percona-postgresql.properties
@@ -96,9 +94,8 @@ get_sources(){
         fi
     cd ../
     cd ${WORKDIR}
-    #
+
     source percona-postgresql.properties
-    #
 
     tar --owner=0 --group=0 --exclude=.* -czf ${PPG_COMMON_PRODUCT_FULL}.tar.gz ${PPG_COMMON_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
@@ -149,15 +146,15 @@ build_srpm(){
     ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'percona-postgresql*.tar.gz' | sort | tail -n1)
     SRC_DIR=${TARFILE%.tar.gz}
-    #
+
     mkdir -vp rpmbuild/{SOURCES,SPECS,BUILD,SRPMS,RPMS}
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm' --strip=1
-    #
+
     cp -av rpm/* rpmbuild/SOURCES
     cd rpmbuild/SOURCES
     cd ../../
     cp -av rpmbuild/SOURCES/*.spec rpmbuild/SPECS
-    #
+
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" --define "version ${PPG_COMMON_MAJOR}"\
         rpmbuild/SPECS/percona-postgresql-common.spec
@@ -200,7 +197,7 @@ build_rpm(){
     cp $SRC_RPM rpmbuild/SRPMS/
 
     cd rpmbuild/SRPMS/
-    #
+
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
@@ -230,13 +227,13 @@ build_source_deb(){
     rm -rf percona-postgresql-common*
     rm -f *.dsc *.orig.tar.gz *.tar.* *.changes
     get_tar "source_tarball" "percona-postgresql-common"
-    #
+
     TARFILE=$(basename $(find . -name 'percona-postgresql-common*.tar.gz' | sort | tail -n1))
     DEBIAN=$(lsb_release -sc)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     tar zxf ${TARFILE}
     BUILDDIR=${TARFILE%.tar.gz}
-    #
+
     
     mv ${TARFILE} ${PPG_COMMON_PRODUCT}_${PPG_COMMON_MAJOR}.orig.tar.gz
     cd ${BUILDDIR}
@@ -273,18 +270,18 @@ build_deb(){
     done
     cd $WORKDIR
     rm -fv *.deb
-    #
+
     export DEBIAN=$(lsb_release -sc)
     export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    #
+
     echo "DEBIAN=${DEBIAN}" >> percona-postgresql.properties
     echo "ARCH=${ARCH}" >> percona-postgresql.properties
 
-    #
+
     DSC=$(basename $(find . -name '*.dsc' | sort | tail -n1))
-    #
+
     dpkg-source -x ${DSC}
-    #
+
     cd ${PPG_COMMON_PRODUCT_FULL}
     if [ ${DEBIAN} = "stretch" ]; then
         sed -i 's:12:11:' debian/compat
@@ -317,18 +314,9 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-#RPM_RELEASE=1
-#DEB_RELEASE=1
 REVISION=0
-#BRANCH="debian/280"
-#REPO="https://salsa.debian.org/postgresql/postgresql-common.git"
-#PRODUCT=percona-postgresql
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-#VERSION='280'
-#RELEASE='1'
-#PRODUCT_FULL=${PRODUCT}-${VERSION}
-#PG_VERSION=15.14
 
 check_workdir
 get_system

@@ -12,28 +12,28 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=python3-ydiff
-    echo "PRODUCT=${PRODUCT}" > ydiff.properties
-    GIT_USER=$(echo ${REPO} | awk -F'/' '{print $4}')
+    #PRODUCT=python3-ydiff
+    echo "PRODUCT=${YDIFF_PRODUCT}" > ydiff.properties
+    GIT_USER=$(echo ${YDIFF_SRC_REPO} | awk -F'/' '{print $4}')
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> ydiff.properties
-    echo "VERSION=${VERSION}" >> ydiff.properties
+    #PRODUCT_FULL=${PRODUCT}-${VERSION}
+    echo "PRODUCT_FULL=${YDIFF_PRODUCT_FULL}" >> ydiff.properties
+    echo "VERSION=${YDIFF_VERSION}" >> ydiff.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> ydiff.properties
     echo "BUILD_ID=${BUILD_ID}" >> ydiff.properties
-    git clone "$REPO" ydiff-${VERSION}
+    git clone "$YDIFF_SRC_REPO" ydiff-${YDIFF_VERSION}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ydiff-${VERSION}
-    if [ ! -z "$BRANCH" ]
+    cd ydiff-${YDIFF_VERSION}
+    if [ ! -z "$YDIFF_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$YDIFF_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/ydiff.properties
@@ -61,13 +61,13 @@ get_sources(){
     source ydiff.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ydiff-${VERSION}.tar.gz ydiff-${VERSION}
+    tar --owner=0 --group=0 --exclude=.* -czf ydiff-${YDIFF_VERSION}.tar.gz ydiff-${YDIFF_VERSION}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> ydiff.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${YDIFF_PRODUCT}/${YDIFF_PRODUCT_FULL}/${YDIFF_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> ydiff.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ydiff-${VERSION}.tar.gz $WORKDIR/source_tarball
-    cp ydiff-${VERSION}.tar.gz $CURDIR/source_tarball
+    cp ydiff-${YDIFF_VERSION}.tar.gz $WORKDIR/source_tarball
+    cp ydiff-${YDIFF_VERSION}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf python3-ydiff*
     return
@@ -120,7 +120,7 @@ build_srpm(){
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     sed -i 's:.rhel7:%{dist}:' ${WORKDIR}/rpmbuild/SPECS/ydiff.spec
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/ydiff.spec
+        --define "version ${YDIFF_VERSION}" rpmbuild/SPECS/ydiff.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -164,7 +164,7 @@ build_rpm(){
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    rpmbuild --define "_topdir ${WORKDIR}/rb" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rb/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rb" --define "dist .$OS_NAME" --define "version ${YDIFF_VERSION}" --rebuild rb/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -195,14 +195,14 @@ build_source_deb(){
     DEBIAN=$(lsb_release -sc)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     tar zxf ${TARFILE}
-    rm -f ydiff-${VERSION}/.travis.yml
+    rm -f ydiff-${YDIFF_VERSION}/.travis.yml
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ydiff_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ydiff_${YDIFF_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new ydiff version ${VERSION}"
+    dch -D unstable --force-distribution -v "${YDIFF_VERSION}-${YDIFF_RELEASE}" "Update to new ydiff version ${YDIFF_VERSION}"
     dpkg-buildpackage -S || true
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -246,8 +246,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ydiff-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ydiff-${YDIFF_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${YDIFF_VERSION}-${YDIFF_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb

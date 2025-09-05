@@ -12,10 +12,8 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    #PRODUCT=percona-postgresql
-    echo "PRODUCT=${PPG_PRODUCT}" > percona-postgresql.properties
 
-    #PRODUCT_FULL=${PRODUCT}-${VERSION}.${RELEASE}
+    echo "PRODUCT=${PPG_PRODUCT}" > percona-postgresql.properties
     echo "PRODUCT_FULL=${PPG_PRODUCT_FULL}" >> percona-postgresql.properties
     echo "VERSION=${PSM_VER}" >> percona-postgresql.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> percona-postgresql.properties
@@ -68,9 +66,7 @@ get_sources(){
 	wget ${PKG_RAW_URL}/postgres/llvm_static_linking.patch
     cd ../
     cd ${WORKDIR}
-    #
     source percona-postgresql.properties
-    #
 
     tar --owner=0 --group=0 --exclude=.* -czf ${PPG_PRODUCT_FULL}.tar.gz ${PPG_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
@@ -121,16 +117,16 @@ build_srpm(){
     ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'percona-postgresql*.tar.gz' | sort | tail -n1)
     SRC_DIR=${TARFILE%.tar.gz}
-    #
+
     mkdir -vp rpmbuild/{SOURCES,SPECS,BUILD,SRPMS,RPMS}
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm' --strip=1
-    #
+
     cp -av rpm/* rpmbuild/SOURCES
     cd rpmbuild/SOURCES
     wget --no-check-certificate "${PG_DOC}"
     cd ../../
     cp -av rpmbuild/SOURCES/percona-postgresql-15.spec rpmbuild/SPECS
-    #
+
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     if [ -f /opt/rh/devtoolset-7/enable ]; then
         source /opt/rh/devtoolset-7/enable
@@ -192,7 +188,7 @@ build_rpm(){
     cp $SRC_RPM rpmbuild/SRPMS/
 
     cd rpmbuild/SRPMS/
-    #
+
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
@@ -226,13 +222,13 @@ build_source_deb(){
     rm -rf percona-postgresql*
     get_tar "source_tarball" "percona-postgresql"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
-    #
+
     TARFILE=$(basename $(find . -name 'percona-postgresql*.tar.gz' | sort | tail -n1))
     DEBIAN=$(lsb_release -sc)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     tar zxf ${TARFILE}
     BUILDDIR=${TARFILE%.tar.gz}
-    #
+
     
     mv ${TARFILE} ${PPG_PRODUCT_FULL}_${PG_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
@@ -277,18 +273,18 @@ build_deb(){
     done
     cd $WORKDIR
     rm -fv *.deb
-    #
+
     export DEBIAN=$(lsb_release -sc)
     export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    #
+
     echo "DEBIAN=${DEBIAN}" >> percona-postgresql.properties
     echo "ARCH=${ARCH}" >> percona-postgresql.properties
 
-    #
+
     DSC=$(basename $(find . -name '*.dsc' | sort | tail -n1))
-    #
+
     dpkg-source -x ${DSC}
-    #
+
     cd ${PPG_PRODUCT}-${PG_MAJOR}-${PG_VERSION}
     dch -m -D "${DEBIAN}" --force-distribution -v "2:${PG_VERSION}-${PG_DEB_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
@@ -330,18 +326,9 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-#RPM_RELEASE=1
-#DEB_RELEASE=1
 REVISION=0
-#BRANCH="REL_15_14"
-#REPO="https://git.postgresql.org/git/postgresql.git"
-#PRODUCT=percona-postgresql
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-#VERSION='15'
-#RELEASE='14'
-#PG_VERSION=${VERSION}.${RELEASE}
-#PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
 check_workdir
 get_system
