@@ -260,9 +260,11 @@ case "$1" in
         PYSYNCOBJ_SRC_BRANCH="${PYSYNCOBJ_VERSION}"
         PYSYNCOBJ_RPM_RELEASE='1'
         PYSYNCOBJ_DEB_RELEASE='1'
+        PYSYNCOBJ_RELEASE='2'
 
         # urls
         PYSYNCOBJ_SRC_REPO="https://github.com/bakwc/PySyncObj.git"
+        PYSYNCOBJ_PERCONA_REPO="https://github.com/Percona-Lab/python3-pysyncobj.git"
     ;;
 
 

@@ -201,3 +201,48 @@ if [ "$COMPONENT" = "wal2json" ]; then
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install libpam0g-dev || DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install libpam-dev
     fi
 fi
+
+# pysyncobj
+if [ "$COMPONENT" = "pysyncobj" ]; then
+  if [ "x$OS" = "xrpm" ]; then
+      if [ x"$RHEL" = x8 ]; then
+          switch_to_vault_repo
+      fi
+      yum -y install wget
+      yum clean all
+      if [[ "${RHEL}" -eq 10 ]]; then
+        yum install oracle-epel-release-el10
+      else
+        yum -y install epel-release
+      fi
+      RHEL=$(rpm --eval %rhel)
+      if [ ${RHEL} = 7 ]; then
+          INSTALL_LIST="git rpm-build python3-devel rpmdevtools rpmlint"
+          yum -y install ${INSTALL_LIST}
+      else
+          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+          dnf clean all
+          rm -r /var/cache/dnf
+          dnf -y upgrade
+          INSTALL_LIST="git rpm-build python3-devel python3-setuptools rpmdevtools rpmlint"
+          yum -y install ${INSTALL_LIST}
+      fi
+    else
+      apt-get update || true
+      apt-get -y install lsb-release wget curl gnupg2
+      export DEBIAN=$(lsb_release -sc)
+      export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
+      until apt-get -y install gnupg2; do
+          sleep 3
+	  echo "WAITING"
+      done
+      apt-get update || true
+
+      if [ "x${DEBIAN}" != "xfocal" ]; then
+        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools python3-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      else
+        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python2-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      fi
+      DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
+    fi
+fi
