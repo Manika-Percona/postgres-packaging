@@ -12,11 +12,9 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    #PRODUCT=python3-ydiff
+
     echo "PRODUCT=${YDIFF_PRODUCT}" > ydiff.properties
     GIT_USER=$(echo ${YDIFF_SRC_REPO} | awk -F'/' '{print $4}')
-
-    #PRODUCT_FULL=${PRODUCT}-${VERSION}
     echo "PRODUCT_FULL=${YDIFF_PRODUCT_FULL}" >> ydiff.properties
     echo "VERSION=${YDIFF_VERSION}" >> ydiff.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> ydiff.properties
@@ -40,26 +38,26 @@ get_sources(){
     rm -fr debian rpm
     mkdir -p debian/source
     cd debian
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/changelog
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/compat
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/copyright
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/docs
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/watch
+    wget ${PKG_RAW_URL}/ydiff/debian/rules
+    wget ${PKG_RAW_URL}/ydiff/debian/changelog
+    wget ${PKG_RAW_URL}/ydiff/debian/compat
+    wget ${PKG_RAW_URL}/ydiff/debian/control
+    wget ${PKG_RAW_URL}/ydiff/debian/copyright
+    wget ${PKG_RAW_URL}/ydiff/debian/docs
+    wget ${PKG_RAW_URL}/ydiff/debian/watch
     cd source
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/debian/source/format
+    wget ${PKG_RAW_URL}/ydiff/debian/source/format
     cd ../../
 
     export DEBIAN=$(lsb_release -sc)
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ydiff/rpm/ydiff.spec
+    wget ${PKG_RAW_URL}/ydiff/rpm/ydiff.spec
     cd ../
     cd ${WORKDIR}
-    #
+
     source ydiff.properties
-    #
+
 
     tar --owner=0 --group=0 --exclude=.* -czf ydiff-${YDIFF_VERSION}.tar.gz ydiff-${YDIFF_VERSION}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
@@ -110,13 +108,13 @@ build_srpm(){
     ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'ydiff*.tar.gz' | sort | tail -n1)
     SRC_DIR=${TARFILE%.tar.gz}
-    #
+
     mkdir -vp rpmbuild/{SOURCES,SPECS,BUILD,SRPMS,RPMS}
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm' --strip=1
-    #
+
     cp -av rpm/* rpmbuild/SOURCES
     cp -av rpm/ydiff.spec rpmbuild/SPECS
-    #
+
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     sed -i 's:.rhel7:%{dist}:' ${WORKDIR}/rpmbuild/SPECS/ydiff.spec
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
@@ -160,7 +158,7 @@ build_rpm(){
     cp $SRC_RPM rb/SRPMS/
 
     cd rb/SRPMS/
-    #
+
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
@@ -190,14 +188,14 @@ build_source_deb(){
     rm -rf python3-ydiff*
     get_tar "source_tarball" "ydiff"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
-    #
+
     TARFILE=$(basename $(find . -name 'ydiff*.tar.gz' | sort | tail -n1))
     DEBIAN=$(lsb_release -sc)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     tar zxf ${TARFILE}
     rm -f ydiff-${YDIFF_VERSION}/.travis.yml
     BUILDDIR=${TARFILE%.tar.gz}
-    #
+
     
     mv ${TARFILE} ydiff_${YDIFF_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
@@ -234,18 +232,18 @@ build_deb(){
     done
     cd $WORKDIR
     rm -fv *.deb
-    #
+
     export DEBIAN=$(lsb_release -sc)
     export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    #
+
     echo "DEBIAN=${DEBIAN}" >> ydiff.properties
     echo "ARCH=${ARCH}" >> ydiff.properties
 
-    #
+
     DSC=$(basename $(find . -name '*.dsc' | sort | tail -n1))
-    #
+
     dpkg-source -x ${DSC}
-    #
+
     cd ydiff-${YDIFF_VERSION}
     dch -m -D "${DEBIAN}" --force-distribution -v "1:${YDIFF_VERSION}-${YDIFF_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
@@ -274,19 +272,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-#RPM_RELEASE=1
-#DEB_RELEASE=1
 REVISION=0
-#BRANCH="1.2"
-#REPO="https://github.com/ymattw/ydiff.git"
-#PRODUCT=python3-ydiff
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-#VERSION='1.2'
-#RELEASE='2'
-#PG_VERSION=15.14
-#PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-#PG_MAJOR_VERSION=$(echo ${PG_VERSION} | cut -f1 -d'.')
+
 
 check_workdir
 get_system

@@ -150,6 +150,54 @@ if [ "$COMPONENT" = "ydiff" ]; then
 fi
 
 # wal2json
-#if [ "$COMPONENT" = "wal2json" ]; then
+if [ "$COMPONENT" = "wal2json" ]; then
+  if [ "x$OS" = "xrpm" ]; then
+      RHEL=$(rpm --eval %rhel)
+      if [ x"$RHEL" = x8 ]; then
+          switch_to_vault_repo
+      fi
+      yum -y install wget
+      add_percona_yum_repo
+      yum clean all
+      if [[ "${RHEL}" -eq 10 ]]; then
+        yum install oracle-epel-release-el10
+      else
+        yum -y install epel-release
+      fi
+      if [ ${RHEL} -gt 7 ]; then
+          dnf -y module disable postgresql
+          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+          dnf clean all
+          rm -r /var/cache/dnf
+          dnf -y upgrade
+	  switch_to_vault_repo
 
-#fi
+          yum -y install clang-devel clang llvm-devel perl lz4-libs c-ares-devel
+      else
+        until yum -y install centos-release-scl; do
+            echo "waiting"
+            sleep 1
+        done
+        yum -y install llvm-toolset-7-clang llvm5.0-devtoolset
+        source /opt/rh/devtoolset-7/enable
+        source /opt/rh/llvm-toolset-7/enable
+      fi
+      INSTALL_LIST="pandoc libtool libevent-devel python3-psycopg2 openssl-devel pam-devel percona-postgresql15-devel git rpmdevtools systemd systemd-devel wget libxml2-devel perl perl-DBD-Pg perl-Digest-SHA perl-IO-Socket-SSL perl-JSON-PP zlib-devel gcc make autoconf perl-ExtUtils-Embed"
+      yum -y install ${INSTALL_LIST}
+      yum -y install lz4 || true
+
+    else
+      export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
+      apt-get update || true
+      apt-get -y install lsb-release wget gnupg2 curl
+      export DEBIAN=$(lsb_release -sc)
+      add_percona_apt_repo
+      apt-get update || true
+      INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-checker-perl libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-15 percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-all libbz2-dev libzstd-dev libevent-dev libssl-dev libc-ares-dev pandoc pkg-config"
+      until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
+        sleep 1
+        echo "waiting"
+      done
+      DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install libpam0g-dev || DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install libpam-dev
+    fi
+fi

@@ -274,9 +274,11 @@ case "$1" in
         WAL2JSON_SRC_BRANCH="wal2json_${WAL2JSON_VERSION//./_}"
         WAL2JSON_RPM_RELEASE='1'
         WAL2JSON_DEB_RELEASE='1'
+        WAL2JSON_RELEASE='2'
 
         # urls
         WAL2JSON_SRC_REPO="https://github.com/eulerto/wal2json.git"
+        WAL2JSON_SRC_REPO_DEB="https://salsa.debian.org/postgresql/wal2json.git"
     ;;
 
 
@@ -284,11 +286,11 @@ case "$1" in
         # versions
         YDIFF_PRODUCT=python3-ydiff
         YDIFF_VERSION=1.2
-        YDIFF_RELEASE='2'
         YDIFF_PRODUCT_FULL=${YDIFF_PRODUCT}-${YDIFF_VERSION}
         YDIFF_SRC_BRANCH="${YDIFF_VERSION}"
         YDIFF_RPM_RELEASE='1'
         YDIFF_DEB_RELEASE='1'
+        YDIFF_RELEASE='2'
 
         # urls
         YDIFF_SRC_REPO="https://github.com/ymattw/ydiff.git"
@@ -303,7 +305,7 @@ PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
-PKG_RAW_URL="https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/PG-1838/${PG_VERSION}"
+PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}"
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
