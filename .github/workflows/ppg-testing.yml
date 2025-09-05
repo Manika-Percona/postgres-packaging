@@ -99,6 +99,7 @@ jobs:
             wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
             dpkg -i percona-release_latest.generic_all.deb
             rm -f percona-release_latest.generic_all.deb
+            apt-get update
           fi
           percona-release disable all
           percona-release enable ${{ inputs.ppg-repo }} testing
