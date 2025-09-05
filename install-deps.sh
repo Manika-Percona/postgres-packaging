@@ -165,7 +165,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
         yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
