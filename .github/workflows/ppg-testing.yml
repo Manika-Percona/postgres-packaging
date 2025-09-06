@@ -129,7 +129,7 @@ jobs:
       - name: Set DEB install list
         if: ${{ !contains(inputs.platform, 'linux') }}
         run: | 
-          PG="percona-postgresql percona-postgresql-${{ env.PG_MAJOR }} percona-postgresql-all percona-postgresql-contrib percona-postgresql-doc percona-postgresql-doc-${{ env.PG_MAJOR }} percona-postgresql-plperl-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-pltcl-${{ env.PG_MAJOR }} percona-postgresql-server-dev-${{ env.PG_MAJOR }} percona-postgresql-server-dev-all percona-postgresql-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plperl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-pltcl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym"
+          PG="percona-postgresql percona-postgresql-${{ env.PG_MAJOR }} percona-postgresql-all percona-postgresql-contrib percona-postgresql-doc percona-postgresql-doc-${{ env.PG_MAJOR }} percona-postgresql-plperl-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-pltcl-${{ env.PG_MAJOR }} percona-postgresql-server-dev-${{ env.PG_MAJOR }} percona-postgresql-common-dev percona-postgresql-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plperl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-pltcl-${{ env.PG_MAJOR }}-dbgsym percona-postgresql-plpython3-${{ env.PG_MAJOR }} percona-postgresql-plpython3-${{ env.PG_MAJOR }}-dbgsym"
           PG_COMMON="percona-postgresql-client percona-postgresql-client-${{ env.PG_MAJOR }} percona-postgresql-common percona-postgresql-client-${{ env.PG_MAJOR }}-dbgsym postgresql-client-common postgresql-common"
           PPG_SERVER="percona-ppg-server-${{ env.PG_MAJOR }} percona-ppg-server-ha-${{ env.PG_MAJOR }}"
           AUDIT="percona-postgresql-${{ env.PG_MAJOR }}-pgaudit percona-postgresql-${{ env.PG_MAJOR }}-pgaudit-dbgsym percona-pgaudit${{ env.PG_MAJOR }}-set-user percona-pgaudit${{ env.PG_MAJOR }}-set-user-dbgsym"
@@ -162,6 +162,11 @@ jobs:
             DEBIAN_FRONTEND=noninteractive apt-get -y install ${{ env.INSTALL_LIST }}
           fi
         shell: bash
+
+      - name: check pgxs package path
+        run: | 
+          dpkg -L percona-postgresql-common-dev | grep pgxs
+        continue-on-error: true
 
       - name: postgresql Version Check
         run: |
