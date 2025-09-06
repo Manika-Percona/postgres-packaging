@@ -198,7 +198,7 @@ Depends:
  ${shlibs:Depends}
 Breaks:
  postgresql-server-dev-all (<< 181~)
-Provides: postgresql-server-dev-all, postgresql-server-dev-all-17
+Provides: percona-postgresql-server-dev-all, postgresql-server-dev-all, postgresql-server-dev-all-17
 Description: development files for PostgreSQL 17 server-side programming
  Header files for compiling SSI code to link into PostgreSQL's backend; for
  example, for C functions to be called from SQL.
