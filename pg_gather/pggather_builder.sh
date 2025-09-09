@@ -12,41 +12,40 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pg_gather
-    echo "PRODUCT=${PRODUCT}" > pg_gather.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pg_gather.properties
+    echo "PRODUCT=${PG_GATHER_PRODUCT}" > pg_gather.properties
+    echo "PRODUCT_FULL=${PG_GATHER_PRODUCT_FULL}" >> pg_gather.properties
     echo "VERSION=${PSM_VER}" >> pg_gather.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pg_gather.properties
     echo "BUILD_ID=${BUILD_ID}" >> pg_gather.properties
-    mkdir ${PRODUCT_FULL} 
-    cd ${PRODUCT_FULL}
-    wget https://raw.githubusercontent.com/percona/support-snippets/master/postgresql/pg_gather/gather.sql .
-    wget https://raw.githubusercontent.com/percona/support-snippets/master/postgresql/pg_gather/README.md .
+
+    mkdir ${PG_GATHER_PRODUCT_FULL} 
+    cd ${PG_GATHER_PRODUCT_FULL}
+    wget ${PG_GATHER_SRC_URL}/gather.sql .
+    wget ${PG_GATHER_SRC_URL}/README.md .
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_gather.properties
     rm -fr debian rpm
     mkdir debian rpm
     cd debian 
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${BRANCH}/pg_gather/debian/rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${BRANCH}/pg_gather/debian/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${BRANCH}/pg_gather/debian/percona-pg-gather.install
+    wget ${PKG_RAW_URL}/pg_gather/debian/rules
+    wget ${PKG_RAW_URL}/pg_gather/debian/control
+    wget ${PKG_RAW_URL}/pg_gather/debian/percona-pg-gather.install
     cd ../
     echo 9 > debian/compat
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${BRANCH}/pg_gather/rpm/pg_gather.spec
+    wget ${PKG_RAW_URL}/pg_gather/rpm/pg_gather.spec
     cd ${WORKDIR}
     #
     source pg_gather.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PG_GATHER_PRODUCT_FULL}.tar.gz ${PG_GATHER_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_gather.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_GATHER_PRODUCT}/${PG_GATHER_PRODUCT_FULL}/${PG_GATHER_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_gather.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PG_GATHER_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PG_GATHER_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-pg_gather*
     return
@@ -98,7 +97,7 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/pg_gather.spec
+        --define "version ${PG_GATHER_VERSION}" rpmbuild/SPECS/pg_gather.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -146,7 +145,7 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PG_GATHER_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -180,19 +179,19 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} percona-pg-gather_${VERSION}.orig.tar.gz
-    mv ${BUILDDIR} percona-pg-gather-${VERSION}
-    cd percona-pg-gather-${VERSION}
+    mv ${TARFILE} ${PG_GATHER_PRODUCT_DEB}_${PG_GATHER_VERSION}.orig.tar.gz
+    mv ${BUILDDIR} ${PG_GATHER_PRODUCT_DEB}-${PG_GATHER_VERSION}
+    cd ${PG_GATHER_PRODUCT_DEB}-${PG_GATHER_VERSION}
 
     cd debian
     rm -rf changelog
-    echo "percona-pg-gather (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pg-gather (${PG_GATHER_VERSION}-${PG_GATHER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- SurabhiBhat <surabhi.bhat@percona.com> $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PG_GATHER_VERSION}-${PG_GATHER_RELEASE}" "Update to new version ${PG_GATHER_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -236,8 +235,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd percona-pg-gather-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PG_GATHER_PRODUCT_DEB-${PG_GATHER_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_GATHER_VERSION}-${PG_GATHER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -260,18 +259,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="15.14"
-GIT_REPO="https://github.com/percona/postgres-packaging"
-PRODUCT=percona-pg_gather
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='30'
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

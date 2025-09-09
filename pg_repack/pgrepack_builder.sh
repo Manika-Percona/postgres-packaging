@@ -12,40 +12,39 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pg_repack
-    echo "PRODUCT=${PRODUCT}" > pg_repack.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pg_repack.properties
+    echo "PRODUCT=${PG_REPACK_PRODUCT}" > pg_repack.properties
+    echo "PRODUCT_FULL=${PG_REPACK_PRODUCT_FULL}" >> pg_repack.properties
     echo "VERSION=${PSM_VER}" >> pg_repack.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pg_repack.properties
     echo "BUILD_ID=${BUILD_ID}" >> pg_repack.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PG_REPACK_SRC_REPO" ${PG_REPACK_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PG_REPACK_PRODUCT_FULL}
+    if [ ! -z "$PG_REPACK_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PG_REPACK_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_repack.properties
     rm -fr debian rpm
-    git clone https://salsa.debian.org/postgresql/pg-repack.git deb_packaging
+    git clone ${PG_REPACK_SRC_REPO_DEB} deb_packaging
     cd deb_packaging
-      git checkout -b percona-pg_repack debian/${VERSION}-${RELEASE}
+      git checkout -b percona-pg_repack debian/${PG_REPACK_VERSION}-${PG_REPACK_RELEASE}
     cd ../
     mv deb_packaging/debian ./
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/Makefile.patch
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/control.in
+    wget ${PKG_RAW_URL}/pg_repack/Makefile.patch
+    wget ${PKG_RAW_URL}/pg_repack/rules
+    wget ${PKG_RAW_URL}/pg_repack/control
+    wget ${PKG_RAW_URL}/pg_repack/control.in
     patch -p0 < Makefile.patch
     rm -rf Makefile.patch
     cd debian
@@ -58,10 +57,10 @@ get_sources(){
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/pg_repack.spec
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/pg_repack-pg15-makefile-pgxs.patch
+    wget ${PKG_RAW_URL}/pg_repack/pg_repack.spec
+    wget ${PKG_RAW_URL}/pg_repack/pg_repack-pg$PG_MAJOR-makefile-pgxs.patch
     cd ../
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_repack/make.patch
+    wget ${PKG_RAW_URL}/pg_repack/make.patch
     patch -p0 < make.patch
     rm -f make.patch
     cd ${WORKDIR}
@@ -69,13 +68,13 @@ get_sources(){
     source pg_repack.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PG_REPACK_PRODUCT_FULL}.tar.gz ${PG_REPACK_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_repack.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_REPACK_PRODUCT}/${PG_REPACK_PRODUCT_FULL}/${PG_REPACK_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_repack.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PG_REPACK_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PG_REPACK_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-pg_repack*
     return
@@ -127,7 +126,7 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/pg_repack.spec
+        --define "version ${PG_REPACK_VERSION}" rpmbuild/SPECS/pg_repack.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -178,7 +177,7 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PG_REPACK_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -212,18 +211,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} percona-pg-repack_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PG_REPACK_PRODUCT_DEB}_${PG_REPACK_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-pg-repack (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pg-repack (${PG_REPACK_VERSION}-${PG_REPACK_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com>  $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PG_REPACK_VERSION}-${PG_REPACK_RELEASE}" "Update to new version ${PG_REPACK_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -267,8 +266,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd percona-pg-repack-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PG_REPACK_PRODUCT_DEB}-${PG_REPACK_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_REPACK_VERSION}-${PG_REPACK_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -295,19 +294,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="ver_1.5.2"
-REPO="https://github.com/reorg/pg_repack.git"
-PRODUCT=percona-pg_repack
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='1.5.2'
-RELEASE='1'
-PG_VERSION=15.14
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

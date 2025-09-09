@@ -12,27 +12,26 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pgaudit15_set_user
-    echo "PRODUCT=${PRODUCT}" > pgaudit.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgaudit.properties
+    echo "PRODUCT=${SET_USER_PRODUCT}" > pgaudit.properties
+    echo "PRODUCT_FULL=${SET_USER_PRODUCT_FULL}" >> pgaudit.properties
     echo "VERSION=${PSM_VER}" >> pgaudit.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgaudit.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgaudit.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$SET_USER_SRC_REPO" ${SET_USER_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${SET_USER_PRODUCT_FULL}
+    if [ ! -z "$SET_USER_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$SET_USER_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pgaudit.properties
@@ -42,30 +41,30 @@ get_sources(){
     echo "3.0 (quilt)" > source/format
     echo 15 > pgversions
     echo 9 > compat
-    echo "percona-pgaudit15-set-user (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pgaudit$PG_MAJOR-set-user (${SET_USER_VERSION}-${SET_USER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
     
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit_set_user/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit_set_user/control.in
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit_set_user/copyright
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit_set_user/rules
+    wget ${PKG_RAW_URL}/pgaudit_set_user/control
+    wget ${PKG_RAW_URL}/pgaudit_set_user/control.in
+    wget ${PKG_RAW_URL}/pgaudit_set_user/copyright
+    wget ${PKG_RAW_URL}/pgaudit_set_user/rules
     cd ../ 
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit_set_user/percona-pgaudit15_set_user.spec
+    wget ${PKG_RAW_URL}/pgaudit_set_user/percona-pgaudit${PG_MAJOR}_set_user.spec
     cd ${WORKDIR}
     #
     source pgaudit.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${SET_USER_PRODUCT_FULL}.tar.gz ${SET_USER_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgaudit.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${SET_USER_PRODUCT}/${SET_USER_PRODUCT_FULL}/${SET_USER_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgaudit.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${SET_USER_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${SET_USER_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf pgaudit*
     return
@@ -113,11 +112,11 @@ build_srpm(){
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm' --strip=1
     #
     cp -av rpm/* rpmbuild/SOURCES
-    cp -av rpm/percona-pgaudit15_set_user.spec rpmbuild/SPECS
+    cp -av rpm/percona-pgaudit${PG_MAJOR}_set_user.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/percona-pgaudit15_set_user.spec
+        --define "version ${SET_USER_VERSION}" rpmbuild/SPECS/percona-pgaudit${PG_MAJOR}_set_user.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -168,7 +167,7 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pgmajorversion 15" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pgmajorversion $PG_MAJOR" --define "dist .$OS_NAME" --define "version ${SET_USER_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -201,11 +200,11 @@ build_source_deb(){
     tar zxf ${TARFILE}
     BUILDDIR=${TARFILE%.tar.gz}
     #
-    PRODUCT_DEB="percona-pgaudit15-set-user"
-    mv ${TARFILE} ${PRODUCT_DEB}_${VERSION}.orig.tar.gz
+
+    mv ${TARFILE} ${SET_USER_PRODUCT_DEB}_${SET_USER_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pgaudit version ${VERSION}"
+    dch -D unstable --force-distribution -v "${SET_USER_VERSION}-${SET_USER_RELEASE}" "Update to new pgaudit version ${SET_USER_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -249,8 +248,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd percona-pgaudit15-set-user-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${SET_USER_PRODUCT_DEB}-${SET_USER_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${SET_USER_VERSION}-${SET_USER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -277,19 +276,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="REL4_1_0"
-REPO="https://github.com/pgaudit/set_user.git"
-PRODUCT=percona-pgaudit15_set_user
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='4.1.0'
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-PG_VERSION=15.14
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

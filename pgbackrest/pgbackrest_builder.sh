@@ -12,35 +12,34 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pgbackrest
-    echo "PRODUCT=${PRODUCT}" > pgbackrest.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgbackrest.properties
+    echo "PRODUCT=${PG_BCKREST_PRODUCT}" > pgbackrest.properties
+    echo "PRODUCT_FULL=${PG_BCKREST_PRODUCT_FULL}" >> pgbackrest.properties
     echo "VERSION=${PSM_VER}" >> pgbackrest.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgbackrest.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgbackrest.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PG_BCKREST_SRC_REPO" ${PG_BCKREST_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PG_BCKREST_PRODUCT_FULL}
+    if [ ! -z "$PG_BCKREST_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PG_BCKREST_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pgbackrest.properties
     rm -fr debian rpm
 
-    GIT_SSL_NO_VERIFY=true git clone https://salsa.debian.org/postgresql/pgbackrest.git deb_packaging
+    GIT_SSL_NO_VERIFY=true git clone ${PG_BCKREST_SRC_REPO_DEB} deb_packaging
     cd deb_packaging
-    git checkout ${DEB_PACKAGING_TAG}
+    git checkout ${PG_BCKREST_DEB_TAG}
     cd -
 
     mv deb_packaging/debian ./
@@ -49,9 +48,9 @@ get_sources(){
         mv $file "percona-$file"
     done
     rm -f control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/compat
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/rules.patch
+    wget ${PKG_RAW_URL}/pgbackrest/control
+    wget ${PKG_RAW_URL}/pgbackrest/compat
+    wget ${PKG_RAW_URL}/pgbackrest/rules.patch
     patch -p0 < rules.patch
     rm rules.patch
     cd ../
@@ -61,23 +60,23 @@ get_sources(){
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/pgbackrest.spec
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/pgbackrest.service
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/pgbackrest.logrotate
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/pgbackrest-tmpfiles.d
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbackrest/pgbackrest.conf
+    wget ${PKG_RAW_URL}/pgbackrest/pgbackrest.spec
+    wget ${PKG_RAW_URL}/pgbackrest/pgbackrest.service
+    wget ${PKG_RAW_URL}/pgbackrest/pgbackrest.logrotate
+    wget ${PKG_RAW_URL}/pgbackrest/pgbackrest-tmpfiles.d
+    wget ${PKG_RAW_URL}/pgbackrest/pgbackrest.conf
     cd ${WORKDIR}
     #
     source pgbackrest.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PG_BCKREST_PRODUCT_FULL}.tar.gz ${PG_BCKREST_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbackrest.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_BCKREST_PRODUCT}/${PG_BCKREST_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbackrest.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PG_BCKREST_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PG_BCKREST_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-pgbackrest*
     return
@@ -128,8 +127,8 @@ build_srpm(){
     cp -av rpm/pgbackrest.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
-    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/pgbackrest.spec
+    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .generic" \
+        --define "version ${PG_BCKREST_VERSION}" rpmbuild/SPECS/pgbackrest.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -177,9 +176,9 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    export LIBPQ_DIR=/usr/pgsql-15/
-    export LIBRARY_PATH=/usr/pgsql-15/lib/:/usr/pgsql-15/include/
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    export LIBPQ_DIR=/usr/pgsql-${PG_MAJOR}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_MAJOR}/lib/:/usr/pgsql-${PG_MAJOR}/include/
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .$OS_NAME" --define "version ${PG_BCKREST_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -213,12 +212,12 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PG_BCKREST_PRODUCT}_${PG_BCKREST_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-pgbackrest (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pgbackrest (${PG_BCKREST_VERSION}-${PG_BCKREST_RELEASE}) unstable; urgency=low" >> changelog
     echo >> changelog
     echo "  * Initial Release." >> changelog
     echo >> changelog
@@ -226,7 +225,7 @@ build_source_deb(){
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pgbackrest version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PG_BCKREST_VERSION}-${PG_BCKREST_RELEASE}" "Update to new pgbackrest version ${PG_BCKREST_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -270,8 +269,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PG_BCKREST_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_BCKREST_VERSION}-${PG_BCKREST_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -298,20 +297,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="release/2.55.0"
-DEB_PACKAGING_TAG="debian/2.55.0-1"
-REPO="https://github.com/pgbackrest/pgbackrest.git"
-PRODUCT=percona-pgbackrest
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='2.55.0'
-RELEASE='1'
-PG_VERSION=15.14
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

@@ -12,34 +12,32 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-patroni
-    echo "PRODUCT=${PRODUCT}" > patroni.properties
-    GIT_USER=$(echo ${REPO} | awk -F'/' '{print $4}')
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> patroni.properties
+    echo "PRODUCT=${PATRONI_PRODUCT}" > patroni.properties
+    GIT_USER=$(echo ${PATRONI_SRC_REPO} | awk -F'/' '{print $4}')
+    echo "PRODUCT_FULL=${PATRONI_PRODUCT_FULL}" >> patroni.properties
     echo "VERSION=${PSM_VER}" >> patroni.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> patroni.properties
     echo "BUILD_ID=${BUILD_ID}" >> patroni.properties
-#   git clone "$REPO" ${PRODUCT_FULL}
-    git clone https://github.com/zalando/patroni.git ${PRODUCT_FULL}
+
+    git clone ${PATRONI_SRC_REPO} ${PATRONI_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PATRONI_PRODUCT_FULL}
+    if [ ! -z "$PATRONI_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PATRONI_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/patroni.properties
     rm -fr debian rpm
-    git clone https://github.com/cybertec-postgresql/patroni-packaging.git all_packaging
+    git clone ${PATRONI_SRC_REPO_DEB} all_packaging
     cd all_packaging
         git reset --hard
         git clean -xdf
@@ -48,10 +46,10 @@ get_sources(){
     mv all_packaging/DEB/debian ./
     cd debian
     rm -f rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/patroni/rules
+    wget ${PKG_RAW_URL}/patroni/rules
     rm -f control
     rm -f postinst
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/patroni/control
+    wget ${PKG_RAW_URL}/patroni/control
     sed -i 's:service-info-only-in-pretty-format.patch::' patches/series
     sed -i 's:patronictl-reinit-wait-rebased-1.6.0.patch::' patches/series
     sed -i "s:'sphinx_github_style':#'sphinx_github_style':g" ../docs/conf.py
@@ -62,7 +60,7 @@ get_sources(){
     fi
 
     git apply patches/add-sample-config.patch
-    sed -i "s|9.6|${PG_MAJOR_VERSION}|g" patroni.yml.sample
+    sed -i "s|9.6|${PG_MAJOR}|g" patroni.yml.sample
     mv install percona-patroni.install
     sed -i 's|patroni.yml.sample|debian/patroni.yml.sample|g' percona-patroni.install
     echo "debian/tmp/usr/lib" >> percona-patroni.install
@@ -73,7 +71,7 @@ get_sources(){
     mv all_packaging/RPM/* rpm/
     cd rpm
     rm -f patroni.spec
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/patroni/patroni.spec
+    wget ${PKG_RAW_URL}/patroni/patroni.spec
     sed -i 's:/opt/app:/opt:g' patroni.2.service
     sed -i 's:/opt/patroni/bin:/usr/bin:' patroni.2.service
     sed -i 's:/opt/patroni/etc/:/etc/patroni/:' patroni.2.service
@@ -86,13 +84,13 @@ get_sources(){
     source patroni.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PATRONI_PRODUCT_FULL}.tar.gz ${PATRONI_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> patroni.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PATRONI_PRODUCT}/${PATRONI_PRODUCT_FULL}/${PATRONI_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> patroni.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PATRONI_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PATRONI_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-patroni*
     return
@@ -146,7 +144,7 @@ build_srpm(){
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     sed -i 's:.rhel7:%{dist}:' ${WORKDIR}/rpmbuild/SPECS/patroni.spec
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/patroni.spec
+        --define "version ${PATRONI_VERSION}" rpmbuild/SPECS/patroni.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -190,7 +188,7 @@ build_rpm(){
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    rpmbuild --define "_topdir ${WORKDIR}/rb" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rb/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rb" --define "dist .$OS_NAME" --define "version ${PATRONI_VERSION}" --rebuild rb/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -224,18 +222,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PATRONI_PRODUCT}_${PATRONI_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-patroni (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-patroni (${PATRONI_VERSION}-${PATRONI_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new patroni version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PATRONI_VERSION}-${PATRONI_RELEASE}" "Update to new patroni version ${PATRONI_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -279,9 +277,9 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
+    cd ${PATRONI_PRODUCT_FULL}
     sed -i 's:ExecStart=/bin/patroni /etc/patroni.yml:ExecStart=/opt/patroni/bin/patroni /etc/patroni/patroni.yml:' extras/startup-scripts/patroni.service
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PATRONI_VERSION}-${PATRONI_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -308,20 +306,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=2
-DEB_RELEASE=2
 REVISION=0
-BRANCH="v4.0.5"
-REPO="https://github.com/zalando/patroni.git"
-PRODUCT=percona-patroni
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='4.0.5'
-RELEASE='1'
-PG_VERSION=15.14
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-PG_MAJOR_VERSION=$(echo ${PG_VERSION} | cut -f1 -d'.')
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

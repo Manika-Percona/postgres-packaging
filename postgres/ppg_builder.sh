@@ -125,7 +125,7 @@ build_srpm(){
     cd rpmbuild/SOURCES
     wget --no-check-certificate "${PG_DOC}"
     cd ../../
-    cp -av rpmbuild/SOURCES/percona-postgresql-15.spec rpmbuild/SPECS
+    cp -av rpmbuild/SOURCES/percona-postgresql-$PG_MAJOR.spec rpmbuild/SPECS
 
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     if [ -f /opt/rh/devtoolset-7/enable ]; then
@@ -135,20 +135,20 @@ build_srpm(){
     wget "${TELEMETRY_AGENT}"
     mv call-home.sh rpmbuild/SOURCES
     cd ${WORKDIR}/rpmbuild/SPECS
-    line_number=$(grep -n SOURCE999 percona-postgresql-15.spec | awk -F ':' '{print $1}')
+    line_number=$(grep -n SOURCE999 percona-postgresql-$PG_MAJOR.spec | awk -F ':' '{print $1}')
     cp ../SOURCES/call-home.sh ./
-    awk -v n=$line_number 'NR <= n {print > "part1.txt"} NR > n {print > "part2.txt"}' percona-postgresql-15.spec
+    awk -v n=$line_number 'NR <= n {print > "part1.txt"} NR > n {print > "part2.txt"}' percona-postgresql-$PG_MAJOR.spec
     head -n -1 part1.txt > temp && mv temp part1.txt
     echo "cat <<'CALLHOME' > /tmp/call-home.sh" >> part1.txt
     cat call-home.sh >> part1.txt
     echo "CALLHOME" >> part1.txt
     cat part2.txt >> part1.txt
     rm -f call-home.sh part2.txt
-    mv part1.txt percona-postgresql-15.spec
+    mv part1.txt percona-postgresql-$PG_MAJOR.spec
     cd ${WORKDIR}
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
         --define "pgmajorversion ${PG_MAJOR}" --define "pginstdir /usr/pgsql-${PG_MAJOR}"  --define "pgpackageversion ${PG_MAJOR}" \
-        rpmbuild/SPECS/percona-postgresql-15.spec
+        rpmbuild/SPECS/percona-postgresql-$PG_MAJOR.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -290,15 +290,15 @@ build_deb(){
     unset $(locale|cut -d= -f1)
         cd debian/
         wget "${TELEMETRY_AGENT}"
-        sed -i 's:exit 0::' percona-postgresql-15.postinst
-        echo "cat <<'CALLHOME' > /tmp/call-home.sh" >> percona-postgresql-15.postinst
-        cat call-home.sh >> percona-postgresql-15.postinst
-        echo "CALLHOME" >> percona-postgresql-15.postinst
-        echo "bash +x /tmp/call-home.sh -f \"PRODUCT_FAMILY_POSTGRESQL\" -v \"${PG_VERSION}-${PG_DEB_RELEASE}\" -d \"PACKAGE\" || :" >> percona-postgresql-15.postinst
-	echo "chgrp percona-telemetry /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-15.postinst
-        echo "chmod 664 /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-15.postinst
-        echo "rm -rf /tmp/call-home.sh" >> percona-postgresql-15.postinst
-        echo "exit 0" >> percona-postgresql-15.postinst
+        sed -i 's:exit 0::' percona-postgresql-$PG_MAJOR.postinst
+        echo "cat <<'CALLHOME' > /tmp/call-home.sh" >> percona-postgresql-$PG_MAJOR.postinst
+        cat call-home.sh >> percona-postgresql-$PG_MAJOR.postinst
+        echo "CALLHOME" >> percona-postgresql-$PG_MAJOR.postinst
+        echo "bash +x /tmp/call-home.sh -f \"PRODUCT_FAMILY_POSTGRESQL\" -v \"${PG_VERSION}-${PG_DEB_RELEASE}\" -d \"PACKAGE\" || :" >> percona-postgresql-$PG_MAJOR.postinst
+	echo "chgrp percona-telemetry /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-$PG_MAJOR.postinst
+        echo "chmod 664 /usr/local/percona/telemetry_uuid &>/dev/null || :" >> percona-postgresql-$PG_MAJOR.postinst
+        echo "rm -rf /tmp/call-home.sh" >> percona-postgresql-$PG_MAJOR.postinst
+        echo "exit 0" >> percona-postgresql-$PG_MAJOR.postinst
         rm -f call-home.sh
     cd ../
     dpkg-buildpackage -rfakeroot -us -uc -b

@@ -12,27 +12,26 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pgbadger
-    echo "PRODUCT=${PRODUCT}" > pgbadger.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgbadger.properties
+    echo "PRODUCT=${PGBADGER_PRODUCT}" > pgbadger.properties
+    echo "PRODUCT_FULL=${PGBADGER_PRODUCT_FULL}" >> pgbadger.properties
     echo "VERSION=${PSM_VER}" >> pgbadger.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgbadger.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgbadger.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PGBADGER_SRC_REPO" ${PGBADGER_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PGBADGER_PRODUCT_FULL}
+    if [ ! -z "$PGBADGER_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PGBADGER_SRC_BRANCH"
         git submodule update --init
 	        # https://github.com/darold/pgbadger/issues/773
         sed -i 's:12.0:12.1:g' pgbadger
@@ -42,31 +41,31 @@ get_sources(){
     
     mkdir debian
     cd debian/
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbadger/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbadger/rules
+    wget ${PKG_RAW_URL}/pgbadger/control
+    wget ${PKG_RAW_URL}/pgbadger/rules
     chmod +x rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbadger/copyright
+    wget ${PKG_RAW_URL}/pgbadger/copyright
     echo 9 > compat
-    echo "percona-pgbadger (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pgbadger (${PGBADGER_VERSION}-${PGBADGER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbadger/percona-pgbadger.spec
+    wget ${PKG_RAW_URL}/pgbadger/percona-pgbadger.spec
     cd ${WORKDIR}
     #
     source pgbadger.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PGBADGER_PRODUCT_FULL}.tar.gz ${PGBADGER_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbadger.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PGBADGER_PRODUCT}/${PGBADGER_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbadger.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PGBADGER_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PGBADGER_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-pgbadger*
     return
@@ -117,8 +116,8 @@ build_srpm(){
     cp -av rpm/percona-pgbadger.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
-    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/percona-pgbadger.spec
+    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-${PG_MAJOR}" --define "dist .generic" \
+        --define "version ${PGBADGER_VERSION}" rpmbuild/SPECS/percona-pgbadger.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -166,9 +165,9 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    export LIBPQ_DIR=/usr/pgsql-15/
-    export LIBRARY_PATH=/usr/pgsql-15/lib/:/usr/pgsql-15/include/
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    export LIBPQ_DIR=/usr/pgsql-${PG_MAJOR}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_MAJOR}/lib/:/usr/pgsql-${PG_MAJOR}/include/
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .$OS_NAME" --define "version ${PGBADGER_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -202,9 +201,9 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PGBADGER_PRODUCT}_${PGBADGER_VERSION}.orig.tar.gz
     cd ${BUILDDIR}    
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pgbadger version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PGBADGER_VERSION}-${PGBADGER_RELEASE}" "Update to new pgbadger version ${PGBADGER_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -249,8 +248,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PGBADGER_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PGBADGER_VERSION}-${PGBADGER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -277,18 +276,9 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="v13.1"
-REPO="https://github.com/darold/pgbadger.git"
-PRODUCT=percona-pgbadger
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='13.1'
-RELEASE='1'
-PG_VERSION=15.14
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
 check_workdir
 get_system

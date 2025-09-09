@@ -99,7 +99,7 @@ get_sources(){
 
     tar --owner=0 --group=0 --exclude=.* -czf ${PPG_COMMON_PRODUCT_FULL}.tar.gz ${PPG_COMMON_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PPG_COMMON_PRODUCT}-15/${PPG_COMMON_PRODUCT_FULL}/${PPG_COMMON_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> percona-postgresql.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PPG_COMMON_PRODUCT}-$PG_MAJOR/${PPG_COMMON_PRODUCT_FULL}/${PPG_COMMON_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> percona-postgresql.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
     cp ${PPG_COMMON_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball

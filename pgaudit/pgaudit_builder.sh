@@ -12,41 +12,40 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pgaudit
-    echo "PRODUCT=${PRODUCT}" > pgaudit.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgaudit.properties
+    echo "PRODUCT=${PGAUDIT_PRODUCT}" > pgaudit.properties
+    echo "PRODUCT_FULL=${PGAUDIT_PRODUCT_FULL}" >> pgaudit.properties
     echo "VERSION=${PSM_VER}" >> pgaudit.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgaudit.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgaudit.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PGAUDIT_SRC_REPO" ${PGAUDIT_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PGAUDIT_PRODUCT_FULL}
+    if [ ! -z "$PGAUDIT_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PGAUDIT_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pgaudit.properties
     rm -fr debian rpm
 
-    git clone https://salsa.debian.org/postgresql/pgaudit.git deb_packaging
+    git clone ${PGAUDIT_SRC_REPO_DEB} deb_packaging
     cd deb_packaging
-    git checkout debian/${VERSION}-${RELEASE}
+    git checkout debian/${PGAUDIT_VERSION}-${PGAUDIT_RELEASE}
     cd ../
     mv deb_packaging/debian ./
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/control.in
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/all.patch
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/rules
+    wget ${PKG_RAW_URL}/pgaudit/control
+    wget ${PKG_RAW_URL}/pgaudit/control.in
+    wget ${PKG_RAW_URL}/pgaudit/all.patch
+    wget ${PKG_RAW_URL}/pgaudit/rules
     mv all.patch debian/patches/
     rm -rf debian/control*
     echo "all.patch" > debian/patches/series
@@ -58,19 +57,19 @@ get_sources(){
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/pgaudit.spec
+    wget ${PKG_RAW_URL}/pgaudit/pgaudit.spec
     cd ${WORKDIR}
     #
     source pgaudit.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PGAUDIT_PRODUCT_FULL}.tar.gz ${PGAUDIT_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgaudit.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PGAUDIT_PRODUCT}/${PGAUDIT_PRODUCT_FULL}/${PGAUDIT_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgaudit.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PGAUDIT_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PGAUDIT_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf pgaudit*
     return
@@ -119,12 +118,12 @@ build_srpm(){
     #
     cp -av rpm/* rpmbuild/SOURCES
     cp -av rpm/pgaudit.spec rpmbuild/SPECS
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgaudit/all.patch
+    wget ${PKG_RAW_URL}/pgaudit/all.patch
     mv all.patch rpmbuild/SOURCES
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/pgaudit.spec
+        --define "version ${PGAUDIT_VERSION}" rpmbuild/SPECS/pgaudit.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -175,7 +174,7 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PGAUDIT_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -209,18 +208,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PGAUDIT_PRODUCT}_${PGAUDIT_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-pgaudit (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pgaudit (${PGAUDIT_VERSION}-${PGAUDIT_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pgaudit version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PGAUDIT_VERSION}-${PGAUDIT_RELEASE}" "Update to new pgaudit version ${PGAUDIT_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -265,7 +264,7 @@ build_deb(){
     dpkg-source -x ${DSC}
     #
     cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PGAUDIT_VERSION}-${PGAUDIT_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -292,19 +291,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=8
-DEB_RELEASE=8
 REVISION=0
-BRANCH="1.7.1"
-REPO="https://github.com/pgaudit/pgaudit.git"
-PRODUCT=percona-pgaudit
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='1.7.1'
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-PG_VERSION=15.14
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

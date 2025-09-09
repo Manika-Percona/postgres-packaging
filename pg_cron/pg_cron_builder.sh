@@ -12,46 +12,39 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pg-cron_${PG_MAJOR_VERSION}
 
-    if [ "x$OS" = "xrpm" ]; then
-        PRODUCT=percona-pg_cron_${PG_MAJOR_VERSION}
-    fi
-
-    echo "PRODUCT=${PRODUCT}" > pg_cron.properties
-
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pg_cron.properties
-    #echo "VERSION=${PSM_VER}" >> pg_cron.properties
-    echo "VERSION=${VERSION}" >> pg_cron.properties
+    echo "PRODUCT=${PG_CRON_PRODUCT}" > pg_cron.properties
+    echo "PRODUCT_FULL=${PG_CRON_PRODUCT_FULL}" >> pg_cron.properties
+    echo "VERSION=${PG_CRON_VERSION}" >> pg_cron.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pg_cron.properties
     echo "BUILD_ID=${BUILD_ID}" >> pg_cron.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PG_CRON_SRC_REPO" ${PG_CRON_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PG_CRON_PRODUCT_FULL}
+    if [ ! -z "$PG_CRON_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PG_CRON_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_cron.properties
     rm -fr debian rpm
 
-    git clone https://salsa.debian.org/postgresql/pg-cron.git deb_packaging
+    git clone ${PG_CRON_SRC_REPO_DEB} deb_packaging
     cd deb_packaging
-    git checkout debian/${VERSION}-${RELEASE}
+    git checkout debian/${PG_CRON_VERSION}-${PG_CRON_RELEASE}
     cd ../
     mv deb_packaging/debian ./
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_cron/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_cron/control.in
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_cron/rules
+    wget ${PKG_RAW_URL}/pg_cron/control
+    wget ${PKG_RAW_URL}/pg_cron/control.in
+    wget ${PKG_RAW_URL}/pg_cron/rules
 
     rm -rf debian/control*
     #rm -rf debian/source/format
@@ -62,24 +55,24 @@ get_sources(){
     sed -i 's:no-temp-instance::' patches/series
     git apply patches/no-temp-instance
     cd -
-    echo ${PG_MAJOR_VERSION} > debian/pgversions
+    echo ${PG_MAJOR} > debian/pgversions
     echo 10 > debian/compat
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pg_cron/pg_cron.spec
+    wget ${PKG_RAW_URL}/pg_cron/pg_cron.spec
     cd ${WORKDIR}
     #
     source pg_cron.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PG_CRON_PRODUCT_FULL}.tar.gz ${PG_CRON_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_cron.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_CRON_PRODUCT}/${PG_CRON_PRODUCT_FULL}/${PG_CRON_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_cron.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PG_CRON_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PG_CRON_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf pg_cron*
     return
@@ -132,7 +125,7 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/pg_cron.spec
+        --define "version ${PG_CRON_VERSION}" rpmbuild/SPECS/pg_cron.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -183,7 +176,7 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PG_CRON_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -220,24 +213,20 @@ build_source_deb(){
     echo "TARFILE=$TARFILE"
     echo "BUILDDIR=$BUILDDIR"
     cd /build/source_tarball
-    PRODUCT=percona-pg-cron
-    if [ "x$OS" = "xrpm" ]; then
-	PRODUCT=percona-pg_cron
-    fi
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
-    tar -xvzf ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PG_CRON_PRODUCT_DEB}_${PG_CRON_VERSION}.orig.tar.gz
+    tar -xvzf ${PG_CRON_PRODUCT_DEB}_${PG_CRON_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
 
-    echo "percona-pg-cron (${VERSION}-${RELEASE}) unstable; urgency=medium" > changelog
+    echo "percona-pg-cron (${PG_CRON_VERSION}-${PG_CRON_RELEASE}) unstable; urgency=medium" > changelog
     echo "* Initial Release version 1.6.2." >> changelog
     echo " -- Muhammad Aqeel <muhammad.aqeel@percona.com>  $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pg-cron version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PG_CRON_VERSION}-${PG_CRON_RELEASE}" "Update to new pg-cron version ${PG_CRON_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -281,9 +270,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    PRODUCT=percona-pg-cron
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PG_CRON_PRODUCT_DEB}-${PG_CRON_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_CRON_VERSION}-${PG_CRON_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -310,20 +298,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=2
-DEB_RELEASE=2
 REVISION=0
-BRANCH="v1.6.2"
-PG_MAJOR_VERSION=15
-PG_VERSION="15.14"
-REPO="https://github.com/citusdata/pg_cron.git"
-PRODUCT=percona-pg-cron_${PG_MAJOR_VERSION}
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='1.6.2'
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

@@ -12,27 +12,26 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-ppg-server-15
-    echo "PRODUCT=${PRODUCT}" > ppg-server.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> ppg-server.properties
+    echo "PRODUCT=${PPG_SERVER_PRODUCT}" > ppg-server.properties
+
+    echo "PRODUCT_FULL=${PPG_SERVER_PRODUCT_FULL}" >> ppg-server.properties
     echo "VERSION=${PSM_VER}" >> ppg-server.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> ppg-server.properties
     echo "BUILD_ID=${BUILD_ID}" >> ppg-server.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+    git clone "$PPG_COMMON_SRC_REPO" ${PPG_SERVER_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PPG_SERVER_PRODUCT_FULL}
+    if [ ! -z "$PPG_SERVER_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PPG_SERVER_SRC_BRANCH"
         git submodule update --init
     fi
     REVISION=$(git rev-parse --short HEAD)
@@ -40,29 +39,29 @@ get_sources(){
     
     mkdir debian
     cd debian/
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ppg-server/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ppg-server/rules
+    wget ${PKG_RAW_URL}/ppg-server/control
+    wget ${PKG_RAW_URL}/ppg-server/rules
     echo 9 > compat
-    echo "percona-ppg-server-15 (${PG_VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-ppg-server-$PG_MAJOR (${PG_VERSION}-${PPG_SERVER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- SurabhiBhat <surabhi.bhat@percona.com> $(date -R)" >> changelog
 
     cd ../
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/ppg-server/ppg-server.spec
+    wget ${PKG_RAW_URL}/ppg-server/ppg-server.spec
     cd ${WORKDIR}
     #
     source ppg-server.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PPG_SERVER_PRODUCT_FULL}.tar.gz ${PPG_SERVER_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> ppg-server.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PPG_SERVER_PRODUCT}/${PPG_SERVER_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> ppg-server.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PPG_SERVER_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PPG_SERVER_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-ppg-server*
     return
@@ -114,7 +113,7 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/ppg-server.spec
+        --define "version ${PPG_SERVER_VERSION}" rpmbuild/SPECS/ppg-server.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -158,9 +157,9 @@ build_rpm(){
     cd $WORKDIR
     RHEL=$(rpm --eval %rhel)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
-    export LIBPQ_DIR=/usr/pgsql-15/
-    export LIBRARY_PATH=/usr/pgsql-15/lib/:/usr/pgsql-15/include/
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    export LIBPQ_DIR=/usr/pgsql-${PG_MAJOR}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_MAJOR}/lib/:/usr/pgsql-${PG_MAJOR}/include/
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PPG_SERVER_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -194,9 +193,9 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PPG_SERVER_PRODUCT}_${PPG_SERVER_VERSION}.orig.tar.gz
     cd ${BUILDDIR}    
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new ppg-server version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PPG_SERVER_VERSION}-${PPG_SERVER_RELEASE}" "Update to new ppg-server version ${PPG_SERVER_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -244,8 +243,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PPG_SERVER_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PPG_SERVER_VERSION}-${PPG_SERVER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -268,18 +267,9 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-PG_VERSION=15.14
-BRANCH="v${PG_VERSION}"
-REPO="https://github.com/percona/postgres-packaging.git"
-PRODUCT=percona-ppg-server-15
 DEBUG=0
-VERSION="ppg-${PG_VERSION}"
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
 check_workdir
 get_system

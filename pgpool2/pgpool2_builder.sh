@@ -20,8 +20,8 @@ set_changelog(){
                 echo "$start_line"
                 current_date=$(date +"%a %b %d %Y")
                 sed -i "$start_line,$ d" $1
-                echo "* $current_date Percona Build/Release Team <eng-build@percona.com> - ${VERSION}-${RPM_RELEASE}" >> $1
-                echo "- Release ${VERSION}-${RPM_RELEASE}" >> $1
+                echo "* $current_date Percona Build/Release Team <eng-build@percona.com> - ${PGPOOL2_VERSION}-${PGPOOL2_RPM_RELEASE}" >> $1
+                echo "- Release ${PGPOOL2_VERSION}-${PGPOOL2_RPM_RELEASE}" >> $1
                 echo >> $1
                 return
             fi
@@ -37,26 +37,25 @@ get_sources(){
         return 0
     fi
 
-    PRODUCT=percona-pgpool-II-pg${PG_RELEASE}
-    PRODUCT_CUT=percona-pgpool-II-${VERSION}
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
+    PRODUCT=percona-pgpool-II-pg${PG_VERSION}
+    PRODUCT_CUT=percona-pgpool-II-${PGPOOL2_VERSION}
+    PRODUCT_FULL=${PRODUCT}-${PGPOOL2_VERSION}
 
     echo "PRODUCT=${PRODUCT}" > pgpool2.properties
     echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgpool2.properties
     echo "PRODUCT_CUT=${PRODUCT_CUT}" >> pgpool2.properties
-    echo "VERSION=${VERSION}" >> pgpool2.properties
-    echo "BRANCH_NAME=$(echo ${BRANCH} | awk -F '/' '{print $(NF)}')" >> pgpool2.properties
-    echo "BUILD_BRANCH=$(echo ${BUILD_BRANCH} | awk -F '/' '{print $(NF)}')" >> pgpool2.properties
+    echo "VERSION=${PGPOOL2_VERSION}" >> pgpool2.properties
+    echo "BRANCH_NAME=$(echo ${PGPOOL2_SRC_BRANCH} | awk -F '/' '{print $(NF)}')" >> pgpool2.properties
+    echo "BUILD_BRANCH=$(echo ${PGPOOL2_BUILD_BRANCH} | awk -F '/' '{print $(NF)}')" >> pgpool2.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgpool2.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgpool2.properties
-    echo "BRANCH_NAME=$(echo ${BRANCH} | awk -F '/' '{print $(NF)}')" >> pgpool2.properties
-    echo "PG_RELEASE=${PG_RELEASE}" >> pgpool2.properties
-    echo "RPM_RELEASE=${RPM_RELEASE}" >> pgpool2.properties
-    echo "DEB_RELEASE=${DEB_RELEASE}" >> pgpool2.properties
+    echo "PG_RELEASE=${PG_VERSION}" >> pgpool2.properties
+    echo "RPM_RELEASE=${PGPOOL2_RPM_RELEASE}" >> pgpool2.properties
+    echo "DEB_RELEASE=${PGPOOL2_DEB_RELEASE}" >> pgpool2.properties
 
     cat pgpool2.properties
 
-    git clone "$REPO" ${PRODUCT_CUT}
+    git clone "$PGPOOL2_SRC_REPO" ${PRODUCT_CUT}
     retval=$?
     if [ $retval != 0 ]
     then
@@ -64,32 +63,32 @@ get_sources(){
         exit 1
     fi
     cd ${PRODUCT_CUT}
-    if [ ! -z "$BRANCH" ]
+    if [ ! -z "$PGPOOL2_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PGPOOL2_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pgpool2.properties
 
     # get files for deb
-    GIT_SSL_NO_VERIFY=true git clone https://salsa.debian.org/postgresql/pgpool2.git ../pgpool2
+    GIT_SSL_NO_VERIFY=true git clone ${PGPOOL2_SRC_REPO_DEB} ../pgpool2
     mv ../pgpool2/debian/ .
-    wget $(echo ${GIT_BUILD_REPO} | sed -re 's|github.com|raw.githubusercontent.com|; s|\.git$||')/${BUILD_BRANCH}/pgpool2/pgpool2-debian-config.patch -O debian/patches/pgpool2-debian-config.patch
+    wget $(echo ${PKG_GIT_REPO} | sed -re 's|github.com|raw.githubusercontent.com|; s|\.git$||')/${PGPOOL2_BUILD_BRANCH}/pgpool2/pgpool2-debian-config.patch -O debian/patches/pgpool2-debian-config.patch
 
-    sed -i "s:PGVERSION:${PG_VER}:g" debian/control.in
+    sed -i "s:PGVERSION:${PG_MAJOR}:g" debian/control.in
     sed -i "s:Source\: pgpool2:Source\: percona-pgpool2:g" debian/control.in
     sed -i "s:Package\: pgpool2:Package\: percona-pgpool2:g" debian/control.in
     sed -i "/Vcs-Git/d" debian/control.in
     sed -i "/Vcs-Browser/d" debian/control.in
     sed -i "s:Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>:Percona Development Team <info@percona.com>:g" debian/control.in
     sed -i '/Uploaders/{N;N;N;d;}' debian/control.in
-    sed -i "0,/pgpool2/ s/pgpool2.*/percona-pgpool2 (${VERSION}-${DEB_RELEASE}) stable; urgency=medium/" debian/changelog
-    sed -i "84s:${PG_RELEASE}:15:" debian/control.in
-    sed -i "90s:${PG_RELEASE}:15:" debian/control
-    sed -i '84s:postgresql-15:postgresql-15|percona-postgresql-15:' debian/control.in
-    sed -i '90s:postgresql-15:postgresql-15|percona-postgresql-15:' debian/control
+    sed -i "0,/pgpool2/ s/pgpool2.*/percona-pgpool2 (${PGPOOL2_VERSION}-${PGPOOL2_DEB_RELEASE}) stable; urgency=medium/" debian/changelog
+    sed -i "84s:${PG_VERSION}:${PG_MAJOR}:" debian/control.in
+    sed -i "90s:${PG_VERSION}:${PG_MAJOR}:" debian/control
+    sed -i "84s:postgresql-${PG_MAJOR}:postgresql-${PG_MAJOR}|percona-postgresql-${PG_MAJOR}:" debian/control.in
+    sed -i "90s:postgresql-${PG_MAJOR}:postgresql-${PG_MAJOR}|percona-postgresql-${PG_MAJOR}:" debian/control
     #sed -i 's:debhelper-compat (= 13):debhelper-compat:' debian/control
     #sed -i 's:debhelper-compat (= 13):debhelper-compat:' debian/control.in
 
@@ -150,7 +149,7 @@ EOT
     #
     tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_CUT}.tar.gz ${PRODUCT_CUT}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgpool2.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PGPOOL2_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgpool2.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
     cp percona-pgpool-II-*.tar.gz $WORKDIR/source_tarball
@@ -228,8 +227,8 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     QA_RPATHS=$(( 0x0001|0x0002|0x0010 )) rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-    --define "pgpool_version ${VERSION}" --define "pg_version ${PG_VER}" --define "pghome /usr/pgsql-${PG_VER}" \
-    --define "pgsql_ver ${PG_VER}0" --define "with-pgsql-includedir /usr/pgsql-${PG_VER}/include/" ${WORKDIR}/rpmbuild/SPECS/pgpool.spec
+    --define "pgpool_version ${PGPOOL2_VERSION}" --define "pg_version ${PG_MAJOR}" --define "pghome /usr/pgsql-${PG_MAJOR}" \
+    --define "pgsql_ver ${PG_MAJOR}0" --define "with-pgsql-includedir /usr/pgsql-${PG_MAJOR}/include/" ${WORKDIR}/rpmbuild/SPECS/pgpool.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -277,14 +276,14 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    export LIBPQ_DIR=/usr/pgsql-${PG_RELEASE}/
-    export LIBRARY_PATH=/usr/pgsql-${PG_RELEASE}/lib/:/usr/pgsql-${PG_RELEASE}/include/
+    export LIBPQ_DIR=/usr/pgsql-${PG_VERSION}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_VERSION}/lib/:/usr/pgsql-${PG_VERSION}/include/
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=$(( 0x0001 | 0x0002 ))
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" \
-    --define "pgpool_version ${VERSION}" --define "pg_version ${PG_VER}" --define "pghome /usr/pgsql-${PG_VER}" \
-    --define "pgsql_ver ${PG_VER}0" --define "with-pgsql-includedir /usr/pgsql-${PG_VER}/include/" \
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${PGPOOL2_VERSION}" \
+    --define "pgpool_version ${PGPOOL2_VERSION}" --define "pg_version ${PG_MAJOR}" --define "pghome /usr/pgsql-${PG_MAJOR}" \
+    --define "pgsql_ver ${PG_MAJOR}0" --define "with-pgsql-includedir /usr/pgsql-${PG_MAJOR}/include/" \
     --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
@@ -319,13 +318,13 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
 
-    mv ${TARFILE} percona-pgpool2_${VERSION}.orig.tar.gz
+    mv ${TARFILE} percona-pgpool2_${PGPOOL2_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
     sed -i '/architecture-is-64-bit/d' debian/control
     sed -i '/architecture-is-64-bit/d' debian/control.in
     rm -rf .pc
     DEBEMAIL="info@percona.com"
-    dch -D unstable --force-distribution -v "${VERSION}-${DEB_RELEASE}" "Update to new percona-pgpool2 pg${PG_RELEASE} version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PGPOOL2_VERSION}-${PGPOOL2_DEB_RELEASE}" "Update to new percona-pgpool2 pg${PG_VERSION} version ${PGPOOL2_VERSION}"
     pg_buildext updatecontrol
     dpkg-buildpackage -S
     cd ../
@@ -368,9 +367,9 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd percona-pgpool2-${VERSION}
-    sed -i "s:\. :${WORKDIR}/percona-pgpool2-${VERSION} :g" debian/rules
-    dch -m -D "${OS_NAME}" --force-distribution -v "1:${VERSION}-${DEB_RELEASE}.${OS_NAME}" 'Update distribution'
+    cd percona-pgpool2-${PGPOOL2_VERSION}
+    sed -i "s:\. :${WORKDIR}/percona-pgpool2-${PGPOOL2_VERSION} :g" debian/rules
+    dch -m -D "${OS_NAME}" --force-distribution -v "1:${PGPOOL2_VERSION}-${PGPOOL2_DEB_RELEASE}.${OS_NAME}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     pg_buildext updatecontrol
     dpkg-buildpackage -rfakeroot -us -uc -b
@@ -398,17 +397,9 @@ OS_NAME=
 ARCH=
 OS=
 REVISION=0
-BRANCH="V4_6_0"
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
-REPO="https://git.postgresql.org/git/pgpool2.git"
-VERSION="4.6.0"
-PG_RELEASE=15.14
-GIT_BUILD_REPO="https://github.com/percona/postgres-packaging.git"
-BUILD_BRANCH=${PG_RELEASE}
+
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-PG_VER=$(echo ${PG_RELEASE} | awk -F'.' '{print $1}')
 check_workdir
 get_system "pgpool2"
 #install_deps

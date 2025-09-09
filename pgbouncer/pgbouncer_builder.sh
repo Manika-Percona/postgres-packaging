@@ -12,67 +12,66 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-pgbouncer
-    echo "PRODUCT=${PRODUCT}" > pgbouncer.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgbouncer.properties
+    echo "PRODUCT=${PGBOUNCER_PRODUCT}" > pgbouncer.properties
+    echo "PRODUCT_FULL=${PGBOUNCER_PRODUCT_FULL}" >> pgbouncer.properties
     echo "VERSION=${PSM_VER}" >> pgbouncer.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgbouncer.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgbouncer.properties
-    git clone "$REPO" ${PRODUCT_FULL}
+
+    git clone "$PGBOUNCER_SRC_REPO" ${PGBOUNCER_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$BRANCH" ]
+    cd ${PGBOUNCER_PRODUCT_FULL}
+    if [ ! -z "$PGBOUNCER_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$BRANCH"
+        git checkout "$PGBOUNCER_SRC_BRANCH"
         git submodule update --init
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pgbouncer.properties
     rm -fr debian rpm
 
-    git clone https://salsa.debian.org/postgresql/pgbouncer.git deb_packaging
+    git clone ${PGBOUNCER_SRC_REPO_DEB} deb_packaging
     mv deb_packaging/debian ./
     cd debian/
     for file in $(ls | grep ^pgbouncer | grep -v pgbouncer.conf  | grep -v service); do
         mv $file "percona-$file"
     done
     rm -f control rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/control
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/preinst
+    wget ${PKG_RAW_URL}/pgbouncer/control
+    wget ${PKG_RAW_URL}/pgbouncer/rules
+    wget ${PKG_RAW_URL}/pgbouncer/preinst
     echo 9 > compat
     cd ../
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/percona-pgbouncer.spec
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer-ini.patch
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer.logrotate
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer.service
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer.service.rhel7
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer.sysconfig
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/pgbouncer/pgbouncer.init
+    wget ${PKG_RAW_URL}/pgbouncer/percona-pgbouncer.spec
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer-ini.patch
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer.logrotate
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer.service
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer.service.rhel7
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer.sysconfig
+    wget ${PKG_RAW_URL}/pgbouncer/pgbouncer.init
     cd ${WORKDIR}
     #
     source pgbouncer.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PGBOUNCER_PRODUCT_FULL}.tar.gz ${PGBOUNCER_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbouncer.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PGBOUNCER_PRODUCT}/${PGBOUNCER_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgbouncer.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PGBOUNCER_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PGBOUNCER_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-pgbouncer*
     return
@@ -123,8 +122,8 @@ build_srpm(){
     cp -av rpm/percona-pgbouncer.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
-    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/percona-pgbouncer.spec
+    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .generic" \
+        --define "version ${PGBOUNCER_VERSION}" rpmbuild/SPECS/percona-pgbouncer.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -172,9 +171,9 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    export LIBPQ_DIR=/usr/pgsql-15/
-    export LIBRARY_PATH=/usr/pgsql-15/lib/:/usr/pgsql-15/include/
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    export LIBPQ_DIR=/usr/pgsql-${PG_MAJOR}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_MAJOR}/lib/:/usr/pgsql-${PG_MAJOR}/include/
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .$OS_NAME" --define "version ${PGBOUNCER_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -208,18 +207,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PGBOUNCER_PRODUCT}_${PGBOUNCER_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-pgbouncer (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-pgbouncer (${PGBOUNCER_VERSION}-${PGBOUNCER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new pgbouncer version ${VERSION}"
+    dch -D unstable --force-distribution -v "${PGBOUNCER_VERSION}-${PGBOUNCER_RELEASE}" "Update to new pgbouncer version ${PGBOUNCER_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -263,8 +262,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PGBOUNCER_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PGBOUNCER_VERSION}-${PGBOUNCER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -291,19 +290,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-BRANCH="pgbouncer_1_24_1"
-REPO="https://github.com/pgbouncer/pgbouncer.git"
-PRODUCT=percona-pgbouncer
 DEBUG=0
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION='1.24.1'
-RELEASE='1'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-PG_VERSION=15.14
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps

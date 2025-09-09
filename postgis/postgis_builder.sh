@@ -12,35 +12,33 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=percona-postgis
-    VERSION=${POSTGIS_VERSION}
-    echo "PRODUCT=${PRODUCT}" > percona-postgis.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}.${RELEASE}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> percona-postgis.properties
+    echo "PRODUCT=${POSTGIS_PRODUCT}" > percona-postgis.properties
+
+    echo "PRODUCT_FULL=${POSTGIS_PRODUCT_FULL}" >> percona-postgis.properties
     echo "VERSION=${POSTGIS_VERSION}" >> percona-postgis.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> percona-postgis.properties
     echo "BUILD_ID=${BUILD_ID}" >> percona-postgis.properties
-    git clone "$POSTGIS_GITREPO"
+    git clone "$POSTGIS_SRC_REPO"
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    mv postgis ${PRODUCT_FULL}
-    cd ${PRODUCT_FULL}
-    if [ ! -z "$POSTGIS_BRANCH" ]
+    mv postgis ${POSTGIS_PRODUCT_FULL}
+    cd ${POSTGIS_PRODUCT_FULL}
+    if [ ! -z "$POSTGIS_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$POSTGIS_BRANCH"
+        git checkout "$POSTGIS_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
     echo "REVISION=${REVISION}" >> ${WORKDIR}/percona-postgis.properties
     rm -fr debian rpm
 
-    git clone https://salsa.debian.org/debian-gis-team/postgis.git deb_packaging
+    git clone ${POSTGIS_SRC_REPO_DEB} deb_packaging
     cd deb_packaging
         #git checkout -b 12 debian/12.9-1
     cd ../
@@ -51,15 +49,15 @@ get_sources(){
             mv $file "percona-$file"
         done
         rm -f rules* control* percona-postgis.install patches/sfcgal*
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/rules
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/control
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgis.install
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3-scripts.install
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3-scripts.lintian-overrides
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3-scripts.postinst
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3-scripts.prerm
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3.install
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-15-postgis-3.lintian-overrides
+        wget ${PKG_RAW_URL}/postgis/debian/rules
+        wget ${PKG_RAW_URL}/postgis/debian/control
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgis.install
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3-scripts.install
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3-scripts.lintian-overrides
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3-scripts.postinst
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3-scripts.prerm
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3.install
+        wget ${PKG_RAW_URL}/postgis/debian/percona-postgresql-$PG_MAJOR-postgis-3.lintian-overrides
 	cp control control.in
         # Remove the sfcgal patch entry from patches/series
         sed -i '/sfcgal/d' patches/series
@@ -72,27 +70,27 @@ get_sources(){
     sed -i 's:200:500:g' regress/core/interrupt_buffer.sql
     sed -i '1d' debian/patches/series
     #relax-test-timing-constraints.patch}
-    git clone https://git.postgresql.org/git/pgrpms.git
+    git clone ${PGRPMS_GIT_REPO}
     mkdir rpm
     mv pgrpms/rpm/redhat/main/non-common/postgis33/main/* rpm/
     rm -rf pgrpms
     cd rpm
         rm -f postgis33.spec postgis33-3.3.0-gdalfpic.patch
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/rpm/percona-postgis33.spec
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/rpm/postgis33-3.3.0-gdalfpic.patch
+        wget ${PKG_RAW_URL}/postgis/rpm/percona-postgis33.spec
+        wget ${PKG_RAW_URL}/postgis/rpm/postgis33-3.3.0-gdalfpic.patch
     cd ../
     cd ${WORKDIR}
     #
     source percona-postgis.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${POSTGIS_PRODUCT_FULL}.tar.gz ${POSTGIS_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> percona-postgis.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${POSTGIS_PRODUCT}/${POSTGIS_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> percona-postgis.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${POSTGIS_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${POSTGIS_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf percona-postgis*
     return
@@ -133,7 +131,7 @@ install_sfcgal(){
     cd $CURDIR/SFCGAL-v1.3.10
     cmake . && make && make install
     chmod 777 /usr/local/lib/libSFCGAL.*
-    cp /usr/local/lib/libSFCGAL.* /usr/lib/postgresql/15/lib
+    cp /usr/local/lib/libSFCGAL.* /usr/lib/postgresql/$PG_MAJOR/lib
     ldconfig -v | grep -i sfcgal
     ln /usr/local/bin/sfcgal-config /usr/bin/sfcgal-config
 }
@@ -181,7 +179,7 @@ build_srpm(){
     #
     cp -av rpm/* rpmbuild/SOURCES
     cd rpmbuild/SOURCES
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/postgis-3.3.8.pdf
+    wget ${PKG_RAW_URL}/postgis/postgis-3.3.8.pdf
     #wget --no-check-certificate https://download.osgeo.org/postgis/docs/postgis-3.3.8.pdf
     #wget --no-check-certificate https://www.postgresql.org/files/documentation/pdf/12/postgresql-12-A4.pdf
     cd ../../
@@ -193,7 +191,7 @@ build_srpm(){
         source /opt/rh/llvm-toolset-7/enable
     fi
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" --define "pginstdir /usr/pgsql-15"  \
+        --define "version ${POSTGIS_VERSION}" --define "pginstdir /usr/pgsql-$PG_MAJOR"  \
         rpmbuild/SPECS/percona-postgis33.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
@@ -245,7 +243,7 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${VERSION}" --define "pginstdir /usr/pgsql-15" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${POSTGIS_VERSION}" --define "pginstdir /usr/pgsql-$PG_MAJOR" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -279,18 +277,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.${RELEASE}.orig.tar.gz
+    mv ${TARFILE} ${POSTGIS_PRODUCT}_${POSTGIS_VERSION}.${POSTGIS_RELEASE}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "percona-postgis (${VERSION}.${RELEASE}) unstable; urgency=low" >> changelog
+    echo "percona-postgis (${POSTGIS_VERSION}.${POSTGIS_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- SurabhiBhat <surabhi.bhat@percona.com> $(date -R)" >> changelog
  
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}.${RELEASE}-${DEB_RELEASE}" "Update to new Percona Platform for PostgreSQL version ${VERSION}.${RELEASE}-${DEB_RELEASE}"
+    dch -D unstable --force-distribution -v "${POSTGIS_VERSION}.${POSTGIS_RELEASE}-${POSTGIS_DEB_RELEASE}" "Update to new Percona Platform for PostgreSQL version ${POSTGIS_VERSION}.${POSTGIS_RELEASE}-${POSTGIS_DEB_RELEASE}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -334,8 +332,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}.${RELEASE}
-    dch -m -D "${DEBIAN}" --force-distribution -v "2:${VERSION}.${RELEASE}-${DEB_RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${POSTGIS_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "2:${POSTGIS_VERSION}.${POSTGIS_RELEASE}-${POSTGIS_DEB_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
 #    if [ "x${DEBIAN}" = "xjammy" -o "x${DEBIAN}" = "xbionic" ]
 #    then
@@ -373,18 +371,9 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=${RPM_RELEASE}
-DEB_RELEASE=${DEB_RELEASE}
 REVISION=0
-POSTGIS_BRANCH=${POSTGIS_BRANCH}
-POSTGIS_GITREPO=${POSTGIS_GITREPO}
-PRODUCT=percona-postgis
 DEBUG=0
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
-VERSION=${POSTGIS_VERSION}
-RELEASE='8'
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
-PPG_VERSION=15.14
 
 check_workdir
 get_system

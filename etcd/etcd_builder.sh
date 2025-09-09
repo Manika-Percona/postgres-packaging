@@ -12,21 +12,12 @@ get_sources(){
         echo "Sources will not be downloaded"
         return 0
     fi
-    PRODUCT=etcd
-    echo "PRODUCT=${PRODUCT}" > etcd.properties
 
-    PRODUCT_FULL=${PRODUCT}-${VERSION}
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> etcd.properties
+    echo "PRODUCT=${ETCD_PRODUCT}" > etcd.properties
+    echo "PRODUCT_FULL=${ETCD_PRODUCT_FULL}" >> etcd.properties
     echo "VERSION=${PSM_VER}" >> etcd.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> etcd.properties
     echo "BUILD_ID=${BUILD_ID}" >> etcd.properties
-#    git clone "$REPO" ${PRODUCT_FULL}
-#    retval=$?
-#    if [ $retval != 0 ]
-#    then
-#        echo "There were some issues during repo cloning from github. Please retry one more time"
-#        exit 1
-#    fi
 
     ARCH=$(uname -m)
     if [ "$ARCH" = "x86_64" ]; then
@@ -35,22 +26,22 @@ get_sources(){
         ARCH="arm64"
     fi
 
-    wget https://github.com/etcd-io/etcd/releases/download/v${VERSION}/etcd-v${VERSION}-linux-${ARCH}.tar.gz
-    tar -xvzf etcd-v${VERSION}-linux-${ARCH}.tar.gz
-    mkdir -p ${PRODUCT_FULL}
-    cp -rp etcd-v${VERSION}-linux-${ARCH}/* ${PRODUCT_FULL}
-    cd ${PRODUCT_FULL}
+    wget ${ETCD_SRC_REPO}/etcd-v${ETCD_VERSION}-linux-${ARCH}.tar.gz
+    tar -xvzf etcd-v${ETCD_VERSION}-linux-${ARCH}.tar.gz
+    mkdir -p ${ETCD_PRODUCT_FULL}
+    cp -rp etcd-v${ETCD_VERSION}-linux-${ARCH}/* ${ETCD_PRODUCT_FULL}
+    cd ${ETCD_PRODUCT_FULL}
     rm -fr debian rpm
 
-    git clone https://github.com/EvgeniyPatlan/etcd-packaging.git deb_packaging
+    git clone ${ETCD_SRC_REPO_DEB} deb_packaging
     mv deb_packaging/deb ./debian
     cd debian/
     rm -f etcd-server.install etcd-client.install rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd-server.install
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/rules
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd-client.install
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd.service
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd.conf.yaml
+    wget ${PKG_RAW_URL}/etcd/etcd-server.install
+    wget ${PKG_RAW_URL}/etcd/rules
+    wget ${PKG_RAW_URL}/etcd/etcd-client.install
+    wget ${PKG_RAW_URL}/etcd/etcd.service
+    wget ${PKG_RAW_URL}/etcd/etcd.conf.yaml
     mv etcd.conf.yaml ../
 
     rm -f etcd-server.etcd.service
@@ -62,21 +53,21 @@ get_sources(){
 
     mkdir rpm
     cd rpm
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd.spec
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd.service
-    wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/etcd/etcd.conf.yaml
+    wget ${PKG_RAW_URL}/etcd/etcd.spec
+    wget ${PKG_RAW_URL}/etcd/etcd.service
+    wget ${PKG_RAW_URL}/etcd/etcd.conf.yaml
     cd ${WORKDIR}
     #
     source etcd.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${ETCD_PRODUCT_FULL}.tar.gz ${ETCD_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> etcd.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${ETCD_PRODUCT}/${ETCD_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> etcd.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${ETCD_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${ETCD_PRODUCT_FULLL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     #rm -rf etcd*
     return
@@ -129,7 +120,7 @@ build_srpm(){
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${VERSION}" rpmbuild/SPECS/etcd.spec
+        --define "version ${ETCD_VERSION}" rpmbuild/SPECS/etcd.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -177,9 +168,9 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    export LIBPQ_DIR=/usr/pgsql-15/
-    export LIBRARY_PATH=/usr/pgsql-15/lib/:/usr/pgsql-15/include/
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-15" --define "dist .$OS_NAME" --define "version ${VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    export LIBPQ_DIR=/usr/pgsql-${PG_MAJOR}/
+    export LIBRARY_PATH=/usr/pgsql-${PG_MAJOR}/lib/:/usr/pgsql-${PG_MAJOR}/include/
+    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "pginstdir /usr/pgsql-$PG_MAJOR" --define "dist .$OS_NAME" --define "version ${ETCD_VERSION}" --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -213,18 +204,18 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
     #
     
-    mv ${TARFILE} ${PRODUCT}_${VERSION}.orig.tar.gz
+    mv ${TARFILE} ${ETCD_PRODUCT}_${ETCD_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
     rm -rf changelog
-    echo "etcd (${VERSION}-${RELEASE}) unstable; urgency=low" >> changelog
+    echo "etcd (${ETCD_VERSION}-${ETCD_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
     echo " -- EvgeniyPatlan <evgeniy.patlan@percona.com> $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${VERSION}-${RELEASE}" "Update to new etcd version ${VERSION}"
+    dch -D unstable --force-distribution -v "${ETCD_VERSION}-${ETCD_RELEASE}" "Update to new etcd version ${ETCD_VERSION}"
     dpkg-buildpackage -S
     cd ../
     mkdir -p $WORKDIR/source_deb
@@ -268,8 +259,8 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${VERSION}-${RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${ETCD_PRODUCT_FULL}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${ETCD_VERSION}-${ETCD_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -296,18 +287,10 @@ OS_NAME=
 ARCH=
 OS=
 INSTALL=0
-RPM_RELEASE=1
-DEB_RELEASE=1
 REVISION=0
-REPO="https://github.com/etcd-io/etcd.git"
-PRODUCT=etcd
 DEBUG=0
-VERSION='3.5.21'
-RELEASE='1'
-PG_VERSION=15.14
-parse_arguments PICK-ARGS-FROM-ARGV "$@"
-PRODUCT_FULL=${PRODUCT}-${VERSION}-${RELEASE}
 
+parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
 get_system
 #install_deps
