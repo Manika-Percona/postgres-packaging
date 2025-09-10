@@ -67,7 +67,7 @@ get_sources(){
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
     cp ${ETCD_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${ETCD_PRODUCT_FULLL}.tar.gz $CURDIR/source_tarball
+    cp ${ETCD_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     #rm -rf etcd*
     return
