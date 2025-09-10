@@ -50,7 +50,7 @@ case "$1" in
     ;;
 
 
-    patroni)
+    patroni) # tested OK
         # versions
         PATRONI_PRODUCT=percona-patroni
         PATRONI_VERSION=4.0.6
