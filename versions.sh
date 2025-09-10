@@ -35,7 +35,7 @@ case "$1" in
     ;;
 
 
-    etcd)
+    etcd) # tested OK
         # versions
         ETCD_PRODUCT=etcd
         ETCD_VERSION=3.5.21

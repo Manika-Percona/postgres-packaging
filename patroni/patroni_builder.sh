@@ -41,7 +41,7 @@ get_sources(){
     cd all_packaging
         git reset --hard
         git clean -xdf
-        git checkout "v1.6.5-1"
+        git checkout "1.6.5-1"
     cd ../
     mv all_packaging/DEB/debian ./
     cd debian
