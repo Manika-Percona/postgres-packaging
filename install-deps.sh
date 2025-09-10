@@ -256,7 +256,7 @@ if [ "$COMPONENT" = "ppg-server-ha" ]; then
       yum clean all
 
       if [ ${RHEL} = 8 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled codeready-builder-for-rhel-8-x86_64-rpms
           dnf clean all
           rm -r /var/cache/dnf
@@ -295,7 +295,7 @@ if [ "$COMPONENT" = "ppg-server" ]; then
       yum clean all
 
       if [ ${RHEL} = 8 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled codeready-builder-for-rhel-8-x86_64-rpms
           dnf clean all
           rm -r /var/cache/dnf
@@ -353,7 +353,7 @@ if [ "$COMPONENT" = "postgis" ]; then
           source /opt/rh/llvm-toolset-7/enable
       else
 	 yum config-manager --enable PowerTools AppStream BaseOS *epel
-	 dnf module -y disable postgresql
+	 dnf module -y disable postgresql || true
          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
          yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL}.noarch.rpm
          wget --no-check-certificate https://download.postgresql.org/pub/repos/yum/reporpms/EL-${RHEL}-${ARCH}/pgdg-redhat-repo-latest.noarch.rpm
@@ -438,7 +438,7 @@ if [ "$COMPONENT" = "pgvector" ]; then
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
         else
-            dnf module -y disable postgresql
+            dnf module -y disable postgresql || true
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
 
             INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR_VERSION}-devel percona-postgresql${PG_MAJOR_VERSION}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
@@ -491,7 +491,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
             sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/oracle-linux-ol9.repo
         fi	
 	if [[ "${RHEL}" -eq 8 ]]; then 
-            dnf -y module disable postgresql
+            dnf -y module disable postgresql || true
         elif [[ "${RHEL}" -eq 7 ]]; then
             PKGLIST+=" llvm-toolset-7-clang llvm-toolset-7 llvm5.0-devel llvm-toolset-7-llvm-devel"
             until yum -y install epel-release centos-release-scl; do
@@ -572,7 +572,7 @@ if [ "$COMPONENT" = "pgbouncer" ]; then
           yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
@@ -625,7 +625,7 @@ if [ "$COMPONENT" = "pgbadger" ]; then
       fi
 
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
@@ -678,7 +678,7 @@ if [ "$COMPONENT" = "pgbackrest" ]; then
           yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --enable ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
@@ -758,7 +758,7 @@ if [ "$COMPONENT" = "pgaudit_set_user" ]; then
             source /opt/rh/llvm-toolset-7/enable
         else
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-            dnf module disable postgresql
+            dnf module disable postgresql || true
 
             INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql15-devel percona-postgresql15-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
             yum -y install ${INSTALL_LIST}
@@ -801,7 +801,7 @@ if [ "$COMPONENT" = "pgaudit" ]; then
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
         else
-            dnf module -y disable postgresql
+            dnf module -y disable postgresql || true
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
 
             INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql15-devel percona-postgresql15-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
@@ -847,7 +847,7 @@ if [ "$COMPONENT" = "pg_repack" ]; then
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
       else
-	dnf module -y disable postgresql
+	dnf module -y disable postgresql || true
 	dnf config-manager --enable ol${RHEL}_codeready_builder
         if [ x"$RHEL" = x8 ]; then
         	INSTALL_LIST="clang-devel clang llvm-devel percona-postgresql15 python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql15-devel percona-postgresql15-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel libzstd-devel lz4-devel"
