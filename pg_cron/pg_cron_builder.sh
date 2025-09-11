@@ -110,7 +110,7 @@ build_srpm(){
         exit 1
     fi
     cd $WORKDIR
-    get_tar "source_tarball" "percona-pg-cron"
+    get_tar "source_tarball" "percona-pg_cron"
     rm -fr rpmbuild
     ls | grep -v tar.gz | xargs rm -rf
     TARFILE=$(find . -name 'percona-pg*cron*.tar.gz' | sort | tail -n1)
@@ -200,7 +200,7 @@ build_source_deb(){
         exit 1
     fi
     rm -rf percona-pg-cron*
-    get_tar "source_tarball" "percona-pg-cron"
+    get_tar "source_tarball" "percona-pg_cron"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
     TARFILE=$(basename $(find . -name 'percona-pg*cron*.tar.gz' | sort | tail -n1))
