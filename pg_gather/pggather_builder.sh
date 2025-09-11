@@ -21,8 +21,8 @@ get_sources(){
 
     mkdir ${PG_GATHER_PRODUCT_FULL} 
     cd ${PG_GATHER_PRODUCT_FULL}
-    wget ${PG_GATHER_SRC_URL}/gather.sql .
-    wget ${PG_GATHER_SRC_URL}/README.md .
+    wget ${PG_GATHER_SRC_URL}/gather.sql
+    wget ${PG_GATHER_SRC_URL}/README.md
     echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_gather.properties
     rm -fr debian rpm
     mkdir debian rpm
