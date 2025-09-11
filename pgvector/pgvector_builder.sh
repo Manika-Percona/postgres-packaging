@@ -15,18 +15,18 @@ get_sources(){
 
     echo "PRODUCT=${PGVECTOR_PRODUCT}" > pgvector.properties
 
-    echo "PRODUCT_FULL=${PRODUCT_FULL}" >> pgvector.properties
+    echo "PRODUCT_FULL=${PGVECTOR_PRODUCT_FULL}" >> pgvector.properties
     echo "VERSION=${PGVECTOR_VERSION}" >> pgvector.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pgvector.properties
     echo "BUILD_ID=${BUILD_ID}" >> pgvector.properties
-    git clone "$PGVECTOR_SRC_REPO" ${PRODUCT_FULL}
+    git clone "$PGVECTOR_SRC_REPO" ${PGVECTOR_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PRODUCT_FULL}
+    cd ${PGVECTOR_PRODUCT_FULL}
     if [ ! -z "$PGVECTOR_SRC_BRANCH" ]
     then
         git reset --hard
@@ -63,13 +63,13 @@ get_sources(){
     source pgvector.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PRODUCT_FULL}.tar.gz ${PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PGVECTOR_PRODUCT_FULL}.tar.gz ${PGVECTOR_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PGVECTOR_PRODUCT}/${PRODUCT_FULL}/${PGVECTOR_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgvector.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PGVECTOR_PRODUCT}/${PGVECTOR_PRODUCT_FULL}/${PGVECTOR_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pgvector.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PGVECTOR_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PGVECTOR_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     rm -rf pgvector*
     return

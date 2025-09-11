@@ -195,7 +195,7 @@ case "$1" in
     ;;
 
 
-    pgpool2)
+    pgpool2) # tested OK
         # versions
         PGPOOL2_PRODUCT=percona-pgpool-II-pg${PG_VERSION}
         PGPOOL2_VERSION=4.6.2
