@@ -255,7 +255,7 @@ case "$1" in
         PPG_SERVER_RELEASE='1'
 
         # urls
-        PPG_COMMON_SRC_REPO=${PKG_GIT_REPO}
+        PPG_SERVER_SRC_REPO=${PKG_GIT_REPO}
     ;;
 
 
