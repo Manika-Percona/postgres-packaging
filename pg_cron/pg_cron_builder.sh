@@ -55,7 +55,6 @@ get_sources(){
     sed -i 's:no-temp-instance::' patches/series
     cd ..
     git apply debian/patches/no-temp-instance
-    cd -
     echo ${PG_MAJOR} > debian/pgversions
     echo 10 > debian/compat
     rm -rf deb_packaging
