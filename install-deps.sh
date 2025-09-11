@@ -613,7 +613,7 @@ if [ "$COMPONENT" = "pgbadger" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-        switch_to_vault_repo
+        switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
