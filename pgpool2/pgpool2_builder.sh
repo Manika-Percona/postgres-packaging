@@ -108,7 +108,7 @@ get_sources(){
 override_dh_builddeb:
 	dh_builddeb -- -Zgzip
 EOT
-    mv -f "debian/percona-pgpool2.tmpfile" "debian/percona-pgpool2.tmpfiles"
+    mv -f "debian/percona-pgpool2.tmpfiles" "debian/percona-pgpool2.tmpfiles"
     echo "etc/pgpool2/aws_eip_if_cmd.sh.sample            usr/share/doc/pgpool2/examples" >> debian/percona-pgpool2.install
     echo "etc/pgpool2/aws_rtb_if_cmd.sh.sample            usr/share/doc/pgpool2/examples" >> debian/percona-pgpool2.install 
 
