@@ -147,7 +147,7 @@ case "$1" in
     ;;
 
 
-    pgbackrest)
+    pgbackrest) # tested OK
         # versions
         PG_BCKREST_PRODUCT=percona-pgbackrest
         PG_BCKREST_VERSION=2.56.0
