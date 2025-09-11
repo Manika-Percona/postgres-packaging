@@ -220,7 +220,7 @@ case "$1" in
         PGVECTOR_SRC_BRANCH="v${PGVECTOR_VERSION}"
         PGVECTOR_RPM_RELEASE='3'
         PGVECTOR_DEB_RELEASE='3'
-        PGVECTOR_RELEASE='3'
+        PGVECTOR_RELEASE='1'
 
         # urls
         PGVECTOR_SRC_REPO="https://github.com/pgvector/pgvector.git"
