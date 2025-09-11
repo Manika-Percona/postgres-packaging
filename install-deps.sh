@@ -476,7 +476,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         percona-release enable ppg-${PG_VERSION} testing
         yum -y install git libtool bison flex byacc
 
-        PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_VER}-devel"
+        PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_MAJOR}-devel"
         PKGLIST+=" git rpmdevtools vim wget"
         PKGLIST+=" perl binutils gcc gcc-c++"
         PKGLIST+=" git rpmdevtools wget gcc make autoconf"
@@ -518,7 +518,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         rm -f percona-release_latest.generic_all.deb
         percona-release enable ppg-${PG_VERSION} testing
 
-        PKGLIST="percona-postgresql-${PG_VER} percona-postgresql-common percona-postgresql-server-dev-all"
+        PKGLIST="percona-postgresql-${PG_MAJOR} percona-postgresql-common percona-postgresql-server-dev-all"
         
         apt-get update
 
