@@ -4,7 +4,6 @@ PG_MAJOR=15
 PG_MINOR=14
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
-
 #-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
