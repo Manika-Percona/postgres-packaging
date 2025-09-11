@@ -115,7 +115,7 @@ case "$1" in
     ;;
 
 
-    pgaudit)
+    pgaudit) # tested OK
         # versions
         PGAUDIT_PRODUCT=percona-pgaudit
         PGAUDIT_VERSION=1.7.1
@@ -131,7 +131,7 @@ case "$1" in
     ;;
 
 
-    pgaudit_set_user)
+    pgaudit_set_user) # tested OK
         # versions
         SET_USER_PRODUCT="percona-pgaudit${PG_MAJOR}_set_user"
         SET_USER_PRODUCT_DEB="percona-pgaudit${PG_MAJOR}-set-user"

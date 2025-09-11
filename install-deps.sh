@@ -684,7 +684,7 @@ if [ "$COMPONENT" = "pgbackrest" ]; then
           rm -r /var/cache/dnf
           dnf -y upgrade
           yum -y install perl lz4-libs
-          yum config-manager --set-enabled powertools
+          yum config-manager --set-enabled powertools || true
           yum -y install libyaml-devel
       else
         until yum -y install centos-release-scl; do
