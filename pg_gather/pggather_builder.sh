@@ -235,7 +235,7 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PG_GATHER_PRODUCT_DEB-${PG_GATHER_VERSION}
+    cd ${PG_GATHER_PRODUCT_DEB}-${PG_GATHER_VERSION}
     dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_GATHER_VERSION}-${PG_GATHER_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
