@@ -98,7 +98,7 @@ case "$1" in
     ;;
 
 
-    pg_repack)
+    pg_repack) # tested OK
         # versions
         PG_REPACK_PRODUCT=percona-pg_repack
         PG_REPACK_PRODUCT_DEB=percona-pg-repack
