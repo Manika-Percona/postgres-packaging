@@ -352,7 +352,7 @@ if [ "$COMPONENT" = "postgis" ]; then
           source /opt/rh/devtoolset-7/enable
           source /opt/rh/llvm-toolset-7/enable
       else
-	 yum config-manager --enable PowerTools AppStream BaseOS
+	 yum config-manager --enable PowerTools AppStream BaseOS || true
 	 dnf module -y disable postgresql || true
          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
          yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL}.noarch.rpm
