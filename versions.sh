@@ -258,7 +258,7 @@ case "$1" in
     ;;
 
 
-    ppg-server)
+    ppg-server) # tested OK
         # versions
         PPG_SERVER_PRODUCT=percona-ppg-server-${PG_MAJOR}
         PPG_SERVER_VERSION=ppg-${PG_VERSION}
@@ -278,7 +278,7 @@ case "$1" in
         PPG_SERVER_HA_PRODUCT=percona-ppg-server-ha-${PG_MAJOR}
         PPG_SERVER_HA_VERSION=ppg-${PG_VERSION}
         PPG_SERVER_HA_PRODUCT_FULL=${PPG_SERVER_PRODUCT}-${PPG_SERVER_VERSION}
-        PPG_SERVER_HA_SRC_BRANCH="v${PG_VERSION}"
+        PPG_SERVER_HA_SRC_BRANCH=${PG_VERSION}
         PPG_SERVER_HA_RPM_RELEASE='1'
         PPG_SERVER_HA_DEB_RELEASE='1'
         PPG_SERVER_HA_RELEASE='1'
