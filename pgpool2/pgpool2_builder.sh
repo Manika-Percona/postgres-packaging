@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
 source ../versions.sh "pgpool2"
 # Common functions
