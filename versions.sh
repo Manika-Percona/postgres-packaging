@@ -107,7 +107,7 @@ case "$1" in
         PG_REPACK_SRC_BRANCH="ver_${PG_REPACK_VERSION}"
         PG_REPACK_RPM_RELEASE='2'
         PG_REPACK_DEB_RELEASE='2'
-        PG_REPACK_RELEASE='2'
+        PG_REPACK_RELEASE='1'
 
         # urls
         PG_REPACK_SRC_REPO="https://github.com/reorg/pg_repack.git"
