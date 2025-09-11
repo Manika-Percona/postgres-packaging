@@ -105,7 +105,7 @@ fi
 if [ "$COMPONENT" = "ydiff" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       yum clean all
@@ -154,7 +154,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -170,7 +170,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-	  switch_to_vault_repo
+	  switch_to_vault_repo || true
 
           yum -y install clang-devel clang llvm-devel perl lz4-libs c-ares-devel
       else
@@ -206,7 +206,7 @@ fi
 if [ "$COMPONENT" = "pysyncobj" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       yum clean all
@@ -561,7 +561,7 @@ if [ "$COMPONENT" = "pgbouncer" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -577,7 +577,7 @@ if [ "$COMPONENT" = "pgbouncer" ]; then
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-	  switch_to_vault_repo
+	  switch_to_vault_repo || true
           yum -y install perl lz4-libs c-ares-devel
       else
         until yum -y install centos-release-scl; do
@@ -630,7 +630,7 @@ if [ "$COMPONENT" = "pgbadger" ]; then
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-          switch_to_vault_repo
+          switch_to_vault_repo || true
           yum -y install perl lz4-libs c-ares-devel
 	  yum -y install rpm-build
       else
@@ -666,7 +666,7 @@ fi
 if [ "$COMPONENT" = "pgbackrest" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -954,7 +954,7 @@ fi
 if [ "$COMPONENT" = "patroni" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
