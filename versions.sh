@@ -164,7 +164,7 @@ case "$1" in
     ;;
 
 
-    pgbadger)
+    pgbadger) # tested OK
         # versions
         PGBADGER_PRODUCT=percona-pgbadger
         PGBADGER_VERSION=13.1
@@ -179,7 +179,7 @@ case "$1" in
     ;;
 
 
-    pgbouncer)
+    pgbouncer) # tested OK
         # versions
         PGBOUNCER_PRODUCT=percona-pgbouncer
         PGBOUNCER_VERSION=1.24.1

@@ -473,7 +473,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         fi
         yum -y install wget
         yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-        percona-release enable ppg-${PG_RELEASE} testing
+        percona-release enable ppg-${PG_VERSION} testing
         yum -y install git libtool bison flex byacc
 
         PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_VER}-devel"
@@ -516,15 +516,10 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
         dpkg -i percona-release_latest.generic_all.deb
         rm -f percona-release_latest.generic_all.deb
-        percona-release enable ppg-${PG_RELEASE} testing
+        percona-release enable ppg-${PG_VERSION} testing
 
         PKGLIST="percona-postgresql-${PG_VER} percona-postgresql-common percona-postgresql-server-dev-all"
-
-        # ---- using a community version of postgresql
-        # wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        # echo "deb http://apt.postgresql.org/pub/repos/apt/ ${PG_RELEASE}"-pgdg main | sudo tee  /etc/apt/sources.list.d/pgdg.list
-        # PKGLIST="postgresql-${PG_RELEASE} postgresql-common postgresql-server-dev-all"
-
+        
         apt-get update
 
         if [[ "${OS_NAME}" != "focal" ]]; then
