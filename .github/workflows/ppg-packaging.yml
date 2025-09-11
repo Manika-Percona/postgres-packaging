@@ -147,6 +147,9 @@ jobs:
           percona-release disable all
           percona-release enable ppg-15.14 testing
 
+      - name: syntax check for script
+        run: bash -n ./pkg-builder.sh
+
       - name: Install dependencies
         if: inputs.install_deps
         run: |

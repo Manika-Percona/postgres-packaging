@@ -66,7 +66,7 @@ case "$1" in
     ;;
 
 
-    pg_cron)
+    pg_cron) # tested OK
         # versions
         PG_CRON_PRODUCT=percona-pg_cron_${PG_MAJOR}
         PG_CRON_PRODUCT_DEB=percona-pg-cron_${PG_MAJOR}
