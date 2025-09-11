@@ -83,7 +83,7 @@ case "$1" in
     ;;
 
 
-    pg_gather)
+    pg_gather) # tested OK
         # versions
         PG_GATHER_PRODUCT=percona-pg_gather
         PG_GATHER_PRODUCT_DEB=percona-pg-gather

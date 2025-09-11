@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xe
 # Versions and other variables
-source ../versions.sh "pgrepack"
+source ../versions.sh "pg_repack"
 # Common functions
 source ../common-functions.sh
 
