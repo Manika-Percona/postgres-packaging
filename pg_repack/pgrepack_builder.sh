@@ -304,7 +304,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "pgrepack"
+    source ../install-deps.sh "pg_repack"
 fi
 get_sources
 build_srpm
