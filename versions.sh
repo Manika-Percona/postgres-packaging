@@ -19,7 +19,7 @@ YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
 APT_REPO="https://repo.percona.com/apt/percona-release_latest.generic_all.deb"
 
 case "$1" in
-    postgresql) # tested OK
+    postgresql)
         # versions
         PPG_PRODUCT=percona-postgresql
         PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
@@ -34,7 +34,7 @@ case "$1" in
         TELEMETRY_AGENT="https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh"
     ;;
 
-    postgresql-common) # tested OK
+    postgresql-common)
         # versions
         PPG_COMMON_PRODUCT=percona-postgresql-common
         PPG_COMMON_MAJOR=280
@@ -49,7 +49,7 @@ case "$1" in
     ;;
 
 
-    etcd) # tested OK
+    etcd)
         # versions
         ETCD_PRODUCT=etcd
         ETCD_VERSION=3.5.21
@@ -64,7 +64,7 @@ case "$1" in
     ;;
 
 
-    patroni) # tested OK
+    patroni)
         # versions
         PATRONI_PRODUCT=percona-patroni
         PATRONI_VERSION=4.0.6
@@ -80,7 +80,7 @@ case "$1" in
     ;;
 
 
-    pg_cron) # tested OK
+    pg_cron)
         # versions
         PG_CRON_PRODUCT=percona-pg_cron_${PG_MAJOR}
         PG_CRON_PRODUCT_DEB=percona-pg-cron_${PG_MAJOR}
@@ -97,7 +97,7 @@ case "$1" in
     ;;
 
 
-    pg_gather) # tested OK
+    pg_gather)
         # versions
         PG_GATHER_PRODUCT=percona-pg_gather
         PG_GATHER_PRODUCT_DEB=percona-pg-gather
@@ -112,7 +112,7 @@ case "$1" in
     ;;
 
 
-    pg_repack) # tested OK
+    pg_repack)
         # versions
         PG_REPACK_PRODUCT=percona-pg_repack
         PG_REPACK_PRODUCT_DEB=percona-pg-repack
@@ -129,7 +129,7 @@ case "$1" in
     ;;
 
 
-    pgaudit) # tested OK
+    pgaudit)
         # versions
         PGAUDIT_PRODUCT=percona-pgaudit
         PGAUDIT_VERSION=1.7.1
@@ -145,7 +145,7 @@ case "$1" in
     ;;
 
 
-    pgaudit_set_user) # tested OK
+    pgaudit_set_user)
         # versions
         SET_USER_PRODUCT="percona-pgaudit${PG_MAJOR}_set_user"
         SET_USER_PRODUCT_DEB="percona-pgaudit${PG_MAJOR}-set-user"
@@ -161,7 +161,7 @@ case "$1" in
     ;;
 
 
-    pgbackrest) # tested OK
+    pgbackrest)
         # versions
         PG_BCKREST_PRODUCT=percona-pgbackrest
         PG_BCKREST_VERSION=2.56.0
@@ -178,7 +178,7 @@ case "$1" in
     ;;
 
 
-    pgbadger) # tested OK
+    pgbadger)
         # versions
         PGBADGER_PRODUCT=percona-pgbadger
         PGBADGER_VERSION=13.1
@@ -193,7 +193,7 @@ case "$1" in
     ;;
 
 
-    pgbouncer) # tested OK
+    pgbouncer)
         # versions
         PGBOUNCER_PRODUCT=percona-pgbouncer
         PGBOUNCER_VERSION=1.24.1
@@ -209,7 +209,7 @@ case "$1" in
     ;;
 
 
-    pgpool2) # tested OK
+    pgpool2)
         # versions
         PGPOOL2_PRODUCT=percona-pgpool-II-pg${PG_VERSION}
         PGPOOL2_VERSION=4.6.2
@@ -225,7 +225,7 @@ case "$1" in
     ;;
 
 
-    pgvector) # tested OK
+    pgvector)
         # versions
         PGVECTOR_PRODUCT=percona-pgvector_${PG_MAJOR}
         PGVECTOR_PRODUCT_DEB=percona-pgvector
@@ -258,7 +258,7 @@ case "$1" in
     ;;
 
 
-    ppg-server) # tested OK
+    ppg-server)
         # versions
         PPG_SERVER_PRODUCT=percona-ppg-server-${PG_MAJOR}
         PPG_SERVER_VERSION=ppg-${PG_VERSION}
@@ -277,7 +277,7 @@ case "$1" in
         # versions
         PPG_SERVER_HA_PRODUCT=percona-ppg-server-ha-${PG_MAJOR}
         PPG_SERVER_HA_VERSION=ppg-${PG_VERSION}
-        PPG_SERVER_HA_PRODUCT_FULL=${PPG_SERVER_PRODUCT}-${PPG_SERVER_VERSION}
+        PPG_SERVER_HA_PRODUCT_FULL=${PPG_SERVER_HA_PRODUCT}-${PPG_SERVER_HA_VERSION}
         PPG_SERVER_HA_SRC_BRANCH=${PG_VERSION}
         PPG_SERVER_HA_RPM_RELEASE='1'
         PPG_SERVER_HA_DEB_RELEASE='1'
@@ -288,7 +288,7 @@ case "$1" in
     ;;
 
 
-    pysyncobj) # tested OK
+    pysyncobj)
         # versions
         PYSYNCOBJ_PRODUCT=python3-pysyncobj
         PYSYNCOBJ_VERSION=0.3.10
@@ -304,7 +304,7 @@ case "$1" in
     ;;
 
 
-    wal2json) # tested OK
+    wal2json)
         # versions
         WAL2JSON_PRODUCT=percona-wal2json
         WAL2JSON_VERSION=2.6
@@ -320,7 +320,7 @@ case "$1" in
     ;;
 
 
-    ydiff) # tested OK
+    ydiff)
         # versions
         YDIFF_PRODUCT=python3-ydiff
         YDIFF_VERSION=1.2
