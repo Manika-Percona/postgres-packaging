@@ -19,7 +19,7 @@ get_sources(){
     echo "VERSION=${PSM_VER}" >> ppg-server.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> ppg-server.properties
     echo "BUILD_ID=${BUILD_ID}" >> ppg-server.properties
-    git clone "$PPG_COMMON_SRC_REPO" ${PPG_SERVER_PRODUCT_FULL}
+    git clone "$PPG_SERVER_PRODUCT_FULLREPO" ${PPG_SERVER_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then

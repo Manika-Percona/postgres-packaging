@@ -211,7 +211,7 @@ case "$1" in
     ;;
 
 
-    pgvector)
+    pgvector) # tested OK
         # versions
         PGVECTOR_PRODUCT=percona-pgvector_${PG_MAJOR}
         PGVECTOR_PRODUCT_DEB=percona-pgvector
