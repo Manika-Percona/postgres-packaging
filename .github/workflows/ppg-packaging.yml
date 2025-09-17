@@ -54,13 +54,13 @@ on:
         default: false
         type: boolean
 
-      #branch:
-      #  description: branch for build options
-      #  required: true
+      branch:
+        description: branch for build options
+        required: true
 
-      #additional_options:
-      #  description: additional build options if any
-      #  required: false
+      additional_options:
+        description: additional build options if any
+        required: false
 
       ppg-repo:
         description: ppg repo to be tested
@@ -213,9 +213,9 @@ jobs:
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 --branch=${{ inputs.branch }} ${{ inputs.additional_options }}
           else
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1 --branch=${{ inputs.branch }} ${{ inputs.additional_options }}
           fi
           #if [[ "${{ inputs.package }}" = "etcd" ]]; then
            # ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 ${{ inputs.additional_options }}
@@ -229,9 +229,9 @@ jobs:
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 #--branch=${{ inputs.branch }} ${{ inputs.additional_options }}
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 --branch=${{ inputs.branch }} ${{ inputs.additional_options }}
           else
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1 --branch=${{ inputs.branch }} ${{ inputs.additional_options }}
           fi
         shell: bash
 
