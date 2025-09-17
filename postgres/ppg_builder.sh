@@ -230,7 +230,7 @@ build_source_deb(){
     BUILDDIR=${TARFILE%.tar.gz}
 
     
-    mv ${TARFILE} ${PPG_PRODUCT_FULL}_${PG_VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PPG_PRODUCT}-${PG_MAJOR}_${PG_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
 
     cd debian
