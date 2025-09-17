@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -x
 # Versions and other variables
-source ../versions.sh "wal2json"
+source versions.sh "wal2json"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -294,7 +294,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "wal2json"
+    source install-deps.sh "wal2json"
 fi
 get_sources
 build_srpm

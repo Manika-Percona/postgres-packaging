@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
-source ../versions.sh "pg_cron"
+source versions.sh "pg_cron"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -308,7 +308,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "pg_cron"
+    source install-deps.sh "pg_cron"
 fi
 get_sources
 build_srpm

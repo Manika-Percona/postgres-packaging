@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
-source ../versions.sh "pgaudit_set_user"
+source versions.sh "pgaudit_set_user"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -286,7 +286,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "pgaudit_set_user"
+    source install-deps.sh "pgaudit_set_user"
 fi
 get_sources
 build_srpm

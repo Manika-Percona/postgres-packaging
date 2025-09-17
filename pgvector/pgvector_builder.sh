@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
-source ../versions.sh "pgvector"
+source versions.sh "pgvector"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -300,7 +300,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "pgvector"
+    source install-deps.sh "pgvector"
 fi
 get_sources
 build_srpm

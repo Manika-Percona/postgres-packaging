@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
-source ../versions.sh "patroni"
+source versions.sh "patroni"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -316,7 +316,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "patroni"
+    source install-deps.sh "patroni"
 fi
 get_sources
 build_srpm

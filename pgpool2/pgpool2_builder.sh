@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -x
 # Versions and other variables
-source ../versions.sh "pgpool2"
+source versions.sh "pgpool2"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 set_changelog(){
     if [ -z $1 ]
@@ -406,7 +406,7 @@ get_system "pgpool2"
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "pgpool2"
+    source install-deps.sh "pgpool2"
 fi
 get_sources
 build_srpm

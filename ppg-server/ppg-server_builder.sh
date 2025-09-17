@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -xe
+set -x
 # Versions and other variables
-source ../versions.sh "ppg-server"
+source versions.sh "ppg-server"
 # Common functions
-source ../common-functions.sh
+source common-functions.sh
 
 get_sources(){
     cd "${WORKDIR}"
@@ -277,7 +277,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source ../install-deps.sh "ppg-server"
+    source install-deps.sh "ppg-server"
 fi
 get_sources
 build_srpm
