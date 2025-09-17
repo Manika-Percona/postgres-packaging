@@ -89,10 +89,10 @@ on:
             - debian:bullseye
             - debian:trixie
 
-      debugging:
-        description: tmate session required
-        default: false
-        type: boolean
+      #debugging:
+      #  description: tmate session required
+      #  default: false
+      #  type: boolean
         
 jobs:
   prepare:
@@ -260,7 +260,7 @@ jobs:
           name: ${{ inputs.package }}-deb-archive
           path: ./deb.tar
 
-      - name: enable tmate debugging
-        if: inputs.debugging && failure()
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 60
+      #- name: enable tmate debugging
+      #  if: inputs.debugging && failure()
+      #  uses: mxschmitt/action-tmate@v3
+      #  timeout-minutes: 60
