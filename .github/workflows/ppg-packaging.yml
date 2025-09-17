@@ -1,0 +1,266 @@
+name: PG Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: package name
+        required: true
+        default: postgres
+        type: choice
+        options:
+          - etcd
+          - patroni
+          - pg_gather
+          - pg_repack
+          - pgaudit
+          - pgaudit_set_user
+          - pgbackrest
+          - pgbadger
+          - pgbouncer
+          - pgpool2
+          - pgvector
+          - postgis
+          - postgres
+          - postgres-common
+          - ppg-server
+          - ppg-server-ha
+          - pysyncobj
+          - wal2json
+          - ydiff
+
+      packaging-repo:
+        description: packaging repo to be used
+        default: Manika-Percona/postgres-packaging
+        required: true
+
+      install_deps:
+        description: install_deps
+        default: true
+        type: boolean
+
+      get_sources:
+        description: get_sources
+        default: false
+        type: boolean
+
+      build_src:
+        description: build_src
+        default: false
+        type: boolean
+
+      build_pkg:
+        description: build_pkg
+        default: false
+        type: boolean
+
+      #branch:
+      #  description: branch for build options
+      #  required: true
+
+      #additional_options:
+      #  description: additional build options if any
+      #  required: false
+
+      ppg-repo:
+        description: ppg repo to be tested
+        required: true
+        default: ppg-15.14
+        type: choice
+        options:
+          - ppg-17.6
+          - ppg-16.10
+          - ppg-15.14
+          - ppg-14.19
+          - ppg-13.22
+
+      platform:
+        description: platform to be tested on
+        required: true
+        default: oraclelinux:10
+        type: choice
+        options:
+            - oraclelinux:10
+            - oraclelinux:9
+            - oraclelinux:8
+            - ubuntu:noble
+            - ubuntu:jammy
+            - debian:bookworm
+            - debian:bullseye
+            - debian:trixie
+
+      debugging:
+        description: tmate session required
+        default: false
+        type: boolean
+        
+jobs:
+  prepare:
+   runs-on: ubuntu-latest
+
+   steps:
+     - name: Checkout packaging repo
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0
+         repository: ${{ inputs.packaging-repo }}
+         ref: ${{ github.ref_name }}
+         path: postgres-packaging
+        
+     - name: Create archive of packaging files
+       run: |
+        mkdir pkg
+        if [[ "${{ inputs.package }}" = "postgres" ]]; then
+         cp postgres-packaging/${{ inputs.package }}/ppg_builder.sh pkg/pkg-builder.sh
+        else
+         cp postgres-packaging/${{ inputs.package }}/*builder.sh pkg/pkg-builder.sh
+        fi
+        #cp postgres-packaging/common-functions.sh pkg/
+        #cp postgres-packaging/install-deps.sh pkg/
+        #cp postgres-packaging/versions.sh pkg/
+       shell: bash
+
+     - name: Upload build files as artifact
+       uses: actions/upload-artifact@v4
+       with:
+         name: build-files
+         path: pkg/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: prepare
+    container:
+      image: ${{ inputs.platform }}
+
+    steps:
+      - name: Check OS
+        run: cat /etc/os-release
+
+      - name: Install build tools
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            yum install -y gcc make tar rpm-build rpmdevtools git
+          else
+            apt-get update
+            apt-get install -y wget curl gcc tar git build-essential devscripts debhelper fakeroot lintian
+          fi
+          echo "Ready to build!"
+
+      - name: Get build script artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: ./
+
+      - name: Create a working directory
+        run: mkdir ${{ inputs.package }}
+
+      - name: Copy build script in required directories
+        run: |
+          cp pkg-builder.sh ${{ inputs.package }}/
+        shell: bash
+
+      - name: Update permissions of the build scripts
+        run: |
+          chmod 755 ${{ inputs.package }}/*
+          #chmod 755 common-functions.sh
+          #chmod 755 install-deps.sh
+          #chmod 755 versions.sh
+        shell: bash
+
+      - name: Enable ppg repo
+        if: ${{ inputs.package != 'postgres' }}
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+          else
+            wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+            dpkg -i percona-release_latest.generic_all.deb
+            rm -f percona-release_latest.generic_all.deb
+          fi
+          percona-release disable all
+          percona-release enable ${{ inputs.ppg-repo }} testing
+
+      #- name: syntax check for script
+      #  run: bash -n ./pkg-builder.sh
+
+      - name: Install dependencies
+        if: inputs.install_deps
+        run: |
+          set -xe
+          cd ${{ inputs.package }}
+          mkdir test
+          if [[ "${{ inputs.package }}" = "llvm" ]]; then
+            ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 ${{ inputs.additional_options }}
+          else
+            ./pkg-builder.sh --builddir=$(pwd)/test --branch=${{ inputs.branch }} --install_deps=1 ${{ inputs.additional_options }}
+          fi
+        shell: bash
+
+      - name: Get Sources
+        if: inputs.get_sources
+        run: |
+          cd ${{ inputs.package }}
+          if [[ "${{ inputs.package }}" = "etcd" ]]; then
+            ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 ${{ inputs.additional_options }}
+          else
+            ./pkg-builder.sh --builddir=$(pwd)/test --branch=${{ inputs.branch }} --get_sources=1 ${{ inputs.additional_options }}
+          fi
+        shell: bash
+
+      - name: Build Source RPM/DEB
+        if: inputs.build_src
+        run: |
+          cd ${{ inputs.package }}
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1
+          else
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1
+          fi
+          #if [[ "${{ inputs.package }}" = "etcd" ]]; then
+           # ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 ${{ inputs.additional_options }}
+          #else
+          #  ./pkg-builder.sh --builddir=$(pwd)/test --branch=${{ inputs.branch }} --build_src_rpm=1 ${{ inputs.additional_options }}
+          #fi
+        shell: bash
+
+      - name: Build RPM/DEB
+        if: inputs.build_pkg
+        run: |
+          cd ${{ inputs.package }}
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 #--branch=${{ inputs.branch }} ${{ inputs.additional_options }}
+          else
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1
+          fi
+        shell: bash
+
+      - name: Archive final rpm/deb packages
+        run: |
+          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+            cp -r ${{ inputs.package }}/rpm .
+            tar -cvf rpm.tar rpm/
+          else
+            cp -r ${{ inputs.package }}/deb .
+            tar -cvf deb.tar deb/
+          fi
+        shell: bash
+
+      - name: Upload rpm tar as artifact
+        if: ${{ contains(inputs.platform, 'linux') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.package }}-rpm-archive
+          path: ./rpm.tar
+
+      - name: Upload deb tar as artifact
+        if: ${{ !contains(inputs.platform, 'linux') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.package }}-deb-archive
+          path: ./deb.tar
+
+      - name: enable tmate debugging
+        if: inputs.debugging && failure()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
