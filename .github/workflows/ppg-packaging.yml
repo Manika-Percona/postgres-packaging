@@ -74,20 +74,30 @@ on:
           - ppg-14.19
           - ppg-13.22
 
-      platform:
-        description: platform to be tested on
+      ppg-repo-type:
+        description: ppg repo to be tested
         required: true
-        default: oraclelinux:10
+        default: experimental
         type: choice
         options:
-            - oraclelinux:10
-            - oraclelinux:9
-            - oraclelinux:8
-            - ubuntu:noble
-            - ubuntu:jammy
-            - debian:bookworm
-            - debian:bullseye
-            - debian:trixie
+          - experimental
+          - testing
+          - release
+
+      #platform:
+      #  description: platform to be tested on
+      #  required: true
+      #  default: oraclelinux:10
+      #  type: choice
+      #  options:
+      #      - oraclelinux:10
+      #      - oraclelinux:9
+      #      - oraclelinux:8
+      #      - ubuntu:noble
+      #      - ubuntu:jammy
+      #      - debian:bookworm
+      #      - debian:bullseye
+      #      - debian:trixie
 
       #debugging:
       #  description: tmate session required
@@ -130,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare
     container:
-      image: ${{ inputs.platform }}
+      image: debian:trixie #${{ inputs.platform }}
 
     steps:
       - name: Check OS
