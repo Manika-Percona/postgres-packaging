@@ -53,7 +53,6 @@ parse_arguments() {
             --postgis_branch=*) POSTGIS_BRANCH="$val" ;;
             --repo=*) REPO="$val" ;;
             --postgis_gitrepo=*) POSTGIS_GITREPO="$val" ;;
-            --version=*) VERSION=$(echo $val|awk -F'-' '{print $2}') ;;
             --postgis_ver=*) POSTGIS_VERSION="$val" ;;
             --rpm_release=*) RPM_RELEASE="$val" ;;
             --deb_release=*) DEB_RELEASE="$val" ;;

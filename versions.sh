@@ -261,7 +261,7 @@ case "$1" in
     ppg-server)
         # versions
         PPG_SERVER_PRODUCT=percona-ppg-server-${PG_MAJOR}
-        PPG_SERVER_VERSION=ppg-${PG_VERSION}
+        PPG_SERVER_VERSION=${PG_VERSION}
         PPG_SERVER_PRODUCT_FULL=${PPG_SERVER_PRODUCT}-${PPG_SERVER_VERSION}
         PPG_SERVER_SRC_BRANCH=${PG_VERSION}
         PPG_SERVER_RPM_RELEASE='1'
@@ -276,7 +276,7 @@ case "$1" in
     ppg-server-ha)
         # versions
         PPG_SERVER_HA_PRODUCT=percona-ppg-server-ha-${PG_MAJOR}
-        PPG_SERVER_HA_VERSION=ppg-${PG_VERSION}
+        PPG_SERVER_HA_VERSION=${PG_VERSION}
         PPG_SERVER_HA_PRODUCT_FULL=${PPG_SERVER_HA_PRODUCT}-${PPG_SERVER_HA_VERSION}
         PPG_SERVER_HA_SRC_BRANCH=${PG_VERSION}
         PPG_SERVER_HA_RPM_RELEASE='1'
