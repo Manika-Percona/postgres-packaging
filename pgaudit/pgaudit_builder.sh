@@ -50,7 +50,7 @@ get_sources(){
     mv all.patch debian/patches/
     rm -rf debian/control*
     echo "all.patch" > debian/patches/series
-    echo "alternative_regression_outputs.patch" >> debian/patches/series
+    #echo "alternative_regression_outputs.patch" >> debian/patches/series
     mv control* debian/
     mv rules debian/
     echo 15 > debian/pgversions
