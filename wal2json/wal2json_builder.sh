@@ -234,7 +234,7 @@ install_deps() {
       apt-get -y install lsb-release wget gnupg2 curl
       export DEBIAN=$(lsb_release -sc)
       add_percona_apt_repo
-      if [ "x${DEBIAN}" != "xtrixie" ]; then
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
         percona-release enable ppg-${PG_VERSION} experimental
       fi
       apt-get update || true
