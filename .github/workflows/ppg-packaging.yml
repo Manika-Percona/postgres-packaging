@@ -208,7 +208,7 @@ jobs:
         shell: bash
 
       - name: Build RPM/DEB
-        if: inputs.build_rpm
+        if: inputs.build_pkg
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
