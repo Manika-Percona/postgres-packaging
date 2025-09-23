@@ -264,7 +264,7 @@ build_deb(){
     #
     dpkg-source -x ${DSC}
     #
-    cd ${PRODUCT}-${VERSION}
+    cd ${PGAUDIT_PRODUCT_FULL}
     dch -m -D "${DEBIAN}" --force-distribution -v "1:${PGAUDIT_VERSION}-${PGAUDIT_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
