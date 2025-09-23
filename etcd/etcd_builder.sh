@@ -218,6 +218,9 @@ install_deps() {
       apt-get -y install lsb-release wget curl gnupg2
       export DEBIAN=$(lsb_release -sc)
       add_percona_apt_repo
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        percona-release enable ppg-${PG_VERSION} experimental
+      fi
       apt-get update || true
       INSTALL_LIST="git vim wget rpm dpkg-dev build-essential ccache cron debconf debhelper devscripts dh-exec curl dh-golang fakeroot golang-go"
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
