@@ -256,7 +256,7 @@ install_deps() {
         percona-release enable ppg-${PG_VERSION} experimental
       fi
       apt-get update || true
-      INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang libjs-mathjax pyflakes3  python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python"
+      INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang libjs-mathjax pyflakes3  python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python "
       if [ "x${DEBIAN}" = "xtrixie" ]; then
         INSTALL_LIST+="python-setuptools python3-dev dh-virtualenv python3-boto3"  
       elif [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" -a "x${DEBIAN}" != "xtrixie" ]; then
