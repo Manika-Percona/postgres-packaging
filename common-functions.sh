@@ -43,6 +43,7 @@ parse_arguments() {
             --builddir=*) WORKDIR="$val" ;;
             --build_src_rpm=*) SRPM="$val" ;;
             --build_src_deb=*) SDEB="$val" ;;
+			--build_source_deb=*) SDEB="$val" ;;
             --build_rpm=*) RPM="$val" ;;
             --build_deb=*) DEB="$val" ;;
             --get_sources=*) SOURCE="$val" ;;
