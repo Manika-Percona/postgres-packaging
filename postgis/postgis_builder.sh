@@ -311,6 +311,9 @@ install_deps() {
       rm -f percona-release_latest.generic_all.deb
       percona-release enable-only tools testing
       percona-release enable-only ppg-${PPG_VERSION} testing
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+            percona-release enable ppg-${PG_VERSION} experimental
+      fi
       percona-release enable telemetry testing
       apt-get update
       if [ "x${DEBIAN}" = "xbionic" ]; then
