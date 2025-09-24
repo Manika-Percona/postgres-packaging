@@ -312,7 +312,7 @@ install_deps() {
       percona-release enable-only tools testing
       percona-release enable-only ppg-${PPG_VERSION} testing
       if [ "x${DEBIAN}" = "xtrixie" ]; then
-            percona-release enable ppg-${PG_VERSION} experimental
+            percona-release enable ppg-${PPG_VERSION} experimental
       fi
       percona-release enable telemetry testing
       apt-get update
