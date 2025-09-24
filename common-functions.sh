@@ -46,8 +46,11 @@ parse_arguments() {
             --build_rpm=*) RPM="$val" ;;
             --build_deb=*) DEB="$val" ;;
             --get_sources=*) SOURCE="$val" ;;
+			--build_tarball=*) TARBALL="$val" ;;
             --branch=*) BRANCH="$val" ;;
             --repo=*) REPO="$val" ;;
+			--pp_branch=*) BUILD_BRANCH="$val" ;;
+            --pp_repo=*) GIT_BUILD_REPO="$val" ;;
             --version=*) VERSION=$(echo $val|awk -F'-' '{print $2}') ;;
             --install_deps=*) INSTALL="$val" ;;
             --postgis_branch=*) POSTGIS_BRANCH="$val" ;;
@@ -56,6 +59,7 @@ parse_arguments() {
             --postgis_ver=*) POSTGIS_VERSION="$val" ;;
             --rpm_release=*) RPM_RELEASE="$val" ;;
             --deb_release=*) DEB_RELEASE="$val" ;;
+			--pg_release=*) PG_RELEASE="$val" ;;
             --help) usage ;;
             *)
               if test -n "$pick_args"
