@@ -228,6 +228,9 @@ install_deps() {
       export DEBIAN=$(lsb_release -sc)
       export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
       add_percona_apt_repo
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+            percona-release enable ppg-${PG_VERSION} experimental
+      fi
       apt-get update || true
       INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-libxml-perl libcontextual-return-perl libxml-checker-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-common libbz2-dev libzstd-dev libevent-dev libssl-dev libc-ares-dev pandoc pkg-config libjson-xs-perl libpod-markdown-perl"
       until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
