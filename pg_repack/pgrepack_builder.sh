@@ -234,9 +234,6 @@ install_deps() {
       export DEBIAN=$(lsb_release -sc)
       export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
       add_percona_apt_repo
-      if [ "x${DEBIAN}" = "xtrixie" ]; then
-        percona-release enable ppg-${PG_VERSION} experimental
-      fi
       percona-release enable tools testing
       apt-get update || true
       INSTALL_LIST="dpkg-dev build-essential percona-postgresql-${PG_MAJOR_VERSION} debconf debhelper devscripts dh-exec git wget libkrb5-dev libssl-dev percona-postgresql-common percona-postgresql-server-dev-all"
