@@ -395,7 +395,7 @@ if [ "$COMPONENT" = "postgis" ]; then
       dpkg -i percona-release_latest.generic_all.deb
       rm -f percona-release_latest.generic_all.deb
       percona-release enable-only tools testing
-      percona-release enable-only ppg-${PPG_VERSION} testing
+      percona-release enable-only ppg-${PG_VERSION} testing
       percona-release enable telemetry testing
       apt-get update
       if [ "x${DEBIAN}" = "xbionic" ]; then
