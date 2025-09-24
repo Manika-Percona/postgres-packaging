@@ -271,7 +271,7 @@ install_deps() {
 	pip3 install python-kubernetes 
       else 
         DEBIAN_FRONTEND=noninteractive apt-get -y install python3-consul python3-kubernetes python3-cdiff || true
-        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" ]; then
+        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" -o "x${DEBIAN}" = "xtrixie" ]; then
           apt-get install -y python3-sphinxcontrib.apidoc
           apt-get install -y python3-pysyncobj
           apt-get install -y python3-boto3
