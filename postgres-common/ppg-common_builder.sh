@@ -435,7 +435,7 @@ build_deb(){
     unset $(locale|cut -d= -f1)
     sed -i '38,55d' Makefile
     dpkg-buildpackage -rfakeroot -us -uc -b
-    cat debian/percona-postgresql-common-dev/usr/share/postgresql-common/supported-versions
+    cat $CURDIR/test/percona-postgresql-common-280/percona-postgresql-common-dev/usr/share/postgresql-common/supported-versions
     mkdir -p $CURDIR/deb
     mkdir -p $WORKDIR/deb
     cd $WORKDIR/
