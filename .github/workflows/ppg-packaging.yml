@@ -34,26 +34,6 @@ on:
         default: Manika-Percona/postgres-packaging
         required: true
 
-      install_deps:
-        description: install_deps
-        default: true
-        type: boolean
-
-      get_sources:
-        description: get_sources
-        default: false
-        type: boolean
-
-      build_src:
-        description: build_src
-        default: false
-        type: boolean
-
-      build_pkg:
-        description: build_pkg
-        default: false
-        type: boolean
-
       branch:
         description: branch for build options
         required: true
@@ -84,25 +64,25 @@ on:
           - testing
           - release
 
-      #platform:
-      #  description: platform to be tested on
-      #  required: true
-      #  default: oraclelinux:10
-      #  type: choice
-      #  options:
-      #      - oraclelinux:10
-      #      - oraclelinux:9
-      #      - oraclelinux:8
-      #      - ubuntu:noble
-      #      - ubuntu:jammy
-      #      - debian:bookworm
-      #      - debian:bullseye
-      #      - debian:trixie
+      platform:
+        description: platform to be tested on
+        required: true
+        default: oraclelinux:10
+        type: choice
+        options:
+            - oraclelinux:10
+            - oraclelinux:9
+            - oraclelinux:8
+            - ubuntu:noble
+            - ubuntu:jammy
+            - debian:bookworm
+            - debian:bullseye
+            - debian:trixie
 
-      #debugging:
-      #  description: tmate session required
-      #  default: false
-      #  type: boolean
+      debugging:
+        description: tmate session required
+        default: false
+        type: boolean
         
 jobs:
   prepare:
@@ -140,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare
     container:
-      image: debian:trixie #${{ inputs.platform }}
+      image: ${{ inputs.platform }}
 
     steps:
       - name: Check OS
@@ -191,11 +171,7 @@ jobs:
           percona-release disable all
           percona-release enable ${{ inputs.ppg-repo }} ${{ inputs.ppg-repo-type }}
 
-      #- name: syntax check for script
-      #  run: bash -n ./pkg-builder.sh
-
       - name: Install dependencies
-        if: inputs.install_deps
         run: |
           set -xe
           cd ${{ inputs.package }}
@@ -208,7 +184,6 @@ jobs:
         shell: bash
 
       - name: Get Sources
-        if: inputs.get_sources
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.package }}" = "etcd" ]]; then
@@ -219,7 +194,6 @@ jobs:
         shell: bash
 
       - name: Build Source RPM/DEB
-        if: inputs.build_src
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -235,7 +209,6 @@ jobs:
         shell: bash
 
       - name: Build RPM/DEB
-        if: inputs.build_pkg
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
@@ -270,7 +243,7 @@ jobs:
           name: ${{ inputs.package }}-deb-archive
           path: ./deb.tar
 
-      #- name: enable tmate debugging
-      #  if: inputs.debugging && failure()
-      #  uses: mxschmitt/action-tmate@v3
-      #  timeout-minutes: 60
+      - name: enable tmate debugging
+        if: inputs.debugging && failure()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
