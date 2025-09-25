@@ -122,7 +122,7 @@ get_sources(){
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/maintscripts-functions.patch
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/percona-postgresql-common.templates.patch
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/rules
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/18.0/postgres-common/supported-versions
+        wget https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/18.0/postgres-common/supported-versions
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}/postgres-common/postgresql-common.install
         wget https://raw.githubusercontent.com/percona/postgres-packaging/refs/heads/${PG_VERSION}/postgres-common/percona-postgresql-common-dev.install
         wget https://raw.githubusercontent.com/percona/postgres-packaging/refs/heads/${PG_VERSION}/postgres-common/percona-postgresql-server-dev-all.install
