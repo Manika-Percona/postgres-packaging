@@ -243,9 +243,6 @@ jobs:
           name: ${{ inputs.package }}-deb-archive
           path: ./deb.tar
 
-      - name: force acquire tmate session
-        run: abc
-
       - name: enable tmate debugging
         if: inputs.debugging && failure()
         uses: mxschmitt/action-tmate@v3
