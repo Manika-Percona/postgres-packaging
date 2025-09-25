@@ -128,6 +128,7 @@ get_sources(){
         wget https://raw.githubusercontent.com/percona/postgres-packaging/refs/heads/${PG_VERSION}/postgres-common/percona-postgresql-server-dev-all.install
         cp postgresql-common.tmpfiles postgresql-common.conf
         sudo chmod +x supported-versions
+        cat supported-versions
         patch -p0 < maintscripts-functions.patch
         patch -p0 < percona-postgresql-common.templates.patch
         rm -rf maintscripts-functions.patch percona-postgresql-common.templates.patch
