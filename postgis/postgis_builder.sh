@@ -129,7 +129,7 @@ get_sources(){
             mv $file "percona-$file"
         done
         rm -f rules* control* percona-postgis.install patches/sfcgal*
-        wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/rules
+        wget https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/18.0/postgis/debian/rules
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/control
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-${PG_MAJOR_VERSION}-postgis-3-scripts.install
         wget https://raw.githubusercontent.com/percona/postgres-packaging/${PPG_VERSION}/postgis/debian/percona-postgresql-${PG_MAJOR_VERSION}-postgis-3-scripts.lintian-overrides
