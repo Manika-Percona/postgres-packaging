@@ -143,6 +143,7 @@ get_sources(){
         sed -i 's:ucfr:ucfr --force:g' postgresql-common.postrm
         mv postgresql-common.install.1 postgresql-common.install
         mv percona-postgresql-common-dev.install.1 percona-postgresql-common-dev.install
+        cat percona-postgresql-common-dev.install
         sed -i '3d' postgresql-client-common.install
         rm -rf percona-postgresql-common-dev.manpages
         echo "pgcommon.sh usr/share/postgresql-common" >> postgresql-client-common.install
@@ -434,6 +435,7 @@ build_deb(){
     unset $(locale|cut -d= -f1)
     sed -i '38,55d' Makefile
     dpkg-buildpackage -rfakeroot -us -uc -b
+    cat debian/percona-postgresql-common-dev/usr/share/postgresql-common/supported-versions
     mkdir -p $CURDIR/deb
     mkdir -p $WORKDIR/deb
     cd $WORKDIR/
