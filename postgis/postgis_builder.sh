@@ -309,7 +309,6 @@ install_deps() {
       wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
       dpkg -i percona-release_latest.generic_all.deb
       rm -f percona-release_latest.generic_all.deb
-      percona-release enable-only tools testing
       percona-release enable-only ppg-${PPG_VERSION} testing
       if [ "x${DEBIAN}" = "xtrixie" ]; then
             percona-release enable ppg-${PPG_VERSION} experimental
