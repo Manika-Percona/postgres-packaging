@@ -58,7 +58,7 @@ get_sources(){
     mkdir rpm
     cd rpm
     wget ${PKG_RAW_URL}/wal2json/percona-wal2json.spec
-    wget ${PKG_RAW_URL}/wal2json/wal2json-pg15-makefile-pgxs.patch
+    wget ${PKG_RAW_URL}/wal2json/wal2json-pg${PG_MAJOR}-makefile-pgxs.patch
     cd ${WORKDIR}
     #
     source wal2json.properties
