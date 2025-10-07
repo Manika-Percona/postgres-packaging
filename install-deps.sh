@@ -60,7 +60,7 @@ else
   dpkg-reconfigure --frontend noninteractive tzdata
   add_percona_apt_repo
   apt-get update
-  if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" ]; then
+  if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" -a "x${DEBIAN}" != "xtrixie" ]; then
     INSTALL_LIST="bison build-essential ccache cron debconf debhelper devscripts dh-exec dh-systemd docbook-xml docbook-xsl dpkg-dev flex gcc gettext git krb5-multidev libbsd-resource-perl libedit-dev libicu-dev libipc-run-perl libkrb5-dev libldap-dev libldap2-dev libmemchan-tcl-dev libpam0g-dev libperl-dev libpython-dev libreadline-dev libselinux1-dev libssl-dev libsystemd-dev libwww-perl libxml2-dev libxml2-utils libxslt-dev libxslt1-dev llvm-dev perl pkg-config python python-dev python3-dev systemtap-sdt-dev tcl-dev tcl8.6-dev uuid-dev vim wget xsltproc zlib1g-dev rename clang gdb liblz4-dev libipc-run-perl libzstd-dev"
   else
     INSTALL_LIST="bison build-essential ccache cron debconf debhelper devscripts dh-exec docbook-xml docbook-xsl dpkg-dev flex gcc gettext git krb5-multidev libbsd-resource-perl libedit-dev libicu-dev libipc-run-perl libkrb5-dev libldap-dev libldap2-dev libmemchan-tcl-dev libpam0g-dev libperl-dev libpython3-dev libreadline-dev libselinux1-dev libssl-dev libsystemd-dev libwww-perl libxml2-dev libxml2-utils libxslt-dev libxslt1-dev llvm-dev perl pkg-config python3 python3-dev systemtap-sdt-dev tcl-dev tcl8.6-dev uuid-dev vim wget xsltproc zlib1g-dev rename clang gdb liblz4-dev libipc-run-perl libzstd-dev"
@@ -140,10 +140,13 @@ if [ "$COMPONENT" = "ydiff" ]; then
       done
       apt-get update || true
 
-      if [ "x${DEBIAN}" != "xfocal" ]; then
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python3-setuptools python3-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools libyaml-dev python3-virtualenv ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python2-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+        INSTALL_LIST+="python2-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
     fi
@@ -238,10 +241,13 @@ if [ "$COMPONENT" = "pysyncobj" ]; then
       done
       apt-get update || true
 
-      if [ "x${DEBIAN}" != "xfocal" ]; then
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools python3-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python2-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+        INSTALL_LIST+="python2-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
     fi
@@ -394,7 +400,6 @@ if [ "$COMPONENT" = "postgis" ]; then
       wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
       dpkg -i percona-release_latest.generic_all.deb
       rm -f percona-release_latest.generic_all.deb
-      percona-release enable-only tools testing
       percona-release enable-only ppg-${PG_VERSION} testing
       percona-release enable telemetry testing
       apt-get update
@@ -453,8 +458,6 @@ if [ "$COMPONENT" = "pgvector" ]; then
 	apt-get -y update || true
         apt-get -y install gnupg2 curl
         add_percona_apt_repo
-        percona-release enable tools testing
-        percona-release enable ppg-${PG_VERSION} testing
         apt-get update || true
         INSTALL_LIST="build-essential dpkg-dev debconf debhelper clang devscripts dh-exec git wget libkrb5-dev libssl-dev percona-postgresql-common percona-postgresql-server-dev-all"
         DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
@@ -512,6 +515,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
     else
         apt-get update
         DEBIAN_FRONTEND=noninteractive apt-get -y install lsb-release gnupg git wget curl
+        export DEBIAN=$(lsb_release -sc)
 
         wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
         dpkg -i percona-release_latest.generic_all.deb
@@ -522,7 +526,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         
         apt-get update
 
-        if [[ "${OS_NAME}" != "focal" ]]; then
+        if [[ "${DEBIAN}" != "focal" ]]; then
             #LLVM_EXISTS=$(grep -c "apt.llvm.org" /etc/apt/sources.list)
             #if [ "${LLVM_EXISTS}" == 0 ]; then
             #    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
@@ -545,9 +549,9 @@ if [ "$COMPONENT" = "pgpool2" ]; then
             echo "waiting"
         done
 
-        cat /etc/apt/sources.list | grep ${OS_NAME}-backports
+        cat /etc/apt/sources.list | grep ${DEBIAN}-backports
         apt list --all-versions debhelper
-        apt-get -y install -t ${OS_NAME}-backports debhelper
+        apt-get -y install -t ${DEBIAN}-backports debhelper
 
         get_openjade_devel
     fi
@@ -988,10 +992,13 @@ if [ "$COMPONENT" = "patroni" ]; then
       done
       add_percona_apt_repo
       apt-get update || true
-      if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" ]; then
-        INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python-setuptools python-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python"
+      INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang libjs-mathjax pyflakes3  python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" -a "x${DEBIAN}" != "xtrixie" ]; then
+        INSTALL_LIST+="python-setuptools python-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python3-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python"
+        INSTALL_LIST+="python3-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
       if [ "x${DEBIAN}" = "xstretch" ]; then
@@ -1000,7 +1007,7 @@ if [ "$COMPONENT" = "patroni" ]; then
 	pip3 install python-kubernetes 
       else 
         DEBIAN_FRONTEND=noninteractive apt-get -y install python3-consul python3-kubernetes python3-cdiff || true
-        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" ]; then
+        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" -o "x${DEBIAN}" = "xtrixie" ]; then
           apt-get install -y python3-sphinxcontrib.apidoc
           apt-get install -y python3-pysyncobj
           apt-get install -y python3-boto3

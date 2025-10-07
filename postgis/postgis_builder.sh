@@ -346,6 +346,7 @@ build_deb(){
         cp debian/control debian/control.in
 	sed -i "248i override_dh_shlibdeps:\n\tdh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info" debian/rules
     fi
+    sed -i '67i\LIBTOOLIZE_MAJOR_VER=`echo ${LIBTOOLIZE_MAJOR_VER} | awk -F'\''-'\'' '\''{print $NF}'\''`' autogen.sh
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
     mkdir -p $WORKDIR/deb
