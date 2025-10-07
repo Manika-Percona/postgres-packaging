@@ -67,7 +67,7 @@ if [ "x$OS" = "xrpm" ]; then
       percona-release disable all
       percona-release enable ppg-${PG_VERSION} testing
       apt-get update
-      if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" ]; then
+      if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" -a "x${DEBIAN}" != "xtrixie" ]; then
         INSTALL_LIST="bison build-essential ccache cron debconf debhelper devscripts dh-exec dh-systemd docbook-xml docbook-xsl dpkg-dev flex gcc gettext git krb5-multidev libbsd-resource-perl libedit-dev libicu-dev libipc-run-perl libkrb5-dev libldap-dev libldap2-dev libmemchan-tcl-dev libpam0g-dev libperl-dev libpython-dev libreadline-dev libselinux1-dev libssl-dev libsystemd-dev libwww-perl libxml2-dev libxml2-utils libxslt-dev libxslt1-dev llvm-dev perl pkg-config python python-dev python3-dev systemtap-sdt-dev tcl-dev tcl8.6-dev uuid-dev vim wget xsltproc zlib1g-dev rename clang gdb liblz4-dev libipc-run-perl libzstd-dev"
       else
         INSTALL_LIST="bison build-essential ccache cron debconf debhelper devscripts dh-exec docbook-xml docbook-xsl dpkg-dev flex gcc gettext git krb5-multidev libbsd-resource-perl libedit-dev libicu-dev libipc-run-perl libkrb5-dev libldap-dev libldap2-dev libmemchan-tcl-dev libpam0g-dev libperl-dev libpython3-dev libreadline-dev libselinux1-dev libssl-dev libsystemd-dev libwww-perl libxml2-dev libxml2-utils libxslt-dev libxslt1-dev llvm-dev perl pkg-config python3 python3-dev systemtap-sdt-dev tcl-dev tcl8.6-dev uuid-dev vim wget xsltproc zlib1g-dev rename clang gdb liblz4-dev libipc-run-perl libzstd-dev"
@@ -113,7 +113,7 @@ fi
 if [ "$COMPONENT" = "ydiff" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       yum clean all
@@ -148,10 +148,13 @@ if [ "$COMPONENT" = "ydiff" ]; then
       done
       apt-get update || true
 
-      if [ "x${DEBIAN}" != "xfocal" ]; then
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python3-setuptools python3-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools libyaml-dev python3-virtualenv ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python2-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+        INSTALL_LIST+="python2-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
     fi
@@ -162,7 +165,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -173,12 +176,13 @@ if [ "$COMPONENT" = "wal2json" ]; then
         yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-	      switch_to_vault_repo
+	  switch_to_vault_repo || true
+
           yum -y install clang-devel clang llvm-devel perl lz4-libs c-ares-devel
       else
         until yum -y install centos-release-scl; do
@@ -189,7 +193,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
       fi
-      INSTALL_LIST="pandoc libtool libevent-devel python3-psycopg2 openssl-devel pam-devel percona-postgresql16-devel git rpmdevtools systemd systemd-devel wget libxml2-devel perl perl-DBD-Pg perl-Digest-SHA perl-IO-Socket-SSL perl-JSON-PP zlib-devel gcc make autoconf perl-ExtUtils-Embed"
+      INSTALL_LIST="pandoc libtool libevent-devel python3-psycopg2 openssl-devel pam-devel percona-postgresql${PG_MAJOR}-devel git rpmdevtools systemd systemd-devel wget libxml2-devel perl perl-DBD-Pg perl-Digest-SHA perl-IO-Socket-SSL perl-JSON-PP zlib-devel gcc make autoconf perl-ExtUtils-Embed"
       yum -y install ${INSTALL_LIST}
       yum -y install lz4 || true
 
@@ -200,7 +204,7 @@ if [ "$COMPONENT" = "wal2json" ]; then
       export DEBIAN=$(lsb_release -sc)
       add_percona_apt_repo
       apt-get update || true
-      INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-checker-perl libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-16 percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-all libbz2-dev libzstd-dev libevent-dev libssl-dev libc-ares-dev pandoc pkg-config"
+      INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-checker-perl libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-${PG_MAJOR} percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-all libbz2-dev libzstd-dev libevent-dev libssl-dev libc-ares-dev pandoc pkg-config"
       until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
         sleep 1
         echo "waiting"
@@ -213,7 +217,7 @@ fi
 if [ "$COMPONENT" = "pysyncobj" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       yum clean all
@@ -245,10 +249,13 @@ if [ "$COMPONENT" = "pysyncobj" ]; then
       done
       apt-get update || true
 
-      if [ "x${DEBIAN}" != "xfocal" ]; then
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools python3-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+      INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python3-setuptools libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 python2-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems curl golang dh-python libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-all"
+        INSTALL_LIST+="python2-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
     fi
@@ -263,7 +270,7 @@ if [ "$COMPONENT" = "ppg-server-ha" ]; then
       yum clean all
 
       if [ ${RHEL} = 8 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled codeready-builder-for-rhel-8-x86_64-rpms
           dnf clean all
           rm -r /var/cache/dnf
@@ -271,9 +278,9 @@ if [ "$COMPONENT" = "ppg-server-ha" ]; then
           yum -y install perl lz4-libs c-ares-devel
       fi
       if [[ "${RHEL}" -eq 10 ]]; then
-        INSTALL_LIST="git wget rpm-build rpmdevtools"
+        INSTALL_LIST="git rpm-build rpmdevtools"
       else
-        INSTALL_LIST="git wget rpm-build rpmdevtools rpmlint"
+        INSTALL_LIST="git rpm-build rpmdevtools rpmlint"
       fi
       yum -y install ${INSTALL_LIST}
       yum -y install lz4 || true
@@ -298,11 +305,11 @@ if [ "$COMPONENT" = "ppg-server" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       yum -y install wget
-      #add_percona_yum_repo
+      add_percona_yum_repo
       yum clean all
 
       if [ ${RHEL} = 8 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled codeready-builder-for-rhel-8-x86_64-rpms
           dnf clean all
           rm -r /var/cache/dnf
@@ -310,9 +317,9 @@ if [ "$COMPONENT" = "ppg-server" ]; then
           yum -y install perl lz4-libs c-ares-devel
       fi
       if [[ "${RHEL}" -eq 10 ]]; then
-        INSTALL_LIST="git wget rpm-build rpmdevtools"
+        INSTALL_LIST="git rpm-build rpmdevtools"
       else
-        INSTALL_LIST="git wget rpm-build rpmdevtools rpmlint"
+        INSTALL_LIST="git rpm-build rpmdevtools rpmlint"
       fi
       yum -y install ${INSTALL_LIST}
       yum -y install lz4 || true
@@ -340,12 +347,12 @@ if [ "$COMPONENT" = "postgis" ]; then
       yum clean all
       RHEL=$(rpm --eval %rhel)
       ARCH=$(uname -m)
-        if [[ "${RHEL}" -eq 10 ]]; then
-            yum install oracle-epel-release-el10
-            dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-        else
-            yum -y install epel-release
-        fi
+      if [[ "${RHEL}" -eq 10 ]]; then
+          yum install oracle-epel-release-el10
+          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+      else
+          yum -y install epel-release
+      fi
       if [ x"$RHEL" = x6 -o x"$RHEL" = x7 ]; then
           until yum -y install centos-release-scl; do
               echo "waiting"
@@ -354,13 +361,13 @@ if [ "$COMPONENT" = "postgis" ]; then
           wget --no-check-certificate https://download.postgresql.org/pub/repos/yum/reporpms/EL-${RHEL}-${ARCH}/pgdg-redhat-repo-latest.noarch.rpm
           yum -y install pgdg-redhat-repo-latest.noarch.rpm
           yum -y install pgdg-srpm-macros
-          INSTALL_LIST="git rpm-build autoconf libtool flex rpmdevtools wget llvm-toolset-7 devtoolset-7 rpmlint percona-postgresql16-devel gcc make  geos geos-devel proj libgeotiff-devel pcre-devel gmp-devel SFCGAL SFCGAL-devel gdal33-devel gdal34-devel geos311-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel proj72-devel protobuf-c-devel pkg-config"
+          INSTALL_LIST="git rpm-build autoconf libtool flex rpmdevtools wget llvm-toolset-7 devtoolset-7 rpmlint percona-postgresql${PG_MAJOR}-devel gcc make  geos geos-devel proj libgeotiff-devel pcre-devel gmp-devel SFCGAL SFCGAL-devel gdal33-devel gdal34-devel geos311-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel proj72-devel protobuf-c-devel pkg-config"
           yum -y install ${INSTALL_LIST}
           source /opt/rh/devtoolset-7/enable
           source /opt/rh/llvm-toolset-7/enable
       else
-         yum config-manager --enable PowerTools AppStream BaseOS *epel
-         dnf module -y disable postgresql
+         yum config-manager --enable PowerTools AppStream BaseOS *epel || true
+         dnf module -y disable postgresql || true
          dnf config-manager --set-enabled ol${RHEL}_codeready_builder
          yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL}.noarch.rpm
          wget --no-check-certificate https://download.postgresql.org/pub/repos/yum/reporpms/EL-${RHEL}-${ARCH}/pgdg-redhat-repo-latest.noarch.rpm
@@ -369,8 +376,8 @@ if [ "$COMPONENT" = "postgis" ]; then
          if [ x"$RHEL" = x9 ]; then
             yum -y install SFCGAL SFCGAL-devel gdal311-devel proj95-devel
          elif [ x"$RHEL" = x10 ]; then
-            yum -y install SFCGAL SFCGAL-devel gdal311-devel proj96-devel 
-         else 
+            yum -y install SFCGAL SFCGAL-devel gdal311-devel proj96-devel
+         else
             yum -y install SFCGAL SFCGAL-devel gdal38-devel proj95-devel
          fi
          if [ x"$RHEL" = x10 ]; then
@@ -378,7 +385,7 @@ if [ "$COMPONENT" = "postgis" ]; then
          else
             yum -y install geos311-devel pcre-devel
          fi
-         INSTALL_LIST="xerces-c-devel clang-devel clang llvm-devel git rpm-build  autoconf libtool flex rpmdevtools wget rpmlint percona-postgresql16-devel gcc make  geos geos-devel libgeotiff-devel gmp-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel protobuf-c-devel pkg-config"
+         INSTALL_LIST="xerces-c-devel clang-devel clang llvm-devel git rpm-build  autoconf libtool flex rpmdevtools wget rpmlint percona-postgresql${PG_MAJOR}-devel gcc make  geos geos-devel libgeotiff-devel gmp-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel protobuf-c-devel pkg-config"
          yum -y install ${INSTALL_LIST}
          yum -y install binutils gcc gcc-c++
          yum clean all
@@ -401,14 +408,13 @@ if [ "$COMPONENT" = "postgis" ]; then
       wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
       dpkg -i percona-release_latest.generic_all.deb
       rm -f percona-release_latest.generic_all.deb
-      percona-release enable-only tools testing
-      percona-release enable-only ppg-${PPG_VERSION} testing
+      percona-release enable-only ppg-${PG_VERSION} testing
       percona-release enable telemetry testing
       apt-get update
       if [ "x${DEBIAN}" = "xbionic" ]; then
-        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git cmake vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-16 protobuf-c-compiler rdfind xsltproc"
+        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git cmake vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-${PG_MAJOR} protobuf-c-compiler rdfind xsltproc"
       else
-        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libsfcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-16 protobuf-c-compiler rdfind xsltproc"
+        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libsfcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-${PG_MAJOR} protobuf-c-compiler rdfind xsltproc"
       fi
 
        until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
@@ -440,15 +446,15 @@ if [ "$COMPONENT" = "pgvector" ]; then
                 echo "waiting"
                 sleep 1
             done
-            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR_VERSION}-devel percona-postgresql${PG_MAJOR_VERSION}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
+            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
             yum -y install ${INSTALL_LIST}
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
         else
-            dnf module -y disable postgresql
+            dnf module -y disable postgresql || true
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
 
-            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR_VERSION}-devel percona-postgresql${PG_MAJOR_VERSION}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
+            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
             yum -y install ${INSTALL_LIST}
             yum -y install binutils gcc gcc-c++
         fi
@@ -460,8 +466,6 @@ if [ "$COMPONENT" = "pgvector" ]; then
 	apt-get -y update || true
         apt-get -y install gnupg2 curl
         add_percona_apt_repo
-        percona-release enable tools testing
-        percona-release enable ppg-${PG_VERSION} testing
         apt-get update || true
         INSTALL_LIST="build-essential dpkg-dev debconf debhelper clang devscripts dh-exec git wget libkrb5-dev libssl-dev percona-postgresql-common percona-postgresql-server-dev-all"
         DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
@@ -480,10 +484,10 @@ if [ "$COMPONENT" = "pgpool2" ]; then
         fi
         yum -y install wget
         yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-        percona-release enable ppg-${PG_RELEASE} testing
+        percona-release enable ppg-${PG_VERSION} testing
         yum -y install git libtool bison flex byacc
 
-        PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_VER}-devel"
+        PKGLIST="clang-devel clang llvm-devel percona-postgresql${PG_MAJOR}-devel"
         PKGLIST+=" git rpmdevtools vim wget"
         PKGLIST+=" perl binutils gcc gcc-c++"
         PKGLIST+=" git rpmdevtools wget gcc make autoconf"
@@ -498,7 +502,7 @@ if [ "$COMPONENT" = "pgpool2" ]; then
             sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/oracle-linux-ol9.repo
         fi	
 	if [[ "${RHEL}" -eq 8 ]]; then 
-            dnf -y module disable postgresql
+            dnf -y module disable postgresql || true
         elif [[ "${RHEL}" -eq 7 ]]; then
             PKGLIST+=" llvm-toolset-7-clang llvm-toolset-7 llvm5.0-devel llvm-toolset-7-llvm-devel"
             until yum -y install epel-release centos-release-scl; do
@@ -519,29 +523,27 @@ if [ "$COMPONENT" = "pgpool2" ]; then
     else
         apt-get update
         DEBIAN_FRONTEND=noninteractive apt-get -y install lsb-release gnupg git wget curl
+        export DEBIAN=$(lsb_release -sc)
 
         wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
         dpkg -i percona-release_latest.generic_all.deb
         rm -f percona-release_latest.generic_all.deb
-        percona-release enable ppg-${PG_RELEASE} testing
+        percona-release enable ppg-${PG_VERSION} testing
 
-        PKGLIST="percona-postgresql-${PG_VER} percona-postgresql-common percona-postgresql-server-dev-all"
-
-        # ---- using a community version of postgresql
-        # wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        # echo "deb http://apt.postgresql.org/pub/repos/apt/ ${PG_RELEASE}"-pgdg main | sudo tee  /etc/apt/sources.list.d/pgdg.list
-        # PKGLIST="postgresql-${PG_RELEASE} postgresql-common postgresql-server-dev-all"
-
+        PKGLIST="percona-postgresql-${PG_MAJOR} percona-postgresql-common percona-postgresql-server-dev-all"
+        
         apt-get update
 
-        if [[ "${OS_NAME}" != "focal" ]]; then
-            LLVM_EXISTS=$(grep -c "apt.llvm.org" /etc/apt/sources.list)
-            if [ "${LLVM_EXISTS}" == 0 ]; then
-                wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-                echo "deb http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
-                echo "deb-src http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
-                apt-get update
-            fi
+        if [[ "${DEBIAN}" != "focal" ]]; then
+            #LLVM_EXISTS=$(grep -c "apt.llvm.org" /etc/apt/sources.list)
+            #if [ "${LLVM_EXISTS}" == 0 ]; then
+            #    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+            #    echo "deb http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
+            #    echo "deb-src http://apt.llvm.org/${OS_NAME}/ llvm-toolchain-${OS_NAME}-7 main" >> /etc/apt/sources.list
+            #    apt-get update
+            #fi
+			wget http://mirrors.kernel.org/ubuntu/pool/universe/l/llvm-toolchain-7/llvm-7_7.0.1-12_amd64.deb http://mirrors.kernel.org/ubuntu/pool/universe/l/llvm-toolchain-7/libllvm7_7.0.1-12_amd64.deb http://mirrors.kernel.org/ubuntu/pool/universe/l/llvm-toolchain-7/llvm-7-runtime_7.0.1-12_amd64.deb
+            apt install ./libllvm7_7.0.1-12_amd64.deb ./llvm-7_7.0.1-12_amd64.deb ./llvm-7-runtime_7.0.1-12_amd64.deb
         fi
 
         PKGLIST+=" debconf devscripts dh-exec git wget libkrb5-dev libssl-dev"
@@ -555,9 +557,9 @@ if [ "$COMPONENT" = "pgpool2" ]; then
             echo "waiting"
         done
 
-        cat /etc/apt/sources.list | grep ${OS_NAME}-backports
+        cat /etc/apt/sources.list | grep ${DEBIAN}-backports
         apt list --all-versions debhelper
-        apt-get -y install -t ${OS_NAME}-backports debhelper
+        apt-get -y install -t ${DEBIAN}-backports debhelper
 
         get_openjade_devel
     fi
@@ -568,7 +570,7 @@ if [ "$COMPONENT" = "pgbouncer" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -579,12 +581,12 @@ if [ "$COMPONENT" = "pgbouncer" ]; then
           yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-	  switch_to_vault_repo
+	  switch_to_vault_repo || true
           yum -y install perl lz4-libs c-ares-devel
       else
         until yum -y install centos-release-scl; do
@@ -620,7 +622,7 @@ if [ "$COMPONENT" = "pgbadger" ]; then
   if [ "x$OS" = "xrpm" ]; then
       RHEL=$(rpm --eval %rhel)
       if [ x"$RHEL" = x8 ]; then
-        switch_to_vault_repo
+        switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -632,12 +634,12 @@ if [ "$COMPONENT" = "pgbadger" ]; then
       fi
 
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --set-enabled ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
-          switch_to_vault_repo
+          switch_to_vault_repo || true
           yum -y install perl lz4-libs c-ares-devel
 	  yum -y install rpm-build
       else
@@ -673,7 +675,7 @@ fi
 if [ "$COMPONENT" = "pgbackrest" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -685,13 +687,13 @@ if [ "$COMPONENT" = "pgbackrest" ]; then
           yum -y install epel-release
       fi
       if [ ${RHEL} -gt 7 ]; then
-          dnf -y module disable postgresql
+          dnf -y module disable postgresql || true
           dnf config-manager --enable ol${RHEL}_codeready_builder
           dnf clean all
           rm -r /var/cache/dnf
           dnf -y upgrade
           yum -y install perl lz4-libs
-          yum config-manager --set-enabled powertools
+          yum config-manager --set-enabled powertools || true
           yum -y install libyaml-devel
       else
         until yum -y install centos-release-scl; do
@@ -703,7 +705,7 @@ if [ "$COMPONENT" = "pgbackrest" ]; then
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
       fi
-      INSTALL_LIST="percona-postgresql16-devel git rpm-build rpmdevtools systemd systemd-devel wget bzip2-devel libxml2-devel openssl-devel perl  perl-DBD-Pg perl-Digest-SHA perl-IO-Socket-SSL perl-JSON-PP zlib-devel gcc make autoconf perl-ExtUtils-Embed libssh-devel libzstd-devel lz4-devel"
+      INSTALL_LIST="percona-postgresql${PG_MAJOR}-devel git rpm-build rpmdevtools systemd systemd-devel wget bzip2-devel libxml2-devel openssl-devel perl  perl-DBD-Pg perl-Digest-SHA perl-IO-Socket-SSL perl-JSON-PP zlib-devel gcc make autoconf perl-ExtUtils-Embed libssh-devel libzstd-devel lz4-devel"
       yum -y install ${INSTALL_LIST}
       yum -y install lz4 || true
       yum -y install perl-libxml-perl || true
@@ -726,7 +728,7 @@ if [ "$COMPONENT" = "pgbackrest" ]; then
       percona-release enable tools testing
       percona-release enable ppg-${PG_VERSION} testing
       apt-get update || true
-      INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-checker-perl libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-16 percona-postgresql-common percona-postgresql-server-dev-all libbz2-dev libzstd-dev libyaml-dev meson python3-setuptools"
+      INSTALL_LIST="build-essential pkg-config liblz4-dev debconf debhelper devscripts dh-exec git wget libxml-checker-perl libxml-libxml-perl libio-socket-ssl-perl libperl-dev libssl-dev libxml2-dev txt2man zlib1g-dev libpq-dev percona-postgresql-${PG_MAJOR} percona-postgresql-common percona-postgresql-server-dev-all libbz2-dev libzstd-dev libyaml-dev meson python3-setuptools"
       until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
         sleep 1
         echo "waiting"
@@ -746,6 +748,7 @@ if [ "$COMPONENT" = "pgaudit_set_user" ]; then
   if [ "x$OS" = "xrpm" ]; then
         yum -y install wget
         add_percona_yum_repo
+        percona-release enable telemetry testing
         yum clean all
         RHEL=$(rpm --eval %rhel)
         if [[ "${RHEL}" -eq 10 ]]; then
@@ -758,15 +761,15 @@ if [ "$COMPONENT" = "pgaudit_set_user" ]; then
                 echo "waiting"
                 sleep 1
             done
-            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql16-devel percona-postgresql16-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make"
+            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make"
             yum -y install ${INSTALL_LIST}
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
         else
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
-            dnf module disable postgresql
+            dnf module disable postgresql || true
 
-            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql16-devel percona-postgresql16-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
+            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
             yum -y install ${INSTALL_LIST}
             yum -y install binutils gcc gcc-c++
         fi
@@ -789,6 +792,7 @@ if [ "$COMPONENT" = "pgaudit" ]; then
   if [ "x$OS" = "xrpm" ]; then
         yum -y install wget
         add_percona_yum_repo
+        percona-release enable telemetry testing
         yum clean all
         RHEL=$(rpm --eval %rhel)
         if [[ "${RHEL}" -eq 10 ]]; then
@@ -801,7 +805,7 @@ if [ "$COMPONENT" = "pgaudit" ]; then
                 echo "waiting"
                 sleep 1
             done
-            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql16-devel percona-postgresql16-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
+            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
             yum -y install ${INSTALL_LIST}
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
@@ -811,10 +815,10 @@ if [ "$COMPONENT" = "pgaudit" ]; then
             else
                 yum -y install epel-release
             fi
-            dnf module -y disable postgresql
+            dnf module -y disable postgresql || true
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
 
-            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql16-devel percona-postgresql16-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
+            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
             yum -y install ${INSTALL_LIST}
             yum -y install binutils gcc gcc-c++
         fi
@@ -852,19 +856,19 @@ if [ "$COMPONENT" = "pg_repack" ]; then
             sleep 1
         done
         yum groupinstall -y "Development Tools"
-        INSTALL_LIST="percona-postgresql16 bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql16-devel percona-postgresql16-server  rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel libzstd-devel lz4-devel"
+        INSTALL_LIST="percona-postgresql${PG_MAJOR} bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server  rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel libzstd-devel lz4-devel"
         yum -y install ${INSTALL_LIST}
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
       else
-	dnf module -y disable postgresql
+	dnf module -y disable postgresql || true
 	dnf config-manager --enable ol${RHEL}_codeready_builder
         if [ x"$RHEL" = x8 ]; then
-                INSTALL_LIST="clang-devel clang llvm-devel percona-postgresql16 python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql16-devel percona-postgresql16-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel libzstd-devel lz4-devel"
+        	INSTALL_LIST="clang-devel clang llvm-devel percona-postgresql${PG_MAJOR} python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel libzstd-devel lz4-devel"
         	yum -y install ${INSTALL_LIST}
         	yum -y install binutils gcc gcc-c++
 	else
-		yum -y install percona-postgresql16-devel
+		yum -y install percona-postgresql${PG_MAJOR}-devel
 		yum -y install zlib-devel libzstd-devel readline-devel lz4-devel clang rpmdevtools git openssl-devel openssl-libs lz4-devel
 	fi
 	if [ x"$RHEL" = x9 ]; then
@@ -879,7 +883,7 @@ if [ "$COMPONENT" = "pg_repack" ]; then
       add_percona_apt_repo
       percona-release enable tools testing
       apt-get update || true
-      INSTALL_LIST="dpkg-dev build-essential percona-postgresql-16 debconf debhelper devscripts dh-exec git wget libkrb5-dev libssl-dev percona-postgresql-common percona-postgresql-server-dev-all"
+      INSTALL_LIST="dpkg-dev build-essential percona-postgresql-${PG_MAJOR} debconf debhelper devscripts dh-exec git wget libkrb5-dev libssl-dev percona-postgresql-common percona-postgresql-server-dev-all"
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
     fi
 fi
@@ -897,7 +901,11 @@ if [ "$COMPONENT" = "pg_gather" ]; then
             sleep 1
         done
       fi
-      INSTALL_LIST="git rpm-build rpmdevtools wget"
+      if [[ "${RHEL}" -eq 10 ]]; then
+        INSTALL_LIST="git rpm-build rpmdevtools wget"
+      else
+        INSTALL_LIST="git rpm-build rpmdevtools wget rpmlint"
+      fi
       yum -y install ${INSTALL_LIST}
     else
       apt-get update || true
@@ -928,15 +936,15 @@ if [ "$COMPONENT" = "pg_cron" ]; then
                 echo "waiting"
                 sleep 1
             done
-            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR_VERSION}-devel percona-postgresql${PG_MAJOR_VERSION}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
+            INSTALL_LIST="bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel llvm5.0-devel llvm-toolset-7-clang openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-Embed perl-ExtUtils-MakeMaker python2-devel readline-devel rpmbuild percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel llvm-toolset-7-clang-devel make gcc gcc-c++"
             yum -y install ${INSTALL_LIST}
             source /opt/rh/devtoolset-7/enable
             source /opt/rh/llvm-toolset-7/enable
         else
-            dnf module -y disable postgresql
+            dnf module -y disable postgresql || true
             dnf config-manager --set-enabled ol${RHEL}_codeready_builder
 
-            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR_VERSION}-devel percona-postgresql${PG_MAJOR_VERSION}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
+            INSTALL_LIST="clang-devel clang llvm-devel python3-devel perl-generators bison e2fsprogs-devel flex gettext git glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpm-build rpmdevtools selinux-policy systemd systemd-devel systemtap-sdt-devel tcl-devel vim wget zlib-devel "
             yum -y install ${INSTALL_LIST}
             yum -y install binutils gcc gcc-c++
         fi
@@ -960,7 +968,7 @@ fi
 if [ "$COMPONENT" = "patroni" ]; then
   if [ "x$OS" = "xrpm" ]; then
       if [ x"$RHEL" = x8 ]; then
-          switch_to_vault_repo
+          switch_to_vault_repo || true
       fi
       yum -y install wget
       add_percona_yum_repo
@@ -997,10 +1005,13 @@ if [ "$COMPONENT" = "patroni" ]; then
       done
       add_percona_apt_repo
       apt-get update || true
-      if [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" ]; then
-        INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python-setuptools python-dev libyaml-dev python3-virtualenv dh-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python"
+      INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget fakeroot devscripts python3-psycopg2 libyaml-dev python3-virtualenv python3-psycopg2 ruby ruby-dev rubygems curl golang libjs-mathjax pyflakes3  python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python "
+      if [ "x${DEBIAN}" = "xtrixie" ]; then
+        INSTALL_LIST+="python3-dev dh-virtualenv python3-boto3"  
+      elif [ "x${DEBIAN}" != "xfocal" -a "x${DEBIAN}" != "xbullseye" -a "x${DEBIAN}" != "xjammy" -a "x${DEBIAN}" != "xbookworm" -a "x${DEBIAN}" != "xnoble" -a "x${DEBIAN}" != "xtrixie" ]; then
+        INSTALL_LIST+="python-setuptools python-dev dh-virtualenv python3-boto"
       else
-        INSTALL_LIST="build-essential debconf debhelper clang devscripts dh-exec git wget build-essential fakeroot devscripts python3-psycopg2 python3-dev libyaml-dev python3-virtualenv python3-psycopg2 wget git ruby ruby-dev rubygems build-essential curl golang libjs-mathjax pyflakes3 python3-boto python3-dateutil python3-dnspython python3-etcd  python3-flake8 python3-kazoo python3-mccabe python3-mock python3-prettytable python3-psutil python3-pycodestyle python3-pytest python3-pytest-cov python3-setuptools python3-pip python3-sphinx python3-sphinx-rtd-theme python3-tz python3-tzlocal sphinx-common python3-click python3-doc python3-cdiff dh-python"
+        INSTALL_LIST+="python3-dev python3-boto"
       fi
       DEBIAN_FRONTEND=noninteractive apt-get -y install ${INSTALL_LIST}
       if [ "x${DEBIAN}" = "xstretch" ]; then
@@ -1009,7 +1020,7 @@ if [ "$COMPONENT" = "patroni" ]; then
 	pip3 install python-kubernetes 
       else 
         DEBIAN_FRONTEND=noninteractive apt-get -y install python3-consul python3-kubernetes python3-cdiff || true
-        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" ]; then
+        if [ "x${DEBIAN}" = "xbookworm" -o "x${DEBIAN}" = "xnoble" -o "x${DEBIAN}" = "xtrixie" ]; then
           apt-get install -y python3-sphinxcontrib.apidoc
           apt-get install -y python3-pysyncobj
           apt-get install -y python3-boto3

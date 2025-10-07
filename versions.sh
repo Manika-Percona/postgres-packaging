@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-PG_MAJOR=15
-PG_MINOR=14
+PG_MAJOR=16
+PG_MINOR=10
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
 #-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
-PKG_GIT_REPO="https://github.com/Manika-Percona/postgres-packaging.git"
-PKG_GIT_BRANCH=PG-1838/${PG_VERSION}
+PKG_GIT_REPO="https://github.com/percona/postgres-packaging.git"
+PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
@@ -89,7 +89,7 @@ case "$1" in
         PG_CRON_SRC_BRANCH="v${PG_CRON_VERSION}"
         PG_CRON_RPM_RELEASE='2'
         PG_CRON_DEB_RELEASE='2'
-        PG_CRON_RELEASE='1'
+        PG_CRON_RELEASE='2'
 
         # urls
         PG_CRON_SRC_REPO="https://github.com/citusdata/pg_cron.git"
@@ -121,7 +121,7 @@ case "$1" in
         PG_REPACK_SRC_BRANCH="ver_${PG_REPACK_VERSION}"
         PG_REPACK_RPM_RELEASE='2'
         PG_REPACK_DEB_RELEASE='2'
-        PG_REPACK_RELEASE='1'
+        PG_REPACK_RELEASE='2'
 
         # urls
         PG_REPACK_SRC_REPO="https://github.com/reorg/pg_repack.git"
@@ -132,11 +132,11 @@ case "$1" in
     pgaudit)
         # versions
         PGAUDIT_PRODUCT=percona-pgaudit
-        PGAUDIT_VERSION=1.7.1
+        PGAUDIT_VERSION=16.1
         PGAUDIT_PRODUCT_FULL=${PGAUDIT_PRODUCT}-${PGAUDIT_VERSION}
         PGAUDIT_SRC_BRANCH=${PGAUDIT_VERSION}
-        PGAUDIT_RPM_RELEASE='8'
-        PGAUDIT_DEB_RELEASE='8'
+        PGAUDIT_RPM_RELEASE='1'
+        PGAUDIT_DEB_RELEASE='1'
         PGAUDIT_RELEASE='1'
 
         # urls
@@ -152,8 +152,8 @@ case "$1" in
         SET_USER_VERSION=4.1.0
         SET_USER_PRODUCT_FULL=${SET_USER_PRODUCT}-${SET_USER_VERSION}
         SET_USER_SRC_BRANCH="REL${SET_USER_VERSION//./_}"
-        SET_USER_RPM_RELEASE='2'
-        SET_USER_DEB_RELEASE='2'
+        SET_USER_RPM_RELEASE='3'
+        SET_USER_DEB_RELEASE='3'
         SET_USER_RELEASE='1'
 
         # urls
@@ -234,7 +234,7 @@ case "$1" in
         PGVECTOR_SRC_BRANCH="v${PGVECTOR_VERSION}"
         PGVECTOR_RPM_RELEASE='3'
         PGVECTOR_DEB_RELEASE='3'
-        PGVECTOR_RELEASE='1'
+        PGVECTOR_RELEASE='3'
 
         # urls
         PGVECTOR_SRC_REPO="https://github.com/pgvector/pgvector.git"
