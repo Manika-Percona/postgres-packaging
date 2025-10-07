@@ -53,7 +53,7 @@ get_sources(){
     echo "alternative_regression_outputs.patch" >> debian/patches/series
     mv control* debian/
     mv rules debian/
-    echo 15 > debian/pgversions
+    echo $PG_MAJOR > debian/pgversions
     echo 9 > debian/compat
     rm -rf deb_packaging
     mkdir rpm

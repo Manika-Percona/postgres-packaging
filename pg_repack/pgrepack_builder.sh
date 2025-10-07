@@ -52,7 +52,7 @@ get_sources(){
     mv ../control ./
     mv ../control.in ./
     cd ../
-    echo 15 > debian/pgversions
+    echo $PG_MAJOR > debian/pgversions
     echo 10 > debian/compat
     rm -rf deb_packaging
     mkdir rpm

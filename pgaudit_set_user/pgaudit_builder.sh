@@ -39,7 +39,7 @@ get_sources(){
     cd debian/
     mkdir source
     echo "3.0 (quilt)" > source/format
-    echo 15 > pgversions
+    echo $PG_MAJOR > pgversions
     echo 9 > compat
     echo "percona-pgaudit$PG_MAJOR-set-user (${SET_USER_VERSION}-${SET_USER_RELEASE}) unstable; urgency=low" >> changelog
     echo "  * Initial Release." >> changelog
