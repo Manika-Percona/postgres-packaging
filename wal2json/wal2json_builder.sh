@@ -51,7 +51,7 @@ get_sources(){
     wget ${PKG_RAW_URL}/wal2json/control
     wget ${PKG_RAW_URL}/wal2json/control.in
     wget ${PKG_RAW_URL}/wal2json/rules
-    echo 15 > pgversions
+    echo ${PG_MAJOR} > pgversions
     echo 9 > compat
     cd ../
     rm -rf deb_packaging
