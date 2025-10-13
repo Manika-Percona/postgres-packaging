@@ -411,13 +411,9 @@ if [ "$COMPONENT" = "postgis" ]; then
       percona-release enable-only ppg-${PG_VERSION} testing
       percona-release enable telemetry testing
       apt-get update
-      if [ "x${DEBIAN}" = "xbionic" ]; then
-        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git cmake vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-${PG_MAJOR} protobuf-c-compiler rdfind xsltproc"
-      else
-        INSTALL_LIST="bison build-essential debconf debhelper devscripts dh-exec dpkg-dev flex gcc git vim wget dctrl-tools docbook docbook-xsl imagemagick libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libsfcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-${PG_MAJOR} protobuf-c-compiler rdfind xsltproc"
-      fi
-
-       until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
+      
+      INSTALL_LIST="bison build-essential imagemagick debconf debhelper devscripts dh-exec dpkg-dev flex gcc git cmake vim wget dctrl-tools docbook docbook-xsl libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libsfcgal-dev libxml2-dev pkg-config po-debconf percona-postgresql-all percona-postgresql-common percona-postgresql-server-dev-all percona-postgresql-${PG_MAJOR_VERSION} protobuf-c-compiler rdfind xsltproc"
+      until DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}; do
         sleep 1
         echo "waiting"
        done
