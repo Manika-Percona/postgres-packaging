@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-PG_MAJOR=15
-PG_MINOR=14
+PG_MAJOR=18
+PG_MINOR=0
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
 #-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
-PKG_GIT_REPO="https://github.com/Manika-Percona/postgres-packaging.git"
-PKG_GIT_BRANCH=PG-1838/${PG_VERSION}
+PKG_GIT_REPO="https://github.com/percona/postgres-packaging.git"
+PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
@@ -23,12 +23,13 @@ case "$1" in
         # versions
         PPG_PRODUCT=percona-postgresql
         PPG_PRODUCT_FULL=${PPG_PRODUCT}-${PG_VERSION}
-        PG_SRC_BRANCH="REL_${PG_MAJOR}_${PG_MINOR}"
+        PG_RELEASE='1'
+        PG_SRC_BRANCH="release-${PG_MAJOR}.${PG_MINOR}.${PG_RELEASE}"
         PG_RPM_RELEASE='1'
         PG_DEB_RELEASE='1'
 
         # urls
-        PG_SRC_REPO="https://git.postgresql.org/git/postgresql.git"
+        PG_SRC_REPO="https://github.com/Percona-Lab/postgres.git"
         PG_SRC_REPO_DEB="https://salsa.debian.org/postgresql/postgresql.git"
         PG_DOC="https://www.postgresql.org/files/documentation/pdf/${PG_MAJOR}/postgresql-${PG_MAJOR}-A4.pdf"
         TELEMETRY_AGENT="https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh"
@@ -89,7 +90,7 @@ case "$1" in
         PG_CRON_SRC_BRANCH="v${PG_CRON_VERSION}"
         PG_CRON_RPM_RELEASE='2'
         PG_CRON_DEB_RELEASE='2'
-        PG_CRON_RELEASE='1'
+        PG_CRON_RELEASE='2'
 
         # urls
         PG_CRON_SRC_REPO="https://github.com/citusdata/pg_cron.git"
@@ -121,7 +122,7 @@ case "$1" in
         PG_REPACK_SRC_BRANCH="ver_${PG_REPACK_VERSION}"
         PG_REPACK_RPM_RELEASE='2'
         PG_REPACK_DEB_RELEASE='2'
-        PG_REPACK_RELEASE='1'
+        PG_REPACK_RELEASE='2'
 
         # urls
         PG_REPACK_SRC_REPO="https://github.com/reorg/pg_repack.git"
@@ -132,11 +133,11 @@ case "$1" in
     pgaudit)
         # versions
         PGAUDIT_PRODUCT=percona-pgaudit
-        PGAUDIT_VERSION=1.7.1
+        PGAUDIT_VERSION=17.1
         PGAUDIT_PRODUCT_FULL=${PGAUDIT_PRODUCT}-${PGAUDIT_VERSION}
         PGAUDIT_SRC_BRANCH=${PGAUDIT_VERSION}
-        PGAUDIT_RPM_RELEASE='8'
-        PGAUDIT_DEB_RELEASE='8'
+        PGAUDIT_RPM_RELEASE='1'
+        PGAUDIT_DEB_RELEASE='1'
         PGAUDIT_RELEASE='1'
 
         # urls
@@ -154,7 +155,7 @@ case "$1" in
         SET_USER_SRC_BRANCH="REL${SET_USER_VERSION//./_}"
         SET_USER_RPM_RELEASE='2'
         SET_USER_DEB_RELEASE='2'
-        SET_USER_RELEASE='1'
+        SET_USER_RELEASE='3'
 
         # urls
         SET_USER_SRC_REPO="https://github.com/pgaudit/set_user.git"
@@ -234,7 +235,7 @@ case "$1" in
         PGVECTOR_SRC_BRANCH="v${PGVECTOR_VERSION}"
         PGVECTOR_RPM_RELEASE='3'
         PGVECTOR_DEB_RELEASE='3'
-        PGVECTOR_RELEASE='1'
+        PGVECTOR_RELEASE='3'
 
         # urls
         PGVECTOR_SRC_REPO="https://github.com/pgvector/pgvector.git"
