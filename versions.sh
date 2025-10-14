@@ -7,8 +7,8 @@ PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 #-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
-PKG_GIT_REPO="https://github.com/Manika-Percona/postgres-packaging.git"
-PKG_GIT_BRANCH=PG-1838/${PG_VERSION}
+PKG_GIT_REPO="https://github.com/percona/postgres-packaging.git"
+PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
