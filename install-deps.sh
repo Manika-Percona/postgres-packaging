@@ -176,6 +176,20 @@ case "$COMPONENT" in
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
     fi
     ;;
+  pg_tde)
+    if [ "x$OS" = "xrpm" ]; then
+      rpm_deps
+      INSTALL_LIST+="wget git vim clang-devel clang llvm-devel json-c-devel libcurl-devel openssl-devel gettext percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpmdevtools binutils make gcc gcc-c++"
+      dnf -y install ${INSTALL_LIST}
+    else
+      deb_deps
+      DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
+      ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+      dpkg-reconfigure --frontend noninteractive tzdata
+      INSTALL_LIST+="build-essential debhelper clang git libjson-c-dev libcurl4-openssl-dev shtool devscripts percona-postgresql-common percona-postgresql-server-dev-all"
+      DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
+    fi
+    ;;
   postgresql-common)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps

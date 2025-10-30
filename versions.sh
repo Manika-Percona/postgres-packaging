@@ -6,6 +6,7 @@ PG_MAJOR=18
 PG_MINOR=0
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
+PG_TDE_VERSION=2.1
 PPG_COMMON_MAJOR=280
 PPG_COMMON_MINOR='1'
 ETCD_VERSION=3.5.21
@@ -56,6 +57,20 @@ case "$1" in
         PG_SRC_REPO_DEB="https://salsa.debian.org/postgresql/postgresql.git"
         PG_DOC="https://www.postgresql.org/files/documentation/pdf/${PG_MAJOR}/postgresql-${PG_MAJOR}-A4.pdf"
         TELEMETRY_AGENT="https://raw.githubusercontent.com/Percona-Lab/telemetry-agent/phase-0/call-home.sh"
+    ;;
+
+    pg_tde)
+        # versions
+        PG_TDE_PRODUCT=percona-pg_tde_${PG_MAJOR}
+        PG_TDE_PRODUCT_DEB=percona-pg-tde_${PG_MAJOR}
+        PG_TDE_PRODUCT_FULL=${PG_TDE_PRODUCT}-${PG_TDE_VERSION}
+        PG_TDE_RELEASE='1'
+        PG_TDE_SRC_BRANCH="release-${PG_TDE_VERSION}"
+        PG_TDE_RPM_RELEASE='1'
+        PG_TDE_DEB_RELEASE='1'
+
+        # urls
+        PG_TDE_SRC_REPO="https://github.com/percona/pg_tde.git"
     ;;
 
     postgresql-common)

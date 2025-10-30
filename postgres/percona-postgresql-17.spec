@@ -902,9 +902,9 @@ fi
 %{pgbaseinstdir}/bin/psql
 %{pgbaseinstdir}/bin/reindexdb
 %{pgbaseinstdir}/bin/vacuumdb
-%{pgbaseinstdir}/bin/pg_tde_change_key_provider
-%{pgbaseinstdir}/bin/pg_tde_archive_decrypt
-%{pgbaseinstdir}/bin/pg_tde_restore_encrypt
+#%{pgbaseinstdir}/bin/pg_tde_change_key_provider
+#%{pgbaseinstdir}/bin/pg_tde_archive_decrypt
+#%{pgbaseinstdir}/bin/pg_tde_restore_encrypt
 %{pgbaseinstdir}/share/errcodes.txt
 %{pgbaseinstdir}/share/man/man1/clusterdb.*
 %{pgbaseinstdir}/share/man/man1/createdb.*
@@ -956,7 +956,7 @@ fi
 %{pgbaseinstdir}/lib/insert_username.so
 %{pgbaseinstdir}/lib/isn.so
 %{pgbaseinstdir}/lib/hstore.so
-%{pgbaseinstdir}/lib/pg_tde.so
+#%{pgbaseinstdir}/lib/pg_tde.so
 %if %plperl
 %{pgbaseinstdir}/lib/hstore_plperl.so
 %{pgbaseinstdir}/lib/jsonb_plperl.so
@@ -1021,8 +1021,8 @@ fi
 %{pgbaseinstdir}/share/extension/fuzzystrmatch*
 %{pgbaseinstdir}/share/extension/hstore.control
 %{pgbaseinstdir}/share/extension/hstore--*.sql
-%{pgbaseinstdir}/share/extension/pg_tde.control
-%{pgbaseinstdir}/share/extension/pg_tde--*.sql
+#%{pgbaseinstdir}/share/extension/pg_tde.control
+#%{pgbaseinstdir}/share/extension/pg_tde--*.sql
 %if %plperl
 %{pgbaseinstdir}/share/extension/hstore_plperl*
 %endif

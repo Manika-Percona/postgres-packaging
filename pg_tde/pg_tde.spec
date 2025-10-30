@@ -1,4 +1,4 @@
-%define pgmajorversion 17
+%define pgmajorversion %{pgmajorversion}
 %define pginstdir /usr/pgsql-%{pgmajorversion}/
 %global pname pg_tde
 %global sname percona-pg_tde_%{pgmajorversion}
@@ -73,9 +73,13 @@ USE_PGXS=1 PATH=%{pginstdir}/bin:$PATH %{__make} %{?_smp_mflags} install DESTDIR
 %files
 %doc README.md
 %license LICENSE
+%{pginstdir}/bin/pg_tde_change_key_provider
+%{pginstdir}/bin/pg_tde_archive_decrypt
+%{pginstdir}/bin/pg_tde_restore_encrypt
 %{pginstdir}/lib/%{pname}.so
 %{pginstdir}/share/extension//%{pname}.control
 %{pginstdir}/share/extension/%{pname}*sql
+
 %if %llvm
 %files llvmjit
    %{pginstdir}/lib/bitcode/%{pname}*.bc
