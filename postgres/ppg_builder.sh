@@ -336,7 +336,7 @@ build_deb(){
 #main
 
 CURDIR=$(pwd)
-VERSION_FILE=$CURDIR/percona-server-mongodb.properties
+VERSION_FILE=$CURDIR/percona-server-postgresql.properties
 args=
 WORKDIR=
 SRPM=0
@@ -344,9 +344,6 @@ SDEB=0
 RPM=0
 DEB=0
 SOURCE=0
-OS_NAME=
-ARCH=
-OS=
 INSTALL=0
 REVISION=0
 DEBUG=0
