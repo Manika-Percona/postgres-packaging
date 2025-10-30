@@ -107,9 +107,9 @@ jobs:
         else
          cp postgres-packaging/${{ inputs.package }}/*builder.sh pkg/pkg-builder.sh
         fi
-        #cp postgres-packaging/common-functions.sh pkg/
-        #cp postgres-packaging/install-deps.sh pkg/
-        #cp postgres-packaging/versions.sh pkg/
+        cp postgres-packaging/common-functions.sh pkg/
+        cp postgres-packaging/install-deps.sh pkg/
+        cp postgres-packaging/versions.sh pkg/
        shell: bash
 
      - name: Upload build files as artifact
@@ -150,14 +150,17 @@ jobs:
       - name: Copy build script in required directories
         run: |
           cp pkg-builder.sh ${{ inputs.package }}/
+          cp common-functions.sh ${{ inputs.package }}/
+          cp install-deps.sh ${{ inputs.package }}/
+          cp versions.sh ${{ inputs.package }}/ 
         shell: bash
 
       - name: Update permissions of the build scripts
         run: |
           chmod 755 ${{ inputs.package }}/*
-          #chmod 755 common-functions.sh
-          #chmod 755 install-deps.sh
-          #chmod 755 versions.sh
+          chmod 755 common-functions.sh
+          chmod 755 install-deps.sh
+          chmod 755 versions.sh
         shell: bash
 
       - name: Enable ppg repo
