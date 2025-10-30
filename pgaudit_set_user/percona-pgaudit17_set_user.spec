@@ -1,16 +1,16 @@
-%global  sname pgaudit17_set_user
-%define pginstdir /usr/pgsql-17/
+%global  sname pgaudit%{pgmajorversion}_set_user
+%define pginstdir /usr/pgsql-%{pgmajorversion}/
 
 Name:		percona-%{sname}
-Version:	4.1.0
-Release:	3%{?dist}
+Version:	%{version}
+Release:	%{release}%{?dist}
 Epoch:      1
-Provides:	pgaudit17_set_user = %{version}-%{release}
+Provides:	pgaudit%{pgmajorversion}_set_user = %{version}-%{release}
 URL:        https://github.com/pgaudit/set_user.git
 License:	PostgreSQL
 Group:		Applications/Database
 Source:		%{name}-%{version}.tar.gz
-Summary:	pgaudit17_set_user - PostgreSQL extension allowing privilege escalation with enhanced logging and control
+Summary:	pgaudit%{pgmajorversion}_set_user - PostgreSQL extension allowing privilege escalation with enhanced logging and control
 Packager:       Percona Development Team <https://jira.percona.com>
 Vendor:         Percona, LLC
 

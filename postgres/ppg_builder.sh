@@ -152,9 +152,16 @@ build_srpm(){
     rm -f call-home.sh part2.txt
     mv part1.txt percona-postgresql-$PG_MAJOR.spec
     cd ${WORKDIR}
-    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "pgmajorversion ${PG_MAJOR}" --define "pginstdir /usr/pgsql-${PG_MAJOR}"  --define "pgpackageversion ${PG_MAJOR}" \
-        --define "release ${BUILD_RELEASE}" rpmbuild/SPECS/percona-postgresql-${PG_MAJOR}.spec
+    rpmbuild -bs \
+        --define "_topdir ${WORKDIR}/rpmbuild" \
+        --define "dist .generic" \
+        --define "pgmajorversion ${PG_MAJOR}" \
+        --define "pginstdir /usr/pgsql-${PG_MAJOR}"  \
+        --define "pgpackageversion ${PG_MAJOR}" \
+        --define "version ${PG_VERSION}" \
+        --define "pg_release ${PG_RELEASE}" \
+        --define "release ${BUILD_RELEASE}" \
+        rpmbuild/SPECS/percona-postgresql-${PG_MAJOR}.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -202,8 +209,16 @@ build_rpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "pgmajorversion ${PG_MAJOR}" --define "pginstdir /usr/pgsql-${PG_MAJOR}" --define "pgpackageversion ${PG_MAJOR}" \
-    --define "release ${BUILD_RELEASE}" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild \
+        --define "_topdir ${WORKDIR}/rpmbuild" \
+        --define "dist .$OS_NAME" \
+        --define "pgmajorversion ${PG_MAJOR}" \
+        --define "pginstdir /usr/pgsql-${PG_MAJOR}" \
+        --define "pgpackageversion ${PG_MAJOR}" \
+        --define "version ${PG_VERSION}" \
+        --define "pg_release ${PG_RELEASE}" \
+        --define "release ${BUILD_RELEASE}" \
+        --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -339,6 +354,7 @@ parse_arguments PICK-ARGS-FROM-ARGV "$@"
 
 if [ ${NIGHTLY} = 1 ]; then
    NIGHTLY_TIMESTAMP=$(date +%Y%m%d%H%M%S)
+   PG_SRC_BRANCH=$PG_SRC_BRANCH_NIGHTLY
    if [ "x$OS" = "xrpm" ]; then
       BUILD_RELEASE=${NIGHTLY_TIMESTAMP}.${PG_RPM_RELEASE}
    else

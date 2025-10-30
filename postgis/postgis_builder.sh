@@ -189,8 +189,12 @@ build_srpm(){
         source /opt/rh/devtoolset-7/enable
         source /opt/rh/llvm-toolset-7/enable
     fi
-    rpmbuild -bs --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .generic" \
-        --define "version ${POSTGIS_VERSION}" --define "pginstdir /usr/pgsql-$PG_MAJOR"  \
+    rpmbuild -bs \
+        --define "_topdir ${WORKDIR}/rpmbuild" \
+        --define "dist .generic" \
+        --define "pgmajorversion ${PG_MAJOR}" \
+        --define "version ${POSTGIS_VERSION}" \
+        --define "pginstdir /usr/pgsql-$PG_MAJOR" \
         rpmbuild/SPECS/percona-postgis35.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
@@ -242,7 +246,13 @@ build_rpm(){
     if [[ "${RHEL}" -eq 10 ]]; then
         export QA_RPATHS=0x0002
     fi
-    rpmbuild --define "_topdir ${WORKDIR}/rpmbuild" --define "dist .$OS_NAME" --define "version ${POSTGIS_VERSION}" --define "pginstdir /usr/pgsql-$PG_MAJOR" --rebuild rpmbuild/SRPMS/$SRC_RPM
+    rpmbuild \
+        --define "_topdir ${WORKDIR}/rpmbuild" \
+        --define "dist .$OS_NAME" \
+        --define "pgmajorversion ${PG_MAJOR}" \
+        --define "version ${POSTGIS_VERSION}" \
+        --define "pginstdir /usr/pgsql-$PG_MAJOR" \
+        --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
     if [ $return_code != 0 ]; then
