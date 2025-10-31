@@ -336,7 +336,7 @@ build_deb(){
 #main
 
 CURDIR=$(pwd)
-VERSION_FILE=$CURDIR/percona-server-postgresql.properties
+VERSION_FILE=$CURDIR/percona-postgresql.properties
 args=
 WORKDIR=
 SRPM=0
