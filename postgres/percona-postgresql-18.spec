@@ -960,6 +960,10 @@ fi
 %{pgbaseinstdir}/lib/insert_username.so
 %{pgbaseinstdir}/lib/isn.so
 %{pgbaseinstdir}/lib/hstore.so
+%{pgbaseinstdir}/lib/pg_logicalinspect.so
+%{pgbaseinstdir}/lib/pg_overexplain.so
+%{pgbaseinstdir}/share/extension/pg_logicalinspect--1.0.sql
+%{pgbaseinstdir}/share/extension/pg_logicalinspect.control
 #%{pgbaseinstdir}/lib/pg_tde.so
 %if %plperl
 %{pgbaseinstdir}/lib/hstore_plperl.so
