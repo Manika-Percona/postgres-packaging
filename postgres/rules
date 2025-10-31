@@ -91,8 +91,14 @@ ifeq ($(call version_ge,11),y)
   TEMP_CONFIG = TEMP_CONFIG=$(AUX_MK_DIR)/test-with-jit.conf
 endif
 
-ifeq ($(call version_ge,18),y)
+ifeq ($(call version_ge,17),y)
   CONFIGURE_FLAGS += --with-lz4
+endif
+
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	ifeq ($(call version_ge,18),y)
+  		CONFIGURE_FLAGS += --with-oauth
+	endif
 endif
 
 # Facilitate hierarchical profile generation on amd64 (#730134)
