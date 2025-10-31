@@ -64,7 +64,11 @@ Vendor:         Percona, LLC
 Source0:        percona-postgresql-%{version}.tar.gz
 Source4:        %{sname}-%{pgmajorversion}-Makefile.regress
 Source5:        %{sname}-%{pgmajorversion}-pg_config.h
-Source6:        %{sname}-%{pgmajorversion}-README-systemd.rpm-dist
+%if %{pgmajorversion} < 18
+Source6: postgresql-%{pgmajorversion}-README-systemd.rpm-dist
+%else
+Source6: postgresql-%{pgmajorversion}-README.rpm-dist
+%endif
 Source7:        %{sname}-%{pgmajorversion}-ecpg_config.h
 Source9:        %{sname}-%{pgmajorversion}-libs.conf
 Source12:       https://www.postgresql.org/files/documentation/pdf/%{pgpackageversion}/%{sname}-%{pgpackageversion}-A4.pdf
