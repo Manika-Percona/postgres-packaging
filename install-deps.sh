@@ -7,8 +7,9 @@ rpm_deps() {
   export RHEL=$(rpm --eval %rhel)
   export ARCH=$(uname -m)
 
+  dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+
   if [[ "${RHEL}" -eq 8 ]]; then
-    dnf config-manager --set-enabled codeready-builder-for-rhel-${RHEL}-x86_64-rpms
     dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RHEL}.noarch.rpm
     if [[ "$COMPONENT" == "pgrepack" ]]; then
       INSTALL_LIST+="python3-devel "
@@ -20,7 +21,7 @@ rpm_deps() {
       INSTALL_LIST+="gdal38-devel proj95-devel geos311-devel pcre-devel "
     fi
   else
-    dnf config-manager --set-enabled ol${RHEL}_codeready_builder
+    dnf -y install oracle-epel-release-el${RHEL}
   fi
 
   if [[ "${RHEL}" -eq 9 ]]; then
