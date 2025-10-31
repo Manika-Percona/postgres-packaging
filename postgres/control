@@ -25,7 +25,6 @@ Build-Depends:
  libkrb5-dev,
  libldap2-dev,
  liblz4-dev,
- libnuma-dev [linux-any],
  libpam0g-dev | libpam-dev,
  libperl-dev,
  libreadline-dev,
