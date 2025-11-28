@@ -83,11 +83,10 @@ endif
 
 ifeq ($(call version_ge,11),y)
   # Detect bullseye
-  DEB_CODENAME := $(shell . /etc/os-release && echo $$VERSION_CODENAME)
-
-  ifeq ($(DEB_CODENAME),bullseye)
-    LLVM_VERSION := 13
-  else
+  #DEB_CODENAME := $(shell . /etc/os-release && echo $$VERSION_CODENAME)
+  #ifeq ($(DEB_CODENAME),bullseye)
+    #LLVM_VERSION := 13
+  #else
     # if LLVM is installed, use it
     ifneq ($(wildcard /usr/bin/llvm-config-*),)
       LLVM_CONFIG = $(lastword $(sort $(wildcard /usr/bin/llvm-config-*)))
@@ -96,7 +95,7 @@ ifeq ($(call version_ge,11),y)
     else
       LLVM_VERSION = 0.invalid # mute dpkg error on empty version fields in debian/control
     endif
-  endif
+  #endif
   TEMP_CONFIG = TEMP_CONFIG=$(AUX_MK_DIR)/test-with-jit.conf
 endif
 
