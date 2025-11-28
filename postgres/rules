@@ -82,13 +82,20 @@ ifeq ($(call version_ge,10),y)
 endif
 
 ifeq ($(call version_ge,11),y)
-  # if LLVM is installed, use it
-  ifneq ($(wildcard /usr/bin/llvm-config-*),)
-    LLVM_CONFIG = $(lastword $(sort $(wildcard /usr/bin/llvm-config-*)))
-    LLVM_VERSION = $(subst /usr/bin/llvm-config-,,$(LLVM_CONFIG))
-    CONFIGURE_FLAGS += --with-llvm LLVM_CONFIG=$(LLVM_CONFIG) CLANG=/usr/bin/clang-$(LLVM_VERSION)
+  # Detect bullseye
+  DEB_CODENAME := $(shell . /etc/os-release && echo $$VERSION_CODENAME)
+
+  ifeq ($(DEB_CODENAME),bullseye)
+    LLVM_VERSION := 13
   else
-    LLVM_VERSION = 0.invalid # mute dpkg error on empty version fields in debian/control
+    # if LLVM is installed, use it
+    ifneq ($(wildcard /usr/bin/llvm-config-*),)
+      LLVM_CONFIG = $(lastword $(sort $(wildcard /usr/bin/llvm-config-*)))
+      LLVM_VERSION = $(subst /usr/bin/llvm-config-,,$(LLVM_CONFIG))
+      CONFIGURE_FLAGS += --with-llvm LLVM_CONFIG=$(LLVM_CONFIG) CLANG=/usr/bin/clang-$(LLVM_VERSION)
+    else
+      LLVM_VERSION = 0.invalid # mute dpkg error on empty version fields in debian/control
+    endif
   endif
   TEMP_CONFIG = TEMP_CONFIG=$(AUX_MK_DIR)/test-with-jit.conf
 endif
