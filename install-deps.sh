@@ -465,7 +465,7 @@ EOF
   patroni)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="wget git vim rpm-build python3-virtualenv python3-setuptools libyaml-devel gcc python3-psycopg2"
+      INSTALL_LIST+="wget git vim rpm-build python3-virtualenv python3-setuptools libyaml-devel gcc python3-psycopg2 python3-devel"
       dnf -y install ${INSTALL_LIST}
     else
       deb_deps
