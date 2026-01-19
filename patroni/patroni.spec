@@ -35,32 +35,32 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{sname}.service
 URL:            https://github.com/zalando/%{sname}
 
-BuildRequires:  python%{python3_pkgversion}-setuptools python%{python3_pkgversion}-devel python3-psycopg2 >= 2.5.4
+BuildRequires:  python%{python3_pkgversion}-setuptools python%{python3_pkgversion}-devel python%{python3_pkgversion}-psycopg2 >= 2.5.4
 
-Requires:       python3-psutil >= 2.0.0 python%{python3_pkgversion}-six python%{python3_pkgversion}-dateutil
-Requires:       python3-psycopg2 >= 2.5.4
-Requires:       python3-psutil >= 2.0.0 python3-psycopg2 >= 2.5.4
-Requires:       python3-ydiff >= 1.2
-Requires:       python3-pysyncobj >= 0.3.10
+Requires:       python%{python3_pkgversion}-psutil >= 2.0.0 python%{python3_pkgversion}-six python%{python3_pkgversion}-dateutil
+Requires:       python%{python3_pkgversion}-psycopg2 >= 2.5.4
+Requires:       python%{python3_pkgversion}-psutil >= 2.0.0 python3-psycopg2 >= 2.5.4
+Requires:       python%{python3_pkgversion}-ydiff >= 1.2
+Requires:       python%{python3_pkgversion}-pysyncobj >= 0.3.10
 
 %if 0%{?rhel} == 7
 Requires:       python36-click >= 4.1 python36-six >= 1.7
 Requires:       python36-dateutil python36-prettytable >= 0.7
 Requires:       python36-PyYAML
 %else
-Requires:       python3-click >= 4.1 python3-six >= 1.7
-Requires:       python3-dateutil python3-prettytable >= 0.7
-Requires:       python3-pyyaml
+Requires:       python%{python3_pkgversion}-click >= 4.1 python%{python3_pkgversion}-six >= 1.7
+Requires:       python%{python3_pkgversion}-dateutil python%{python3_pkgversion}-prettytable >= 0.7
+Requires:       python%{python3_pkgversion}-pyyaml
 %endif
 
 %if 0%{?fedora} && 0%{?fedora} <= 43
-Requires:        python3-click python3-cryptography >= 1.4 python3-psutil
-Requires:        python3-prettytable python%{python3_pkgversion}-pyyaml
-Requires:        python3-urllib3 >= 1.19.1 python3-psycopg2 python3-wcwidth
+Requires:        python%{python3_pkgversion}-click python%{python3_pkgversion}-cryptography >= 1.4 python%{python3_pkgversion}-psutil
+Requires:        python%{python3_pkgversion}-prettytable python%{python3_pkgversion}-pyyaml
+Requires:        python%{python3_pkgversion}-urllib3 >= 1.19.1 python%{python3_pkgversion}-psycopg2 python%{python3_pkgversion}-wcwidth
 %endif
 
 %if 0%{?rhel} > 7
-Requires:      python3-pyyaml, python3-urllib3, python3-prettytable, python3-six python3-dateutil python3-click python3-psutil python3-PyYAML python3-psycopg2
+Requires:      python%{python3_pkgversion}-pyyaml, python%{python3_pkgversion}-urllib3, python%{python3_pkgversion}-prettytable, python%{python3_pkgversion}-six python%{python3_pkgversion}-dateutil python%{python3_pkgversion}-click python%{python3_pkgversion}-psutil python%{python3_pkgversion}-PyYAML python%{python3_pkgversion}-psycopg2
 %else
 Requires:      python36-six python2-pyyaml python36-urllib3 python36-prettytable python36-dateutil python36-click python36-psutil python36-PyYAML python36-psycopg2
 %endif
@@ -77,10 +77,10 @@ Requires:        python%{python3_pkgversion}-wcwidth
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} == 10
-Requires:        python3-click python%{python3_pkgversion}-cryptography >= 1.4
-Requires:        python3-prettytable python%{python3_pkgversion}-pyyaml python3-psutil
-Requires:        python%{python3_pkgversion}-urllib3 >= 1.19.1 python3-psycopg2
-Requires:        python3-wcwidth
+Requires:        python%{python3_pkgversion}-click python%{python3_pkgversion}-cryptography >= 1.4
+Requires:        python%{python3_pkgversion}-prettytable python%{python3_pkgversion}-pyyaml python%{python3_pkgversion}-psutil
+Requires:        python%{python3_pkgversion}-urllib3 >= 1.19.1 python%{python3_pkgversion}-psycopg2
+Requires:        python%{python3_pkgversion}-wcwidth
 %endif
 
 %if 0%{?suse_version} >= 1500
@@ -91,7 +91,7 @@ Requires:        python%{python3_pkgversion}-prettytable python%{python3_pkgvers
 Requires:        python%{python3_pkgversion}-wcwidth
 %endif
 
-Requires:      python3, libffi, postgresql-server, libyaml, python3-ydiff, ydiff, python3-pysyncobj
+Requires:      python%{python3_pkgversion}, libffi, postgresql-server, libyaml, python%{python3_pkgversion}-ydiff, ydiff, python%{python3_pkgversion}-pysyncobj
 Requires:      libffi, postgresql-server, libyaml, postgresql%{pgmajor}-server
 BuildRequires: libyaml-devel gcc
 Provides:      patroni
