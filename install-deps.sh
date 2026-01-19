@@ -120,7 +120,7 @@ deb_deps() {
         apt-get install -y python3-sphinxcontrib.apidoc python3-pysyncobj python3-boto3
     elif [ "x${DEBIAN}" = "xjammy" -o "x${DEBIAN}" = "xbuster" -o "x${DEBIAN}" = "xbullseye" ]; then
         pip3 install --upgrade sphinx sphinx-rtd-theme
-        pip3 install sphinxcontrib.apidoc pysyncobj boto3
+        pip3 install sphinxcontrib.apidoc pysyncobj boto3 ydiff
     fi
   fi
 
