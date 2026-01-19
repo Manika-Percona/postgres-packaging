@@ -33,7 +33,6 @@ Build-Depends:
  python3-sphinx,
  python3-sphinx-rtd-theme,
  python3-sphinxcontrib.apidoc,
- python3-tz,
  python3-tzlocal,
  python3-yaml,
  python3-ydiff,

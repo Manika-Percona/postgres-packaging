@@ -41,10 +41,6 @@ override_dh_installinit:
 	# init script installed via debian/patroni.install
 	dh_installinit -ppatroni --only-scripts
 
-override_dh_installdocs:
-	dh_installdocs
-	dh_sphinxdoc /usr/share/doc/patroni/html
-
 override_dh_auto_test:
 	python3 -m pytest tests
 
