@@ -228,7 +228,7 @@ EOF
   pg_oidc)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="sudo wget git vim rpm-build libcurl-devel krb5-devel openssl-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpmdevtools binutils make gcc gcc-c++ gcc-toolset-13"
+      INSTALL_LIST+="sudo wget git vim rpm-build libcurl-devel krb5-devel openssl-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpmdevtools binutils make gcc gcc-c++ gcc-toolset-14"
       dnf -y install ${INSTALL_LIST}
     else
       deb_deps
