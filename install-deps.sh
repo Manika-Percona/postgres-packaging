@@ -20,10 +20,13 @@ rpm_deps() {
     if [[ "$COMPONENT" == "postgis" ]]; then
       INSTALL_LIST+="gdal38-devel proj95-devel geos311-devel pcre-devel "
     fi
+    if [[ "$COMPONENT" == "pg_oidc" ]]; then
+      INSTALL_LIST+="gcc-toolset-14 "
+    fi
   fi
 
   if [[ "${RHEL}" -eq 9 ]]; then
-    if [[ "$COMPONENT" == "postgresql" || "$COMPONENT" == "pg_repack" ]]; then
+    if [[ "$COMPONENT" == "postgresql" || "$COMPONENT" == "pg_repack" || "$COMPONENT" == "pg_oidc" ]]; then
       INSTALL_LIST+="gcc-toolset-14 "
     fi
     if [[ "$COMPONENT" == "pgpool2" ]]; then
@@ -37,6 +40,9 @@ rpm_deps() {
   if [[ "${RHEL}" -eq 10 ]]; then
     if [[ "$COMPONENT" == "postgis" ]]; then
       INSTALL_LIST+="gdal311-devel proj96-devel geos313-devel pcre2-devel "
+    fi
+    if [[ "$COMPONENT" == "pg_oidc" ]]; then
+      INSTALL_LIST+="gcc-toolset-15 "
     fi
   fi
   
@@ -228,7 +234,7 @@ EOF
   pg_oidc)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="sudo wget git vim rpm-build libcurl-devel krb5-devel openssl-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpmdevtools binutils make gcc gcc-c++ gcc-toolset-14"
+      INSTALL_LIST+="sudo wget git vim rpm-build libcurl-devel krb5-devel openssl-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server rpmdevtools binutils make gcc gcc-c++"
       dnf -y install ${INSTALL_LIST}
     else
       deb_deps
