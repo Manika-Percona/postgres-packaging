@@ -15,7 +15,7 @@ License:        Apache-2.0
 URL:            https://github.com/Percona-Lab/pg_oidc_validator
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires:  gcc-toolset-13
+BuildRequires:  gcc-toolset-14
 BuildRequires:  postgresql%{pgmajorversion}-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  openssl-devel
@@ -33,12 +33,12 @@ authentication for PostgreSQL connections.
 %setup -q
 
 %build
-source /opt/rh/gcc-toolset-13/enable
+source /opt/rh/gcc-toolset-14/enable
 export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 %{?_smp_mflags} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
 
 %install
-source /opt/rh/gcc-toolset-13/enable
+source /opt/rh/gcc-toolset-14/enable
 export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 install DESTDIR=%{buildroot} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
 
