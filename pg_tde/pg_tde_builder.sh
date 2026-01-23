@@ -230,7 +230,7 @@ build_source_deb(){
     echo 10 > compat
     echo "${PG_TDE_PRODUCT_DEB} (${PG_TDE_VERSION}-${PG_TDE_RELEASE}) unstable; urgency=low" > changelog
     echo "  * Initial Release." >> changelog
-    echo " -- Muhammad Aqeel <muhammad.aqeel@percona.com>  $(date -R)" >> changelog
+    echo " -- Manika Singhal <manika.singhal@percona.com>  $(date -R)" >> changelog
 
     cd ../
     

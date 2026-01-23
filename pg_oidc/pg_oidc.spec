@@ -1,7 +1,12 @@
 
-Name:           pg_oidc_validator
-Version:        0.2
-Release:        1%{?dist}
+%define pgmajorversion %{pgmajor}
+%define pginstdir /usr/pgsql-%{pgmajorversion}/
+%global pname pg_oidc_validator
+%global sname percona-pg_oidc_validator%{pgmajorversion}
+
+Name:           %{sname}
+Version:        %{version}
+Release:        %{release}%{?dist}
 Summary:        PostgreSQL OAuth/OIDC token validator extension
 
 %global debug_package %{nil}
@@ -11,11 +16,11 @@ URL:            https://github.com/Percona-Lab/pg_oidc_validator
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-toolset-13
-BuildRequires:  postgresql18-devel
+BuildRequires:  postgresql%{pgmajorversion}-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  openssl-devel
 
-Requires:       postgresql18
+Requires:       postgresql%{pgmajorversion}
 Requires:       libcurl
 Requires:       openssl-libs
 
@@ -29,18 +34,18 @@ authentication for PostgreSQL connections.
 
 %build
 source /opt/rh/gcc-toolset-13/enable
-export PG_CONFIG=/usr/pgsql-18/bin/pg_config
+export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 %{?_smp_mflags} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
 
 %install
 source /opt/rh/gcc-toolset-13/enable
-export PG_CONFIG=/usr/pgsql-18/bin/pg_config
+export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 install DESTDIR=%{buildroot} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
 
 %files
 %license LICENSE.txt
 %doc README.md
-/usr/pgsql-18/lib/pg_oidc_validator.so
+%{pginstdir}/lib/%{pname}.so
 
 %changelog
 * Wed Jan 21 2026 Manika Singhal <manika.singhal@percona.com> - 0.2-1

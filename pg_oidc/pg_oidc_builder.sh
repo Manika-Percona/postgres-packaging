@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -x
 # Versions and other variables
-source versions.sh "pg_tde"
+source versions.sh "pg_oidc"
 # Common functions
 source common-functions.sh
 
@@ -13,39 +13,37 @@ get_sources(){
         return 0
     fi
 
-    echo "PRODUCT=${PG_TDE_PRODUCT}" > pg_tde.properties
-    echo "PRODUCT_FULL=${PG_TDE_PRODUCT_FULL}" >> pg_tde.properties
-    echo "VERSION=${PG_TDE_VERSION}" >> pg_tde.properties
-    echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pg_tde.properties
-    echo "BUILD_ID=${BUILD_ID}" >> pg_tde.properties
-    git clone --recursive "$PG_TDE_SRC_REPO" ${PG_TDE_PRODUCT_FULL}
+    echo "PRODUCT=${PG_OIDC_PRODUCT}" > pg_oidc.properties
+    echo "PRODUCT_FULL=${PG_OIDC_PRODUCT_FULL}" >> pg_oidc.properties
+    echo "VERSION=${PG_OIDC_VERSION}" >> pg_oidc.properties
+    echo "BUILD_NUMBER=${BUILD_NUMBER}" >> pg_oidc.properties
+    echo "BUILD_ID=${BUILD_ID}" >> pg_oidc.properties
+    git clone --recursive "$PG_OIDC_SRC_REPO" ${PG_OIDC_PRODUCT_FULL}
     retval=$?
     if [ $retval != 0 ]
     then
         echo "There were some issues during repo cloning from github. Please retry one more time"
         exit 1
     fi
-    cd ${PG_TDE_PRODUCT_FULL}
-    if [ ! -z "$PG_TDE_SRC_BRANCH" ]
+    cd ${PG_OIDC_PRODUCT_FULL}
+    if [ ! -z "$PG_OIDC_SRC_BRANCH" ]
     then
         git reset --hard
         git clean -xdf
-        git checkout "$PG_TDE_SRC_BRANCH"
+        git checkout "$PG_OIDC_SRC_BRANCH"
     fi
     REVISION=$(git rev-parse --short HEAD)
-    echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_tde.properties
+    echo "REVISION=${REVISION}" >> ${WORKDIR}/pg_oidc.properties
     rm -fr debian rpm
 
-    #git clone https://salsa.debian.org/postgresql/pg_tde.git deb_packaging
     mkdir debian
     cd debian
     #git checkout debian/${VERSION}-${RELEASE}
-    wget ${PKG_RAW_URL}/pg_tde/debian/control
-    wget ${PKG_RAW_URL}/pg_tde/debian/control.in
-    wget ${PKG_RAW_URL}/pg_tde/debian/rules
-    wget ${PKG_RAW_URL}/pg_tde/debian/percona-pg-tde${PG_MAJOR}.install
-    wget ${PKG_RAW_URL}/pg_tde/debian/percona-pg-tde${PG_MAJOR}-client.install
-    sed -i "s/@@PGMAJOR@@/${PG_MAJOR}/g" control control.in rules percona-pg-tde${PG_MAJOR}.install percona-pg-tde${PG_MAJOR}-client.install
+    wget ${PKG_RAW_URL}/pg_oidc/debian/control
+    wget ${PKG_RAW_URL}/pg_oidc/debian/control.in
+    wget ${PKG_RAW_URL}/pg_oidc/debian/rules
+    wget ${PKG_RAW_URL}/pg_oidc/debian/percona-pg-oidc${PG_MAJOR}.install
+    sed -i "s/@@PGMAJOR@@/${PG_MAJOR}/g" control control.in rules percona-pg-oidc${PG_MAJOR}.install
     sudo chmod +x rules
     cd ../
 
@@ -54,20 +52,20 @@ get_sources(){
     rm -rf deb_packaging
     mkdir rpm
     cd rpm
-    wget ${PKG_RAW_URL}/pg_tde/pg_tde.spec
+    wget ${PKG_RAW_URL}/pg_oidc/pg_oidc.spec
 
     cd ${WORKDIR}
     #
-    source pg_tde.properties
+    source pg_oidc.properties
     #
 
-    tar --owner=0 --group=0 --exclude=.* -czf ${PG_TDE_PRODUCT_FULL}.tar.gz ${PG_TDE_PRODUCT_FULL}
+    tar --owner=0 --group=0 --exclude=.* -czf ${PG_OIDC_PRODUCT_FULL}.tar.gz ${PG_OIDC_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_TDE_PRODUCT}/${PG_TDE_PRODUCT_FULL}/${PG_TDE_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_tde.properties
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PG_OIDC_PRODUCT}/${PG_OIDC_PRODUCT_FULL}/${PG_OIDC_SRC_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> pg_oidc.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
-    cp ${PG_TDE_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
-    cp ${PG_TDE_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
+    cp ${PG_OIDC_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
+    cp ${PG_OIDC_PRODUCT_FULL}.tar.gz $CURDIR/source_tarball
     cd $CURDIR
     return
 }
@@ -75,10 +73,10 @@ get_sources(){
 get_deb_sources(){
     param=$1
 
-    FILE=$(basename $(find $WORKDIR/source_deb -name "percona-pg*tde*.$param" | sort | tail -n1))
+    FILE=$(basename $(find $WORKDIR/source_deb -name "percona-pg*oidc*.$param" | sort | tail -n1))
     if [ -z $FILE ]
     then
-        FILE=$(basename $(find $CURDIR/source_deb -name "percona-pg*tde*.$param" | sort | tail -n1))
+        FILE=$(basename $(find $CURDIR/source_deb -name "percona-pg*oidc*.$param" | sort | tail -n1))
         if [ -z $FILE ]
         then
             echo "There is no sources for build"
@@ -104,26 +102,26 @@ build_srpm(){
         exit 1
     fi
     cd $WORKDIR
-    get_tar "source_tarball" "percona-pg*tde"
+    get_tar "source_tarball" "percona-pg*oidc*validator"
     rm -fr rpmbuild
     ls | grep -v tar.gz | xargs rm -rf
-    TARFILE=$(find . -name 'percona-pg_tde*.tar.gz' | sort | tail -n1)
+    TARFILE=$(find . -name 'percona-pg_oidc*.tar.gz' | sort | tail -n1)
     SRC_DIR=${TARFILE%.tar.gz}
     #
     mkdir -vp rpmbuild/{SOURCES,SPECS,BUILD,SRPMS,RPMS}
     tar vxzf ${WORKDIR}/${TARFILE} --wildcards '*/rpm' --strip=1
     #
     cp -av rpm/* rpmbuild/SOURCES
-    cp -av rpm/pg_tde.spec rpmbuild/SPECS
+    cp -av rpm/pg_oidc.spec rpmbuild/SPECS
     #
     mv -fv ${TARFILE} ${WORKDIR}/rpmbuild/SOURCES
     rpmbuild -bs \
         --define "_topdir ${WORKDIR}/rpmbuild" \
         --define "dist .generic" \
         --define "pgmajor ${PG_MAJOR}" \
-        --define "version ${PG_TDE_VERSION}" \
-        --define "release ${PG_TDE_RELEASE}" \
-        rpmbuild/SPECS/pg_tde.spec
+        --define "version ${PG_OIDC_VERSION}" \
+        --define "release ${PG_OIDC_RELEASE}" \
+        rpmbuild/SPECS/pg_oidc.spec
     mkdir -p ${WORKDIR}/srpm
     mkdir -p ${CURDIR}/srpm
     cp rpmbuild/SRPMS/*.src.rpm ${CURDIR}/srpm
@@ -142,10 +140,10 @@ build_rpm(){
         echo "It is not possible to build rpm here"
         exit 1
     fi
-    SRC_RPM=$(basename $(find $WORKDIR/srpm -name 'percona-pg_tde*.src.rpm' | sort | tail -n1))
+    SRC_RPM=$(basename $(find $WORKDIR/srpm -name 'percona-pg_oidc*.src.rpm' | sort | tail -n1))
     if [ -z $SRC_RPM ]
     then
-        SRC_RPM=$(basename $(find $CURDIR/srpm -name 'percona-pg_tde*.src.rpm' | sort | tail -n1))
+        SRC_RPM=$(basename $(find $CURDIR/srpm -name 'percona-pg_oidc*.src.rpm' | sort | tail -n1))
         if [ -z $SRC_RPM ]
         then
             echo "There is no src rpm for build"
@@ -179,8 +177,8 @@ build_rpm(){
         --define "_topdir ${WORKDIR}/rpmbuild" \
         --define "dist .$OS_NAME" \
         --define "pgmajor ${PG_MAJOR}" \
-        --define "version ${PG_TDE_VERSION}" \
-        --define "release ${PG_TDE_RELEASE}" \
+        --define "version ${PG_OIDC_VERSION}" \
+        --define "release ${PG_OIDC_RELEASE}" \
         --rebuild rpmbuild/SRPMS/$SRC_RPM
 
     return_code=$?
@@ -204,17 +202,17 @@ build_source_deb(){
         echo "It is not possible to build source deb here"
         exit 1
     fi
-    rm -rf percona-pg_tde*
-    get_tar "source_tarball" "percona-pg*tde"
+    rm -rf percona-pg_oidc*
+    get_tar "source_tarball" "percona-pg*oidc*validator"
     rm -f *.dsc *.orig.tar.gz *.debian.tar.gz *.changes
     #
-    TARFILE=$(basename $(find . -name 'percona-pg*tde*.tar.gz' | sort | tail -n1))
+    TARFILE=$(basename $(find . -name 'percona-pg*oidc*.tar.gz' | sort | tail -n1))
     DEBIAN=$(lsb_release -sc)
     ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     tar zxf ${TARFILE}
     BUILDDIR=${TARFILE%.tar.gz}
 
-    mv ${TARFILE} ${PG_TDE_PRODUCT_DEB}_${PG_TDE_VERSION}.orig.tar.gz
+    mv ${TARFILE} ${PG_OIDC_PRODUCT_DEB}_${PG_OIDC_VERSION}.orig.tar.gz
     cd ${BUILDDIR}
     rm -f .github/workflows/*.yml
     rm -f .github/workflows/*.yaml
@@ -228,13 +226,13 @@ build_source_deb(){
     echo "3.0 (quilt)" > source/format
     echo ${PG_MAJOR} > pgversions
     echo 10 > compat
-    echo "${PG_TDE_PRODUCT_DEB} (${PG_TDE_VERSION}-${PG_TDE_RELEASE}) unstable; urgency=low" > changelog
+    echo "${PG_OIDC_PRODUCT_DEB} (${PG_OIDC_VERSION}-${PG_OIDC_RELEASE}) unstable; urgency=low" > changelog
     echo "  * Initial Release." >> changelog
-    echo " -- Muhammad Aqeel <muhammad.aqeel@percona.com>  $(date -R)" >> changelog
+    echo " -- Manika Singhal <manika.singhal@percona.com>  $(date -R)" >> changelog
 
     cd ../
     
-    dch -D unstable --force-distribution -v "${PG_TDE_VERSION}-${PG_TDE_RELEASE}" "Update to new pg-tde version ${PG_TDE_VERSION}"
+    dch -D unstable --force-distribution -v "${PG_OIDC_VERSION}-${PG_OIDC_RELEASE}" "Update to new pg-oidc-validator version ${PG_OIDC_VERSION}"
     pg_buildext updatecontrol
     dpkg-buildpackage -S
     cd ../
@@ -271,16 +269,16 @@ build_deb(){
     export DEBIAN=$(lsb_release -sc)
     export ARCH=$(echo $(uname -m) | sed -e 's:i686:i386:g')
     #
-    echo "DEBIAN=${DEBIAN}" >> pg_tde.properties
-    echo "ARCH=${ARCH}" >> pg_tde.properties
+    echo "DEBIAN=${DEBIAN}" >> pg_oidc.properties
+    echo "ARCH=${ARCH}" >> pg_oidc.properties
 
     #
     DSC=$(basename $(find . -name '*.dsc' | sort | tail -n1))
     #
     dpkg-source -x ${DSC}
 
-    cd ${PG_TDE_PRODUCT_DEB}-${PG_TDE_VERSION}
-    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_TDE_VERSION}-${PG_TDE_RELEASE}.${DEBIAN}" 'Update distribution'
+    cd ${PG_OIDC_PRODUCT_DEB}-${PG_OIDC_VERSION}
+    dch -m -D "${DEBIAN}" --force-distribution -v "1:${PG_OIDC_VERSION}-${PG_OIDC_RELEASE}.${DEBIAN}" 'Update distribution'
     unset $(locale|cut -d= -f1)
     dpkg-buildpackage -rfakeroot -us -uc -b
     mkdir -p $CURDIR/deb
@@ -295,7 +293,7 @@ build_deb(){
 #main
 
 CURDIR=$(pwd)
-VERSION_FILE=$CURDIR/pg_tde.properties
+VERSION_FILE=$CURDIR/pg_oidc.properties
 args=
 WORKDIR=
 SRPM=0
@@ -314,7 +312,7 @@ get_system
 if [ $INSTALL = 0 ]; then
     echo "Dependencies will not be installed"
 else
-    source install-deps.sh "pg_tde"
+    source install-deps.sh "pg_oidc"
 fi
 get_sources
 build_srpm
