@@ -42,7 +42,7 @@ rpm_deps() {
       INSTALL_LIST+="gdal311-devel proj96-devel geos313-devel pcre2-devel "
     fi
     if [[ "$COMPONENT" == "pg_oidc" ]]; then
-      INSTALL_LIST+="libstdc++-devel "
+      INSTALL_LIST+="libstdc++-static "
     fi
   fi
   
