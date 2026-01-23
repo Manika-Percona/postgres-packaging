@@ -17,8 +17,8 @@ Source0:        %{name}-%{version}.tar.gz
 
 %if 0%{?rhel} && 0%{?rhel} <= 9
 BuildRequires:  gcc-toolset-14
-%else
-BuildRequires:  gcc-toolset-15
+#%else
+#BuildRequires:  gcc-toolset-15
 %endif
 
 BuildRequires:  postgresql%{pgmajorversion}-devel
@@ -40,8 +40,8 @@ authentication for PostgreSQL connections.
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 9
 source /opt/rh/gcc-toolset-14/enable
-%else
-source /opt/rh/gcc-toolset-15/enable
+#%else
+#source /opt/rh/gcc-toolset-15/enable
 %endif
 export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 %{?_smp_mflags} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
@@ -49,8 +49,8 @@ make USE_PGXS=1 %{?_smp_mflags} with_llvm=no COMPILER='g++ $(CXXFLAGS)'
 %install
 %if 0%{?rhel} && 0%{?rhel} <= 9
 source /opt/rh/gcc-toolset-14/enable
-%else
-source /opt/rh/gcc-toolset-15/enable
+#%else
+#source /opt/rh/gcc-toolset-15/enable
 %endif
 export PG_CONFIG=%{pginstdir}/bin/pg_config
 make USE_PGXS=1 install DESTDIR=%{buildroot} with_llvm=no COMPILER='g++ $(CXXFLAGS)'

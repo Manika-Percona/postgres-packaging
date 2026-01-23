@@ -41,9 +41,9 @@ rpm_deps() {
     if [[ "$COMPONENT" == "postgis" ]]; then
       INSTALL_LIST+="gdal311-devel proj96-devel geos313-devel pcre2-devel "
     fi
-    if [[ "$COMPONENT" == "pg_oidc" ]]; then
-      INSTALL_LIST+="gcc-toolset-15 "
-    fi
+    #if [[ "$COMPONENT" == "pg_oidc" ]]; then
+    #  INSTALL_LIST+="gcc-toolset-15 "
+    #fi
   fi
   
   dnf -y module disable postgresql || true
