@@ -16,7 +16,5 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	make USE_PGXS=1 install DESTDIR=$(CURDIR)/debian/tmp
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/postgresql/@@PGMAJOR@@/lib
-	install -m 644 /usr/lib/postgresql/@@PGMAJOR@@/lib/pg_oidc_validator* $(CURDIR)/debian/tmp/usr/lib/postgresql/@@PGMAJOR@@/lib/
 
 override_dh_auto_test:
