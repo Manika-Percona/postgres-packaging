@@ -1,5 +1,5 @@
 
 usr/lib/postgresql/@@PGMAJOR@@/lib/pg_oidc_validator.so
-usr/lib/postgresql/18/lib/bitcode/pg_oidc_validator/src/pg_oidc_validator.bc
-usr/lib/postgresql/18/lib/bitcode/pg_oidc_validator/src/http_client.bc
-usr/lib/postgresql/18/lib/bitcode/pg_oidc_validator/src/jwk.bc
+usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/pg_oidc_validator.bc
+usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/http_client.bc
+usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/jwk.bc

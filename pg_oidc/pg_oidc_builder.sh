@@ -42,8 +42,8 @@ get_sources(){
     wget ${PKG_RAW_URL}/pg_oidc/debian/control
     wget ${PKG_RAW_URL}/pg_oidc/debian/control.in
     wget ${PKG_RAW_URL}/pg_oidc/debian/rules
-    wget ${PKG_RAW_URL}/pg_oidc/debian/percona-pg-oidc${PG_MAJOR}.install
-    sed -i "s/@@PGMAJOR@@/${PG_MAJOR}/g" control control.in rules percona-pg-oidc${PG_MAJOR}.install
+    wget ${PKG_RAW_URL}/pg_oidc/debian/percona-pg-oidc-validator${PG_MAJOR}.install
+    sed -i "s/@@PGMAJOR@@/${PG_MAJOR}/g" control control.in rules percona-pg-oidc-validator${PG_MAJOR}.install
     sudo chmod +x rules
     cd ../
 
