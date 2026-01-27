@@ -1,4 +1,4 @@
-usr/lib/postgresql/@@PGMAJOR@@/lib/pg_oidc_validator.so
-usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/pg_oidc_validator.bc
-usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/http_client.bc
-usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/jwk.bc
+pg_oidc_validator.so usr/lib/postgresql/@@PGMAJOR@@/lib/pg_oidc_validator.so
+src/pg_oidc_validator.bc usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/pg_oidc_validator.bc
+src/http_client.bc usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/http_client.bc
+src/jwk.bc usr/lib/postgresql/@@PGMAJOR@@/lib/bitcode/pg_oidc_validator/src/jwk.bc
