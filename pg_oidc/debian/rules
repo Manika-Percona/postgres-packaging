@@ -11,8 +11,8 @@ override_dh_builddeb:
 override_dh_auto_clean:
 	rm -rf build
 
-override_dh_auto_configure:
-	cp /usr/bin/shtool .
+#override_dh_auto_configure:
+#	cp /usr/bin/shtool .
 
 override_dh_auto_build:
 	make USE_PGXS=1
