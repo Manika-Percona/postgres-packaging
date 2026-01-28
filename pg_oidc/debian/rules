@@ -26,3 +26,6 @@ override_dh_auto_install:
 	with_llvm=no
 
 override_dh_auto_test:
+
+override_dh_installdocs:
+	dh_installdocs --all README.*
