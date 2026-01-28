@@ -93,11 +93,11 @@ case "$1" in
         PG_OIDC_PRODUCT_DEB=percona-pg-oidc-validator${PG_MAJOR}
         PG_OIDC_PRODUCT_FULL=${PG_OIDC_PRODUCT}-${PG_OIDC_VERSION}
         PG_OIDC_RELEASE='1'
-        PG_OIDC_SRC_BRANCH="${PG_OIDC_VERSION}"
+        PG_OIDC_SRC_BRANCH=debbuild #"${PG_OIDC_VERSION}"
         PG_OIDC_RPM_RELEASE='1'
         PG_OIDC_DEB_RELEASE='1'
         # urls
-        PG_OIDC_SRC_REPO="https://github.com/Percona-Lab/pg_oidc_validator.git"
+        PG_OIDC_SRC_REPO="https://github.com/dutow/pg_oidc_validator.git" #"https://github.com/Percona-Lab/pg_oidc_validator.git"
     ;;
 
 
