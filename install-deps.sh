@@ -144,8 +144,8 @@ deb_deps() {
     DEBIAN_FRONTEND=noninteractive apt-get -y install software-properties-common
     wget https://apt.llvm.org/llvm.sh
     chmod +x llvm.sh
-    ./llvm.sh 23 all
-    apt-get install libc++-21-dev libc++abi-21-dev
+    ./llvm.sh 21 all
+    apt-get install libc++-21-dev libc++abi-21-dev clang-21 clang++-21
   fi
   
   return;  
