@@ -21,6 +21,8 @@ override_dh_auto_build:
     with_llvm=no
 
 override_dh_auto_install:
-	make USE_PGXS=1 install DESTDIR=$(CURDIR)/debian/tmp with_llvm=no
+	make USE_PGXS=1 install DESTDIR=$(CURDIR)/debian/tmp \
+	PG_CONFIG=/usr/lib/postgresql/@@PGMAJOR@@/bin/pg_config \
+	with_llvm=no
 
 override_dh_auto_test:
