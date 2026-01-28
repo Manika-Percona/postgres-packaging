@@ -139,6 +139,13 @@ deb_deps() {
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install dh_systemd
     fi
   fi
+
+  if [[ "$COMPONENT" == "pg_oidc" ]]; then
+    wget https://apt.llvm.org/llvm.sh
+    chmod +x llvm.sh
+    ./llvm.sh 21 all
+    apt-get install libc++-21-dev libc++abi-21-dev
+  fi
   
   return;  
 }
@@ -241,7 +248,7 @@ EOF
       DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
       ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
       dpkg-reconfigure --frontend noninteractive tzdata
-      INSTALL_LIST+="sudo build-essential debhelper clang-21 clang++-21 git libjwt-dev libcurl4-openssl-dev libssl-dev libreadline-dev libkrb5-dev zlib1g-dev libxml2-dev libxslt1-dev uuid-dev flex bison pkg-config percona-postgresql-${PG_MAJOR} percona-postgresql-server-dev-all"
+      INSTALL_LIST+="sudo build-essential debhelper clang git libjwt-dev libcurl4-openssl-dev libssl-dev libreadline-dev libkrb5-dev zlib1g-dev libxml2-dev libxslt1-dev uuid-dev flex bison pkg-config percona-postgresql-${PG_MAJOR} percona-postgresql-server-dev-all"
       DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
     fi
     ;;
