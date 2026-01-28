@@ -141,6 +141,7 @@ deb_deps() {
   fi
 
   if [[ "$COMPONENT" == "pg_oidc" ]]; then
+    DEBIAN_FRONTEND=noninteractive apt-get -y install software-properties-common
     wget https://apt.llvm.org/llvm.sh
     chmod +x llvm.sh
     ./llvm.sh 21 all
