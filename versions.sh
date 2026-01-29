@@ -31,12 +31,12 @@ PG_OIDC_VERSION=0.2
 #-------------------------------------- COMMON URLs --------------------------------------
 
 # Github Packaging Repo
-PKG_GIT_REPO="https://github.com/percona/postgres-packaging.git"
-PKG_GIT_BRANCH=${PG_VERSION}
+PKG_GIT_REPO="https://github.com/Manika-Percona/postgres-packaging.git"
+PKG_GIT_BRANCH=18.2 #${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
-PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PG_VERSION}"
+PKG_RAW_URL="https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/18.2"
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
@@ -93,7 +93,7 @@ case "$1" in
         PG_OIDC_PRODUCT_DEB=percona-pg-oidc-validator${PG_MAJOR}
         PG_OIDC_PRODUCT_FULL=${PG_OIDC_PRODUCT}-${PG_OIDC_VERSION}
         PG_OIDC_RELEASE='1'
-        PG_OIDC_SRC_BRANCH="${PG_OIDC_VERSION}"
+        PG_OIDC_SRC_BRANCH=main #"${PG_OIDC_VERSION}"
         PG_OIDC_RPM_RELEASE='1'
         PG_OIDC_DEB_RELEASE='1'
         # urls
