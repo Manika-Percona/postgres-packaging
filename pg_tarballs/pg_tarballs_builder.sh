@@ -176,7 +176,7 @@ PATRONI_BRANCH="v4.1.0"
 HAPROXY_BRANCH="v2.8.16"
 PGVECTOR_BRANCH="v0.8.1"
 PG_TDE_BRANCH="release-2.1.1"
-PG_OIDC_BRANCH="0.2"
+PG_OIDC_BRANCH="main"
 
 create_build_environment(){
 
