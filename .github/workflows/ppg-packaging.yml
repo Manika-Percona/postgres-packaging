@@ -230,14 +230,14 @@ jobs:
         if: ${{ contains(inputs.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-rpm-archive
+          name: ${{ inputs.package }}-${{ matrix.platform }}-rpm-archive
           path: ./rpm.tar
 
       - name: Upload deb tar as artifact
         if: ${{ !contains(inputs.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-deb-archive
+          name: ${{ inputs.package }}-${{ matrix.platform }}-deb-archive
           path: ./deb.tar
 
       - name: enable tmate debugging
