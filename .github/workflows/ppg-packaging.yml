@@ -135,7 +135,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             yum install -y gcc make tar rpm-build rpmdevtools git
           else
             apt-get update
@@ -171,7 +171,7 @@ jobs:
       - name: Enable ppg repo
         if: ${{ inputs.package != 'postgres' }}
         run: |
-          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
           else
             wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
@@ -198,7 +198,7 @@ jobs:
       - name: Build Source RPM/DEB
         run: |
           cd ${{ inputs.package }}
-          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1
           else
             ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1
@@ -208,7 +208,7 @@ jobs:
       - name: Build RPM/DEB
         run: |
           cd ${{ inputs.package }}
-          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1
           else
             ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1
@@ -217,7 +217,7 @@ jobs:
 
       - name: Archive final rpm/deb packages
         run: |
-          if [[ "${{ inputs.platform }}" == *"linux"* ]]; then
+          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             cp -r ${{ inputs.package }}/rpm .
             tar -cvf rpm.tar rpm/
           else
