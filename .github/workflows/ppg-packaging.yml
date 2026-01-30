@@ -226,18 +226,26 @@ jobs:
           fi
         shell: bash
 
+      - name: Compute platform label
+        run: |
+          if [[ "${{ matrix.platform }}" == *linux* ]]; then
+            echo "PLATFORM_LABEL=ol${{ matrix.platform##*: }}" >> $GITHUB_ENV
+          else
+            echo "PLATFORM_LABEL=${{ matrix.platform##*: }}" >> $GITHUB_ENV
+          fi
+
       - name: Upload rpm tar as artifact
         if: ${{ contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-${{ matrix.platform }}-rpm-archive
+          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-rpm-archive
           path: ./rpm.tar
 
       - name: Upload deb tar as artifact
         if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-${{ matrix.platform }}-deb-archive
+          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-deb-archive
           path: ./deb.tar
 
       - name: enable tmate debugging
