@@ -228,10 +228,11 @@ jobs:
 
       - name: Compute platform label
         run: |
-          if [[ "${{ matrix.platform }}" == *linux* ]]; then
-            echo "PLATFORM_LABEL=ol${{ matrix.platform##*: }}" >> $GITHUB_ENV
+          PLATFORM="${{ matrix.platform }}"
+          if [[ "$PLATFORM" == *linux* ]]; then
+            echo "PLATFORM_LABEL=ol${PLATFORM##*:}" >> "$GITHUB_ENV"
           else
-            echo "PLATFORM_LABEL=${{ matrix.platform##*: }}" >> $GITHUB_ENV
+            echo "PLATFORM_LABEL=${PLATFORM##*:}" >> "$GITHUB_ENV"
           fi
         shell: bash
 
