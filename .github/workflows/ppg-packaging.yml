@@ -227,14 +227,14 @@ jobs:
         shell: bash
 
       - name: Upload rpm tar as artifact
-        if: ${{ contains(inputs.platform, 'linux') }}
+        if: ${{ contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.package }}-${{ matrix.platform }}-rpm-archive
           path: ./rpm.tar
 
       - name: Upload deb tar as artifact
-        if: ${{ !contains(inputs.platform, 'linux') }}
+        if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.package }}-${{ matrix.platform }}-deb-archive
