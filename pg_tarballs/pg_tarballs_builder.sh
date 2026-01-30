@@ -1334,8 +1334,8 @@ build_pg_oidc(){
     fi
 
 	export PATH=${POSTGRESQL_PREFIX}/bin:$PATH
-    make USE_PGXS=1 -j4
-    make USE_PGXS=1 -j4 install
+    make USE_PGXS=1 -j4 with_llvm=no CXX=g++
+    make USE_PGXS=1 -j4 install with_llvm=no CXX=g++
 
 	build_status "ends" "pgOIDC"
 }
