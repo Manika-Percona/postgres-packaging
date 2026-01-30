@@ -64,11 +64,13 @@ are required to perform a backup which increases security.
 %setup -q -n %{name}-%{version}
 
 %build
+export PG_CONFIG=/usr/pgsql-%{pgmajorversion}/bin/pg_config
 %{__install} -d build
 %meson
 %meson_build
 
 %install
+export PG_CONFIG=/usr/pgsql-%{pgmajorversion}/bin/pg_config
 %meson_install
 %{__install} -D -d -m 0755 %{buildroot}%{perl_vendorlib} %{buildroot}%{_bindir}
 %{__install} -D -d -m 0700 %{buildroot}/%{_sharedstatedir}/pgbackrest
