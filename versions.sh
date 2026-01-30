@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PG_MAJOR=16
-PG_MINOR=12
+PG_MINOR=11
 PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 
 PPG_COMMON_MAJOR=288
@@ -18,8 +18,6 @@ PGBADGER_VERSION=13.2
 PGBOUNCER_VERSION=1.25.1
 PGPOOL2_VERSION=4.7.0
 PGVECTOR_VERSION=0.8.1
-POSTGIS33_VERSION=3.3
-POSTGIS33_MINOR=8
 POSTGIS35_VERSION=3.5
 POSTGIS35_MINOR=4
 PYSYNCOBJ_VERSION=0.3.10
@@ -249,21 +247,6 @@ case "$1" in
         # urls
         PGVECTOR_SRC_REPO="https://github.com/pgvector/pgvector.git"
         PGVECTOR_SRC_REPO_DEB="https://salsa.debian.org/postgresql/pgvector.git"
-    ;;
-
-
-    postgis33)
-        # versions
-        POSTGIS_PRODUCT=percona-postgis
-        POSTGIS_PRODUCT_FULL=${POSTGIS_PRODUCT}-${POSTGIS33_VERSION}.${POSTGIS33_MINOR}
-        POSTGIS33_RELEASE='2'
-        POSTGIS_SRC_BRANCH="${POSTGIS33_VERSION}.${POSTGIS33_MINOR}"
-        POSTGIS_RPM_RELEASE='2'
-        POSTGIS_DEB_RELEASE='2'
-
-        # urls
-        POSTGIS_SRC_REPO="https://github.com/postgis/postgis.git"
-        POSTGIS_SRC_REPO_DEB="https://salsa.debian.org/debian-gis-team/postgis.git"
     ;;
 
 
