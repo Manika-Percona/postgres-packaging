@@ -80,7 +80,6 @@ export PG_CONFIG=/usr/pgsql-%{pgmajorversion}/bin/pg_config
 %{__install} -D -d -m 0700 %{buildroot}/var/spool/pgbackrest
 %{__install} -D -d -m 0755 %{buildroot}%{_sysconfdir}
 %{__install} %{SOURCE1} %{buildroot}/%{_sysconfdir}/pgbackrest.conf
-%{__cp} -a builddir/src/pgbackrest %{buildroot}%{_bindir}/pgbackrest
 
 # Install logrotate file:
 %{__install} -p -d %{buildroot}%{_sysconfdir}/logrotate.d
