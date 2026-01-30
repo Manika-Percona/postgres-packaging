@@ -65,7 +65,7 @@ are required to perform a backup which increases security.
 
 %build
 export PG_CONFIG=/usr/pgsql-%{pgmajorversion}/bin/pg_config
-export PKG_CONFIG_LIBDIR=/usr/pgsql-%{pgmajorversion}/lib/pkgconfig
+export PKG_CONFIG_LIBDIR=/usr/pgsql-%{pgmajorversion}/lib/pkgconfig:/usr/lib64/pkgconfig
 unset PKG_CONFIG_PATH
 %{__install} -d build
 %meson
