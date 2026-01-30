@@ -233,6 +233,7 @@ jobs:
           else
             echo "PLATFORM_LABEL=${{ matrix.platform##*: }}" >> $GITHUB_ENV
           fi
+        shell: bash
 
       - name: Upload rpm tar as artifact
         if: ${{ contains(matrix.platform, 'linux') }}
