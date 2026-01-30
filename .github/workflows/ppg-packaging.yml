@@ -114,17 +114,17 @@ jobs:
     needs: prepare
 
     strategy:
-    fail-fast: false
-    matrix:
-      platform:
-        - oraclelinux:10
-        - oraclelinux:9
-        - oraclelinux:8
-        - ubuntu:noble
-        - ubuntu:jammy
-        - debian:bookworm
-        - debian:bullseye
-        - debian:trixie
+      fail-fast: false
+      matrix:
+        platform:
+          - oraclelinux:10
+          - oraclelinux:9
+          - oraclelinux:8
+          - ubuntu:noble
+          - ubuntu:jammy
+          - debian:bookworm
+          - debian:bullseye
+          - debian:trixie
 
     container:
       image: ${{ matrix.platform }}
