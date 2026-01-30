@@ -1332,10 +1332,11 @@ build_pg_oidc(){
         git clean -xdf
         git checkout "${PG_OIDC_BRANCH}"
     fi
-
+	yum install -y gcc-toolset-14 gcc-toolset-14-gcc-c++
+	source /opt/rh/gcc-toolset-14/enable
 	export PATH=${POSTGRESQL_PREFIX}/bin:$PATH
-    make USE_PGXS=1 -j4 with_llvm=no CXX=g++
-    make USE_PGXS=1 -j4 install with_llvm=no CXX=g++
+    make USE_PGXS=1 -j4 with_llvm=no
+    make USE_PGXS=1 -j4 install with_llvm=no
 
 	build_status "ends" "pgOIDC"
 }
