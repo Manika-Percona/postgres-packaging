@@ -61,6 +61,18 @@ on:
           - experimental
           - testing
 
+      pg-major:
+        description: Postgres major version for which package will be built
+        required: true
+        default: "16"
+        type: choice
+        options:
+          - "18"
+          - "17"
+          - "16"
+          - "15"
+          - "14"
+
       arch:
         description: architecture
         required: true
@@ -93,8 +105,10 @@ jobs:
         mkdir pkg
         if [[ "${{ inputs.package }}" = "postgres" ]]; then
          cp postgres-packaging/${{ inputs.package }}/ppg_builder.sh pkg/pkg-builder.sh
+        elif [[ "${{ inputs.package }}" = "etcd" || "${{ inputs.package }}" = "haproxy" || "${{ inputs.package }}" = "pgbadger" || "${{ inputs.package }}" = "pysyncobj" || "${{ inputs.package }}" = "ydiff" ]]; then
+         cp postgres-packaging/common/${{ inputs.package }}/*builder.sh pkg/pkg-builder.sh
         else
-         cp postgres-packaging/${{ inputs.package }}/*builder.sh pkg/pkg-builder.sh
+         cp postgres-packaging/non-common/${{ inputs.package }}/*builder.sh pkg/pkg-builder.sh
         fi
         cp postgres-packaging/common-functions.sh pkg/
         cp postgres-packaging/install-deps.sh pkg/
@@ -184,22 +198,22 @@ jobs:
           set -xe
           cd ${{ inputs.package }}
           mkdir test
-            ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }}
+            ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
       - name: Get Sources
         run: |
           cd ${{ inputs.package }}
-          ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }}
+          ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
       - name: Build Source RPM/DEB
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 --repo_component=${{ inputs.ppg-repo-type }}
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
           else
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1 --repo_component=${{ inputs.ppg-repo-type }}
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_src_deb=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
           fi
         shell: bash
 
@@ -207,9 +221,9 @@ jobs:
         run: |
           cd ${{ inputs.package }}
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 --pg_major=${{ inputs.pg-major }}
           else
-            ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1
+            ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1 --pg_major=${{ inputs.pg-major }}
           fi
         shell: bash
 
