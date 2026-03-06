@@ -283,10 +283,10 @@ jobs:
       - name: Install build tools
         run: |
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
-            yum install -y gcc make tar rpm-build rpmdevtools git
+            yum install -y gcc make tar rpm-build rpmdevtools git sudo
           else
             apt-get update
-            apt-get install -y wget curl gcc tar git build-essential devscripts debhelper fakeroot lintian
+            apt-get install -y wget curl gcc tar git build-essential devscripts debhelper fakeroot lintian sudo
           fi
           echo "Ready to build!"
 
