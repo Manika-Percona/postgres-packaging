@@ -229,7 +229,6 @@ jobs:
         run: |
           set -xe
           cd ${{ inputs.package }}
-          mkdir test
           sudo ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
@@ -330,7 +329,6 @@ jobs:
         run: |
           set -xe
           cd ${{ inputs.package }}
-          mkdir test
           sudo ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
