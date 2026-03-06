@@ -201,11 +201,19 @@ jobs:
             ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
+      - name: Set Build ID
+        run: echo "BUILD_ID=${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_ENV"
+
       - name: Get Sources
         run: |
           cd ${{ inputs.package }}
           ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
+
+      - name: Get uploadPath for internal server (repo.ci)
+        run: |
+          uploadPath=$(grep "UPLOAD" test/etcd.properties | cut -d = -f 2)
+          echo $uploadPath
 
       - name: Build Source RPM/DEB
         run: |

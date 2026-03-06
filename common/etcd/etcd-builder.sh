@@ -15,7 +15,7 @@ get_sources(){
 
     echo "PRODUCT=${ETCD_PRODUCT}" > etcd.properties
     echo "PRODUCT_FULL=${ETCD_PRODUCT_FULL}" >> etcd.properties
-    echo "VERSION=${PSM_VER}" >> etcd.properties
+    echo "VERSION=${ETCD_VERSION}" >> etcd.properties
     echo "BUILD_NUMBER=${BUILD_NUMBER}" >> etcd.properties
     echo "BUILD_ID=${BUILD_ID}" >> etcd.properties
 
@@ -63,7 +63,8 @@ get_sources(){
 
     tar --owner=0 --group=0 --exclude=.* -czf ${ETCD_PRODUCT_FULL}.tar.gz ${ETCD_PRODUCT_FULL}
     DATE_TIMESTAMP=$(date +%F_%H-%M-%S)
-    echo "UPLOAD=UPLOAD/experimental/BUILDS/${ETCD_PRODUCT}/${ETCD_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> etcd.properties
+    #echo "UPLOAD=UPLOAD/experimental/BUILDS/${ETCD_PRODUCT}/${ETCD_PRODUCT_FULL}/${PSM_BRANCH}/${REVISION}/${DATE_TIMESTAMP}/${BUILD_ID}" >> etcd.properties
+    echo "UPLOAD=UPLOAD/manika/${ETCD_PRODUCT}/${ETCD_PRODUCT_FULL}/PG${PG_MAJOR}/${DATE_TIMESTAMP}/${BUILD_ID}" >> etcd.properties
     mkdir $WORKDIR/source_tarball
     mkdir $CURDIR/source_tarball
     cp ${ETCD_PRODUCT_FULL}.tar.gz $WORKDIR/source_tarball
@@ -294,8 +295,6 @@ RPM=0
 DEB=0
 SOURCE=0
 INSTALL=0
-REVISION=0
-DEBUG=0
 
 parse_arguments PICK-ARGS-FROM-ARGV "$@"
 check_workdir
