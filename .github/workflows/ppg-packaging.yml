@@ -32,7 +32,7 @@ on:
 
       packaging-repo:
         description: packaging repo to be used
-        default: percona/postgres-packaging
+        default: Manika-Percona/postgres-packaging
         required: true
 
       packaging-branch:
@@ -212,7 +212,7 @@ jobs:
 
       - name: Get uploadPath for internal server (repo.ci)
         run: |
-          uploadPath=$(grep "UPLOAD" test/etcd.properties | cut -d = -f 2)
+          uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
           echo $uploadPath
 
       - name: Build Source RPM/DEB
