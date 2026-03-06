@@ -148,14 +148,6 @@ jobs:
           chmod 755 ${{ inputs.package }}/*
         shell: bash
 
-      #- name: Install dependencies
-      #  run: |
-      #    set -xe
-      #    cd ${{ inputs.package }}
-      #    mkdir test
-      #      ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
-      #  shell: bash
-
       - name: Set Build ID
         run: echo "BUILD_ID=${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_ENV"
 
@@ -231,28 +223,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.package }}-source_tarball
-          path: ${{ inputs.package }}/test/
-
-      #- name: Enable ppg repo
-      #  if: ${{ inputs.package != 'postgres' }}
-      #  run: |
-      #    if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
-      #      yum -y install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
-      #    else
-      #      wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
-      #      dpkg -i percona-release_latest.generic_all.deb
-      #      rm -f percona-release_latest.generic_all.deb
-      #    fi
-      #    percona-release disable all
-      #    percona-release enable ${{ inputs.ppg-repo }} ${{ inputs.ppg-repo-type }}
-
-      #- name: Install dependencies
-      #  run: |
-      #    set -xe
-      #    cd ${{ inputs.package }}
-      #    mkdir test
-      #      ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
-      #  shell: bash
+          path: ${{ inputs.package }}/test/source_tarball/
 
       - name: Build Source RPM/DEB
         run: |
@@ -355,19 +326,25 @@ jobs:
             ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
+      - name: Get source tarball from artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.package }}-source_tarball
+          path: ${{ inputs.package }}/test/source_tarball/
+
       - name: Get source rpm from artifact
         if: ${{ contains(matrix.platform, 'linux') }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.package }}-srpm
-          path: ${{ inputs.package }}/test/
+          path: ${{ inputs.package }}/test/srpm/
 
       - name: Get source rpm from artifact
         if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.package }}-source_deb
-          path: ${{ inputs.package }}/test/
+          path: ${{ inputs.package }}/test/source_deb/
 
       - name: Build RPM/DEB
         run: |
