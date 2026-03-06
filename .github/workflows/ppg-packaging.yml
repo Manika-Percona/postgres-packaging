@@ -176,7 +176,7 @@ jobs:
           name: ${{ inputs.package }}-source_tarball
           path: ${{ inputs.package }}/source_tarball
 
-  build-srpm/sdeb:
+  build-srpm-sdeb:
     runs-on: ${{ inputs.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: prepare, build-source-tarball
 
@@ -277,7 +277,7 @@ jobs:
           name: ${{ inputs.package }}-source_deb
           path: ${{ inputs.package }}/source_deb
 
-  build-rpm/deb:
+  build-rpm-deb:
     runs-on: ${{ inputs.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     needs: prepare, build-source-tarball, build-srpm/sdeb
 
