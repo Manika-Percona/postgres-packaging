@@ -210,10 +210,10 @@ jobs:
           ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
-      - name: Get uploadPath for internal server (repo.ci)
+      - name: Set uploadPath for internal server (repo.ci)
         run: |
           uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
-          echo $uploadPath
+          echo "UPLOADPATH=$uploadPath" >> "$GITHUB_ENV"
 
       - name: Build Source RPM/DEB
         run: |
@@ -233,6 +233,13 @@ jobs:
           else
             ./pkg-builder.sh --builddir=$(pwd)/test --build_deb=1 --pg_major=${{ inputs.pg-major }}
           fi
+        shell: bash
+
+      - name: List all build items
+        run: |
+          cd ${{ inputs.package }}
+          ls -lrt
+          abc
         shell: bash
 
       - name: Archive final rpm/deb packages
@@ -274,3 +281,11 @@ jobs:
         if: inputs.debugging && failure()
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 60
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+     - name: Get Upload Path for repo.ci
+       run: echo $UPLOADPATH
