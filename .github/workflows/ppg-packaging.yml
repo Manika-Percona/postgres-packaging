@@ -239,7 +239,9 @@ jobs:
         run: |
           cd ${{ inputs.package }}
           ls -lrt
-          abc
+          ls -lrt source_tarball
+          ls -lrt srpm
+          ls -lrt rpm
         shell: bash
 
       - name: Archive final rpm/deb packages
