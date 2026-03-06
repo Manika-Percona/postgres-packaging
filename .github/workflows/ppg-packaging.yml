@@ -356,15 +356,6 @@ jobs:
           fi
         shell: bash
 
-      - name: List all build items
-        run: |
-          cd ${{ inputs.package }}
-          ls -lrt
-          ls -lrt source_tarball
-          ls -lrt srpm
-          ls -lrt rpm
-        shell: bash
-
       - name: Archive final rpm/deb packages
         run: |
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
