@@ -159,9 +159,10 @@ jobs:
       - name: Set Build ID
         run: echo "BUILD_ID=${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_ENV"
 
-      - name: Get Sources
+      - name: Build Sources
         run: |
           cd ${{ inputs.package }}
+          mkdir test
           ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
@@ -256,6 +257,7 @@ jobs:
       - name: Build Source RPM/DEB
         run: |
           cd ${{ inputs.package }}
+          mkdir test
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
           else
@@ -371,6 +373,7 @@ jobs:
       - name: Build RPM/DEB
         run: |
           cd ${{ inputs.package }}
+          mkdir test
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 --pg_major=${{ inputs.pg-major }}
           else
