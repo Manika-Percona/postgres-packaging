@@ -225,6 +225,14 @@ jobs:
           name: ${{ inputs.package }}-source_tarball
           path: ${{ inputs.package }}/test/source_tarball/
 
+      - name: Install dependencies
+        run: |
+          set -xe
+          cd ${{ inputs.package }}
+          mkdir test
+            ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
+        shell: bash
+
       - name: Build Source RPM/DEB
         run: |
           cd ${{ inputs.package }}
@@ -339,7 +347,7 @@ jobs:
           name: ${{ inputs.package }}-srpm
           path: ${{ inputs.package }}/test/srpm/
 
-      - name: Get source rpm from artifact
+      - name: Get source deb from artifact
         if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/download-artifact@v4
         with:
