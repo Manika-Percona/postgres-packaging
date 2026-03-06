@@ -257,7 +257,6 @@ jobs:
       - name: Build Source RPM/DEB
         run: |
           cd ${{ inputs.package }}
-          mkdir test
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_src_rpm=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
           else
@@ -373,7 +372,6 @@ jobs:
       - name: Build RPM/DEB
         run: |
           cd ${{ inputs.package }}
-          mkdir test
           if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
             ./pkg-builder.sh --builddir=$(pwd)/test --build_rpm=1 --pg_major=${{ inputs.pg-major }}
           else
