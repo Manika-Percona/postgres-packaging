@@ -178,7 +178,7 @@ jobs:
 
   build-srpm-sdeb:
     runs-on: ${{ inputs.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    needs: prepare, build-source-tarball
+    needs: [prepare, build-source-tarball]
 
     strategy:
       fail-fast: false
@@ -279,7 +279,7 @@ jobs:
 
   build-rpm-deb:
     runs-on: ${{ inputs.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    needs: prepare, build-source-tarball, build-srpm/sdeb
+    needs: [prepare, build-source-tarball, build-srpm-sdeb]
 
     strategy:
       fail-fast: false
@@ -429,7 +429,7 @@ jobs:
 
   upload:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [prepare, build-source-tarball, build-srpm-sdeb, build-rpm-deb]
 
     steps:
      - name: Get Upload Path for repo.ci
