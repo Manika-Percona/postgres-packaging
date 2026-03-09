@@ -325,13 +325,6 @@ jobs:
           percona-release disable all
           percona-release enable ${{ inputs.ppg-repo }} ${{ inputs.ppg-repo-type }}
 
-      - name: Install dependencies
-        run: |
-          set -xe
-          cd ${{ inputs.package }}
-          sudo ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
-        shell: bash
-
       - name: Get source tarball from artifact
         uses: actions/download-artifact@v4
         with:
@@ -351,6 +344,13 @@ jobs:
         with:
           name: ${{ inputs.package }}-source_deb
           path: ${{ inputs.package }}/test/source_deb/
+
+      - name: Install dependencies
+        run: |
+          set -xe
+          cd ${{ inputs.package }}
+          sudo ./pkg-builder.sh --builddir=$(pwd)/test --install_deps=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
+        shell: bash
 
       - name: Build RPM/DEB
         run: |
