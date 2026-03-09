@@ -161,7 +161,7 @@ jobs:
       - name: Set uploadPath for internal server (repo.ci)
         run: |
           uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
-          echo "UPLOADPATH=$uploadPath" >> "$GITHUB_ENV"
+          echo "UPLOADPATH=$uploadPath" >> "$GITHUB_OUTPUT"
 
       - name: Upload source tarballs as artifact
         uses: actions/upload-artifact@v4
