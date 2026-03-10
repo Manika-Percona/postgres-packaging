@@ -404,11 +404,6 @@ jobs:
           name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-deb-archive
           path: ./deb.tar
 
-      - name: enable tmate debugging
-        if: inputs.debugging && failure()
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 60
-
   sign-and-upload:
     runs-on: ubuntu-latest
     needs: [prepare, build-source-tarball, build-srpm-sdeb, build-rpm-deb]
@@ -439,7 +434,11 @@ jobs:
         pattern: ${{ inputs.package }}-*
         path: artifacts
 
-     - name: list all the artifacts
+     - name: Copy all the artifacts to required location
        run: |
-         cd artifacts
-         ls -lrt
+         abcd
+
+     - name: enable tmate debugging
+       if: inputs.debugging && failure()
+       uses: mxschmitt/action-tmate@v3
+       timeout-minutes: 60
