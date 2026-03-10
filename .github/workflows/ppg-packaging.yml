@@ -170,6 +170,7 @@ jobs:
         id: set_uploadPath
         run: |
           uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
+          echo $uploadPath
           echo "uploadPath=$uploadPath" >> "$GITHUB_OUTPUT"
 
       - name: Upload source tarballs as artifact
