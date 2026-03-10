@@ -470,6 +470,8 @@ jobs:
        uses: softprops/action-gh-release@v2
        with:
         draft: true # keep private as they are not signed yet
+        tag_name: etcd-v${{ needs.prepare.outputs.COMP_VERSION }}-${GITHUB_RUN_NUMBER}
+        name: etcd v${{ needs.prepare.outputs.COMP_VERSION }} build ${GITHUB_RUN_NUMBER}
         files: ${{ env.pkg_name }}.tar.gz
 
      - name: enable tmate debugging
