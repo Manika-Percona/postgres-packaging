@@ -130,6 +130,8 @@ jobs:
   build-source-tarball:
     runs-on: ubuntu-latest
     needs: prepare
+    outputs:
+      UPLOADPATH: ${{ steps.set_uploadPath.outputs.uploadPath }}
 
     steps:
       - name: Get build script artifact
@@ -154,8 +156,8 @@ jobs:
           chmod 755 ${{ inputs.package }}/*
         shell: bash
 
-      #- name: Set Build ID
-      #  run: echo "BUILD_ID=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+      - name: Set Build ID
+        run: echo "BUILD_ID=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
 
       - name: Build Sources
         run: |
@@ -164,11 +166,11 @@ jobs:
           sudo ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
-      #- name: Set uploadPath for internal server (repo.ci)
-      #  id: set_uploadPath
-      #  run: |
-      #    uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
-      #    echo "UPLOADPATH=$uploadPath" >> "$GITHUB_OUTPUT"
+      - name: Set uploadPath for internal server (repo.ci)
+        id: set_uploadPath
+        run: |
+          uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
+          echo "uploadPath=$uploadPath" >> "$GITHUB_OUTPUT"
 
       - name: Upload source tarballs as artifact
         uses: actions/upload-artifact@v4
@@ -369,17 +371,6 @@ jobs:
           fi
         shell: bash
 
-      - name: Archive final rpm/deb packages
-        run: |
-          if [[ "${{ matrix.platform }}" == *"linux"* ]]; then
-            cp -r ${{ inputs.package }}/rpm .
-            tar -cvf rpm.tar rpm/
-          else
-            cp -r ${{ inputs.package }}/deb .
-            tar -cvf deb.tar deb/
-          fi
-        shell: bash
-
       - name: Compute platform label
         run: |
           PLATFORM="${{ matrix.platform }}"
@@ -394,37 +385,41 @@ jobs:
         if: ${{ contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-rpm-archive
-          path: ./rpm.tar
+          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-rpms
+          path: ${{ inputs.package }}/rpm
 
       - name: Upload deb tar as artifact
         if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-deb-archive
-          path: ./deb.tar
+          name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-debs
+          path: ${{ inputs.package }}/deb
 
   sign-and-upload:
     runs-on: ubuntu-latest
     needs: [prepare, build-source-tarball, build-srpm-sdeb, build-rpm-deb]
 
     steps:
+     - name: Get package full name and upload path
+       run: |
+          echo "pkg_name=${{ inputs.package }}-${{ needs.prepare.outputs.COMP_VERSION }}" >> "$GITHUB_ENV"
+          echo "UPLOAD_PATH=${{ needs.build-source-tarball.outputs.UPLOADPATH }}" >> "$GITHUB_ENV"
+
      - name: Create final artifact structure
        run: |
-        BASE="${{ inputs.package }}-${{ needs.prepare.outputs.COMP_VERSION }}/source"
+        BASE="${{ env.UPLOAD_PATH }}/source"
         for t in tarball redhat debian; do
           mkdir -p "$BASE/$t"
         done
-        BASE="${{ inputs.package }}-${{ needs.prepare.outputs.COMP_VERSION }}/binary/redhat"
+        BASE="${{ env.UPLOAD_PATH }}/binary"
         for v in 10 9 8; do
           for arch in x86_64 aarch64; do
-            mkdir -p "$BASE/$v/$arch"
+            mkdir -p "$BASE/redhat/$v/$arch"
           done
         done
-        BASE="${{ inputs.package }}-${{ needs.prepare.outputs.COMP_VERSION }}/binary/debian"
         for v in bookworm bullseye jammy noble trixie; do
           for arch in x86_64 aarch64; do
-            mkdir -p "$BASE/$v/$arch"
+            mkdir -p "$BASE/debian/$v/$arch"
           done
         done
 
@@ -436,7 +431,46 @@ jobs:
 
      - name: Copy all the artifacts to required location
        run: |
-         abcd
+          cp artifacts/etcd-source_tarball/* "${{ env.UPLOAD_PATH }}/source/tarball"
+          cp artifacts/etcd-srpm/* "${{ env.UPLOAD_PATH }}/source/redhat"
+          cp artifacts/etcd-source_deb/* "${{ env.UPLOAD_PATH }}/source/debian"
+          if [[ "${{ inputs.arch }}" = "amd64" ]]; then
+            cp artifacts/etcd-ol8-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/8/x86_64"
+            cp artifacts/etcd-ol9-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/9/x86_64"
+            cp artifacts/etcd-ol10-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/10/x86_64"
+            cp artifacts/etcd-bookworm-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bookworm/x86_64"
+            cp artifacts/etcd-bullseye-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bullseye/x86_64"
+            cp artifacts/etcd-jammy-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/jammy/x86_64"
+            cp artifacts/etcd-noble-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/noble/x86_64"
+            cp artifacts/etcd-trixie-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/trixie/x86_64"
+          else
+            cp artifacts/etcd-ol8-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/8/aarch64"
+            cp artifacts/etcd-ol9-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/9/aarch64"
+            cp artifacts/etcd-ol10-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/10/aarch64"
+            cp artifacts/etcd-bookworm-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bookworm/aarch64"
+            cp artifacts/etcd-bullseye-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bullseye/aarch64"
+            cp artifacts/etcd-jammy-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/jammy/aarch64"
+            cp artifacts/etcd-noble-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/noble/aarch64"
+            cp artifacts/etcd-trixie-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/trixie/aarch64"
+          fi
+
+     #- name: Sign RPMs/Debs
+     #  run: |
+     #     for rpm in ${{ env.pkg_name }}/binary/redhat/*/*/*.rpm; do
+     #       signpackage --verbose --password "${SIGN_PASSWORD}" --rpm "$rpm"
+     #     done
+     #     for deb in ${{ env.pkg_name }}/binary/debian/*/*/*.deb; do
+     #       signpackage --verbose --password "${SIGN_PASSWORD}" --deb "$rpm"
+     #     done
+
+     - name: Archive final artifact
+       run: tar -czf ${{ env.pkg_name }}.tar.gz ${{ inputs.package }}
+
+     - name: Upload final artifact as release artifact
+       uses: softprops/action-gh-release@v2
+       with:
+        draft: true # keep private as they are not signed yet
+        files: ${{ env.pkg_name }}.tar.gz
 
      - name: enable tmate debugging
        if: inputs.debugging && failure()
