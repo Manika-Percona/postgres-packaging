@@ -163,14 +163,13 @@ jobs:
         run: |
           cd ${{ inputs.package }}
           mkdir test
-          sudo ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
+          sudo -E ./pkg-builder.sh --builddir=$(pwd)/test --get_sources=1 --repo_component=${{ inputs.ppg-repo-type }} --pg_major=${{ inputs.pg-major }}
         shell: bash
 
       - name: Set uploadPath for internal server (repo.ci)
         id: set_uploadPath
         run: |
           uploadPath=$(grep "UPLOAD" ${{ inputs.package }}/test/${{ inputs.package }}.properties | cut -d = -f 2)
-          echo $uploadPath
           echo "uploadPath=$uploadPath" >> "$GITHUB_OUTPUT"
 
       - name: Upload source tarballs as artifact
