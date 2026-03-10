@@ -395,7 +395,7 @@ jobs:
           name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-debs
           path: ${{ inputs.package }}/deb
 
-  sign-and-upload:
+  upload-draft-release:
     runs-on: ubuntu-latest
     needs: [prepare, build-source-tarball, build-srpm-sdeb, build-rpm-deb]
 
