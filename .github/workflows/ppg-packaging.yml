@@ -448,7 +448,8 @@ jobs:
      - name: Upload final artifact as release artifact
        uses: softprops/action-gh-release@v2
        with:
-        draft: true # keep private as they are not signed yet
+        draft: false
+        prerelease: true
         tag_name: etcd-v${{ needs.prepare.outputs.COMP_VERSION }}-${{ github.run_number }}
         name: etcd v${{ needs.prepare.outputs.COMP_VERSION }}-${{ github.run_number }}
         files: ${{ env.pkg_name }}.tar.gz
