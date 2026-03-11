@@ -381,14 +381,14 @@ jobs:
           fi
         shell: bash
 
-      - name: Upload rpm tar as artifact
+      - name: Upload rpms as artifact
         if: ${{ contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.package }}-${{ env.PLATFORM_LABEL }}-rpms
           path: ${{ inputs.package }}/rpm
 
-      - name: Upload deb tar as artifact
+      - name: Upload debs as artifact
         if: ${{ !contains(matrix.platform, 'linux') }}
         uses: actions/upload-artifact@v4
         with:
@@ -407,21 +407,11 @@ jobs:
 
      - name: Create final artifact structure
        run: |
-        BASE="${{ env.UPLOAD_PATH }}/source"
-        for t in tarball redhat debian; do
-          mkdir -p "$BASE/$t"
-        done
-        BASE="${{ env.UPLOAD_PATH }}/binary"
-        for v in 10 9 8; do
-          for arch in x86_64 aarch64; do
-            mkdir -p "$BASE/redhat/$v/$arch"
-          done
-        done
-        for v in bookworm bullseye jammy noble trixie; do
-          for arch in x86_64 aarch64; do
-            mkdir -p "$BASE/debian/$v/$arch"
-          done
-        done
+        mkdir -p ${{ env.UPLOAD_PATH }}/source_tarball
+        mkdir -p ${{ env.UPLOAD_PATH }}/srpm
+        mkdir -p ${{ env.UPLOAD_PATH }}/source_deb
+        mkdir -p ${{ env.UPLOAD_PATH }}/rpm
+        mkdir -p ${{ env.UPLOAD_PATH }}/deb
 
      - name: Get all the artifacts
        uses: actions/download-artifact@v4
@@ -431,28 +421,17 @@ jobs:
 
      - name: Copy all the artifacts to required location
        run: |
-          cp artifacts/etcd-source_tarball/* "${{ env.UPLOAD_PATH }}/source/tarball"
-          cp artifacts/etcd-srpm/* "${{ env.UPLOAD_PATH }}/source/redhat"
-          cp artifacts/etcd-source_deb/* "${{ env.UPLOAD_PATH }}/source/debian"
-          if [[ "${{ inputs.arch }}" = "amd64" ]]; then
-            cp artifacts/etcd-ol8-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/8/x86_64"
-            cp artifacts/etcd-ol9-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/9/x86_64"
-            cp artifacts/etcd-ol10-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/10/x86_64"
-            cp artifacts/etcd-bookworm-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bookworm/x86_64"
-            cp artifacts/etcd-bullseye-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bullseye/x86_64"
-            cp artifacts/etcd-jammy-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/jammy/x86_64"
-            cp artifacts/etcd-noble-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/noble/x86_64"
-            cp artifacts/etcd-trixie-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/trixie/x86_64"
-          else
-            cp artifacts/etcd-ol8-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/8/aarch64"
-            cp artifacts/etcd-ol9-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/9/aarch64"
-            cp artifacts/etcd-ol10-rpms/* "${{ env.UPLOAD_PATH }}/binary/redhat/10/aarch64"
-            cp artifacts/etcd-bookworm-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bookworm/aarch64"
-            cp artifacts/etcd-bullseye-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/bullseye/aarch64"
-            cp artifacts/etcd-jammy-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/jammy/aarch64"
-            cp artifacts/etcd-noble-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/noble/aarch64"
-            cp artifacts/etcd-trixie-debs/* "${{ env.UPLOAD_PATH }}/binary/debian/trixie/aarch64"
-          fi
+          cp artifacts/etcd-source_tarball/* "${{ env.UPLOAD_PATH }}/source_tarball/"
+          cp artifacts/etcd-srpm/* "${{ env.UPLOAD_PATH }}/srpm/"
+          cp artifacts/etcd-source_deb/* "${{ env.UPLOAD_PATH }}/source_deb/"
+          cp artifacts/etcd-ol8-rpms/* "${{ env.UPLOAD_PATH }}/rpm/"
+          cp artifacts/etcd-ol9-rpms/* "${{ env.UPLOAD_PATH }}/rpm/"
+          cp artifacts/etcd-ol10-rpms/* "${{ env.UPLOAD_PATH }}/rpm/"
+          cp artifacts/etcd-bookworm-debs/* "${{ env.UPLOAD_PATH }}/deb/"
+          cp artifacts/etcd-bullseye-debs/* "${{ env.UPLOAD_PATH }}/deb/"
+          cp artifacts/etcd-jammy-debs/* "${{ env.UPLOAD_PATH }}/deb/"
+          cp artifacts/etcd-noble-debs/* "${{ env.UPLOAD_PATH }}/deb/"
+          cp artifacts/etcd-trixie-debs/* "${{ env.UPLOAD_PATH }}/deb/"
 
      #- name: Sign RPMs/Debs
      #  run: |
