@@ -101,9 +101,9 @@ case "$1" in
         PG_CRON_PRODUCT_DEB=percona-pg-cron_${PG_MAJOR}
         PG_CRON_PRODUCT_FULL=${PG_CRON_PRODUCT}-${PG_CRON_VERSION}
         PG_CRON_SRC_BRANCH="v${PG_CRON_VERSION}"
-        PG_CRON_RPM_RELEASE='3'
-        PG_CRON_DEB_RELEASE='3'
-        PG_CRON_RELEASE='3'
+        PG_CRON_RPM_RELEASE='1'
+        PG_CRON_DEB_RELEASE='1'
+        PG_CRON_RELEASE='1'
 
         # urls
         PG_CRON_SRC_REPO="https://github.com/citusdata/pg_cron.git"
