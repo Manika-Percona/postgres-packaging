@@ -98,7 +98,7 @@ case "$1" in
     pg_cron)
         # versions
         PG_CRON_PRODUCT=percona-pg_cron_${PG_MAJOR}
-        PG_CRON_PRODUCT_DEB=percona-pg-cron_${PG_MAJOR}
+        PG_CRON_PRODUCT_DEB=percona-pg-cron
         PG_CRON_PRODUCT_FULL=${PG_CRON_PRODUCT}-${PG_CRON_VERSION}
         PG_CRON_SRC_BRANCH="v${PG_CRON_VERSION}"
         PG_CRON_RPM_RELEASE='1'
