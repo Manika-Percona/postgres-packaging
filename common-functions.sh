@@ -82,7 +82,7 @@ switch_to_vault_repo() {
 add_percona_yum_repo(){
     yum -y install ${YUM_REPO}
     percona-release disable all
-    percona-release enable ppg-${PG_VERSION} ${REPO_COMP}
+    percona-release enable ppg-16.13 ${REPO_COMP}
     return
 }
 
@@ -92,7 +92,7 @@ add_percona_apt_repo(){
     rm -f percona-release_1.0-33.generic_all.deb
     percona-release disable all
     percona-release enable telemetry testing
-    percona-release enable ppg-${PG_VERSION} ${REPO_COMP}
+    percona-release enable ppg-16.13 ${REPO_COMP}
     return
 }
 
