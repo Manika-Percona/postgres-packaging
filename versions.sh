@@ -8,7 +8,7 @@ POSTGRES_COMMON_VERSION=290
 POSTGRES_COMMON_MINOR=1
 PG_TDE_VERSION=2.1.2
 PATRONI_VERSION=4.1.2
-PG_CRON_VERSION=1.6.2
+PG_CRON_VERSION=1.6.7
 PG_GATHER_VERSION=33
 PG_REPACK_VERSION=1.5.3
 PGAUDIT_VERSION=17.1
@@ -28,7 +28,7 @@ PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
-PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PKG_GIT_BRANCH}"
+PKG_RAW_URL="https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/${PKG_GIT_BRANCH}"
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
