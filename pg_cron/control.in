@@ -1,7 +1,7 @@
 Source: percona-pg-cron
 Section: database
 Priority: optional
-Maintainer: Percona Development Team info@percona.com 
+Maintainer: Percona Development Team <info@percona.com>
 Build-Depends: debhelper, debhelper-compat (= 13), percona-postgresql-server-dev-all,
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
