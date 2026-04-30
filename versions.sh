@@ -7,7 +7,7 @@ PG_VERSION=${PG_MAJOR}.${PG_MINOR}
 POSTGRES_COMMON_VERSION=290
 POSTGRES_COMMON_MINOR=1
 PATRONI_VERSION=4.1.2
-PG_CRON_VERSION=1.6.2
+PG_CRON_VERSION=1.6.7
 PG_GATHER_VERSION=33
 PG_REPACK_VERSION=1.5.3
 PGAUDIT_VERSION=1.7.1
@@ -27,7 +27,7 @@ PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
-PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PKG_GIT_BRANCH}"
+PKG_RAW_URL="https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/${PKG_GIT_BRANCH}"
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
@@ -85,9 +85,9 @@ case "$1" in
         PG_CRON_PRODUCT_DEB=percona-pg-cron_${PG_MAJOR}
         PG_CRON_PRODUCT_FULL=${PG_CRON_PRODUCT}-${PG_CRON_VERSION}
         PG_CRON_SRC_BRANCH="v${PG_CRON_VERSION}"
-        PG_CRON_RPM_RELEASE='3'
-        PG_CRON_DEB_RELEASE='3'
-        PG_CRON_RELEASE='2'
+        PG_CRON_RPM_RELEASE='1'
+        PG_CRON_DEB_RELEASE='1'
+        PG_CRON_RELEASE='1'
 
         # urls
         PG_CRON_SRC_REPO="https://github.com/citusdata/pg_cron.git"
