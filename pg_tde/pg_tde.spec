@@ -89,31 +89,6 @@ Development and testing support files for pg_tde, including Perl test modules.
 %{pginstdir}/bin/pg_tde_rewind
 %{pginstdir}/bin/pg_tde_waldump
 %{pginstdir}/bin/pg_tde_upgrade
-%{pginstdir}/lib/bitcode/pg_tde.index.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/access/pg_tde_tdemap.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/access/pg_tde_xlog.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/access/pg_tde_xlog_keys.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/access/pg_tde_xlog_smgr.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/catalog/tde_keyring.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/catalog/tde_keyring_parse_opts.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/catalog/tde_principal_key.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/common/pg_tde_utils.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/encryption/enc_aes.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/encryption/enc_tde.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_api.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_curl.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_file.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_kmip.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_kmip_impl.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/keyring/keyring_vault.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/libkmip/libkmip/src/kmip.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/libkmip/libkmip/src/kmip_bio.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/libkmip/libkmip/src/kmip_locate.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/libkmip/libkmip/src/kmip_memset.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/pg_tde.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/pg_tde_event_capture.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/pg_tde_guc.bc
-%{pginstdir}/lib/bitcode/pg_tde/src/smgr/pg_tde_smgr.bc
 
 %files devel
 %{pginstdir}/lib/pgxs/src/test/perl/PostgreSQL/Test/TdeCluster.pm
