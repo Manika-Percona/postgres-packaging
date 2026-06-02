@@ -25,7 +25,7 @@ License:	PostgreSQL
 URL:		https://github.com/%{sname}/%{sname}/
 Source0:	%{name}-%{version}.tar.gz
 
-BuildRequires:	percona-postgresql%{pgmajorversion}-devel chrpath json-c-devel openssl-devel libcurl-devel lz4-devel zlib-devel libzstd-devel libxml2-devel libxslt-devel libselinux-devel pam-devel krb5-devel readline-devel
+BuildRequires:	percona-postgresql%{pgmajorversion}-devel chrpath json-c-devel openssl-devel libcurl-devel lz4-devel zlib-devel libzstd-devel libxml2-devel libxslt-devel libselinux-devel pam-devel krb5-devel readline-devel meson
 %if 0%{?gts_version}
 BuildRequires:  gcc-toolset-%{gts_version}-gcc gcc-toolset-%{gts_version}-gcc-c++ gcc-toolset-%{gts_version}-annobin-plugin-gcc
 %endif
@@ -57,12 +57,12 @@ This packages provides JIT support for pg_tde
 %if 0%{?gts_version}
 	source /opt/rh/gcc-toolset-14/enable
 %endif
-sed -i 's:PG_CONFIG = pg_config:PG_CONFIG = /usr/pgsql-%{pgmajorversion}/bin/pg_config:' Makefile
-USE_PGXS=1 PATH=%{pginstdir}/bin:$PATH %{__make}
+%meson -Dpg_config=%{pginstdir}/bin/pg_config
+%meson_build
 
 %install
 %{__rm} -rf %{buildroot}
-USE_PGXS=1 PATH=%{pginstdir}/bin:$PATH %{__make} %{?_smp_mflags} install DESTDIR=%{buildroot}
+%meson_install
 find %{buildroot}%{pginstdir} -type f \( -name '*.so' -o -name 'pg_tde_*' \) -exec chrpath --delete {} \; 2>/dev/null || true
 mkdir -p %{buildroot}/%{pginstdir}/lib/pgxs/src/test/perl/PostgreSQL/Test
 install -m 644 ci_scripts/perl/PostgreSQL/Test/TdeCluster.pm %{buildroot}/%{pginstdir}/lib/pgxs/src/test/perl/PostgreSQL/Test/
