@@ -291,7 +291,7 @@ EOF
   pgpool2)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="wget git vim binutils gcc gcc-c++ make autoconf libtool bison flex byacc chrpath clang-devel clang rpmdevtools percona-postgresql${PG_MAJOR}-devel llvm-devel jade pam-devel openssl-devel docbook-dtds docbook-style-xsl openldap-devel docbook-style-dsssl libmemcached-devel libxslt"
+      INSTALL_LIST+="wget git vim binutils gcc gcc-c++ make autoconf libtool bison flex byacc chrpath clang-devel-20.1.8 clang-20.1.8 rpmdevtools percona-postgresql${PG_MAJOR}-devel llvm-devel-20.1.8 jade pam-devel openssl-devel docbook-dtds docbook-style-xsl openldap-devel docbook-style-dsssl libmemcached-devel libxslt"
       dnf -y install ${INSTALL_LIST}
     else
       deb_deps
