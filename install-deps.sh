@@ -209,6 +209,22 @@ EOF
     ;;
 
 
+  pg_tde)
+    if [ "x$OS" = "xrpm" ]; then
+      rpm_deps
+      INSTALL_LIST+="sudo wget git vim chrpath clang-devel-20.1.8 clang-20.1.8 llvm-devel-20.1.8 json-c-devel libcurl-devel openssl-devel lz4-devel zlib-devel libzstd-devel libxml2-devel libxslt-devel libselinux-devel pam-devel krb5-devel readline-devel gettext percona-postgresql${PG_MAJOR}-devel rpmdevtools binutils meson gcc gcc-c++"
+      dnf -y install ${INSTALL_LIST}
+    else
+      deb_deps
+      DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
+      ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+      dpkg-reconfigure --frontend noninteractive tzdata
+      INSTALL_LIST+="sudo build-essential debhelper clang git libjson-c-dev pkg-config libcurl4-openssl-dev liblz4-dev libssl-dev zlib1g-dev libzstd-dev libxml2-dev libxml2-utils libxslt-dev libxslt1-dev libselinux1-dev libpam0g-dev krb5-multidev libkrb5-dev libreadline-dev shtool devscripts percona-postgresql-common percona-postgresql-server-dev-all libnuma-dev meson ninja-build chrpath"
+      DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated install ${INSTALL_LIST}
+    fi
+    ;;
+
+
   wal2json)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
@@ -257,7 +273,7 @@ EOF
   postgis)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="wget git vim which binutils gcc gcc-c++ rpm-build rpmdevtools SFCGAL SFCGAL-devel pcre2-devel xerces-c-devel clang-devel-20.1.8 clang-20.1.8 llvm-devel-20.1.8 autoconf libtool flex rpmlint percona-postgresql${PG_MAJOR}-devel make geos geos-devel libgeotiff-devel gmp-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel protobuf-c-devel pkg-config docbook-xsl libxslt-devel"
+      INSTALL_LIST+="wget git vim which binutils gcc gcc-c++ rpm-build rpmdevtools SFCGAL SFCGAL-devel pcre2-devel xerces-c-devel clang-devel clang llvm-devel autoconf libtool flex rpmlint percona-postgresql${PG_MAJOR}-devel make geos geos-devel libgeotiff-devel gmp-devel gmp-devel gtk2-devel json-c-devel libgeotiff17-devel protobuf-c-devel pkg-config docbook-xsl libxslt-devel"
       dnf -y install ${INSTALL_LIST}
       if [ ! -f  /usr/bin/llvm-config ]; then
         ln -s /usr/bin/llvm-config-64 /usr/bin/llvm-config
@@ -277,7 +293,7 @@ EOF
   pgvector)
     if [ "x$OS" = "xrpm" ]; then
       rpm_deps
-      INSTALL_LIST+="wget git vim binutils gcc gcc-c++ rpm-build rpmdevtools clang-devel-20.1.8 clang-20.1.8 llvm-devel-20.1.8 perl-generators bison flex patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server selinux-policy systemd systemd-devel systemtap-sdt-devel "
+      INSTALL_LIST+="wget git vim binutils gcc gcc-c++ rpm-build rpmdevtools clang-devel clang llvm-devel perl-generators bison flex patch perl perl-ExtUtils-MakeMaker perl-ExtUtils-Embed readline-devel percona-postgresql${PG_MAJOR}-devel percona-postgresql${PG_MAJOR}-server selinux-policy systemd systemd-devel systemtap-sdt-devel "
       INSTALL_LIST+="python3-devel e2fsprogs-devel gettext glibc-devel krb5-devel libicu-devel libselinux-devel libuuid-devel libxml2-devel libxslt-devel openldap-devel openssl-devel pam-devel tcl-devel zlib-devel"
       dnf -y install ${INSTALL_LIST}
     else

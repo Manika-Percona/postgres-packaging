@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+include /usr/share/postgresql-common/pgxs_debian_control.mk
+
+export DH_VERBOSE = 1
+PG_CONFIG = /usr/lib/postgresql/@@PGMAJOR@@/bin/pg_config
+
+%:
+	dh $@
+
+override_dh_builddeb:
+	dh_builddeb -- -Zgzip
+
+override_dh_auto_clean:
+	rm -rf build
+
+override_dh_auto_configure:
+	meson setup build -Dpg_config=$(PG_CONFIG)
+
+override_dh_auto_build:
+	meson compile -C build
+
+override_dh_auto_install:
+	DESTDIR=$(CURDIR)/debian/tmp meson install -C build
+	find $(CURDIR)/debian/tmp -type f \( -name '*.so' -o -name 'pg_tde_*' \) \
+		-exec chrpath --delete {} \; 2>/dev/null || true
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/postgresql/@@PGMAJOR@@/lib/pgxs/src/test/perl/PostgreSQL/Test
+	install -m 644 ci_scripts/perl/PostgreSQL/Test/TdeCluster.pm $(CURDIR)/debian/tmp/usr/lib/postgresql/@@PGMAJOR@@/lib/pgxs/src/test/perl/PostgreSQL/Test/
+
+override_dh_auto_test:
+
+override_dh_installdocs:
+	dh_installdocs --all README.*

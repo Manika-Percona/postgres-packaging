@@ -92,7 +92,6 @@ Patch1:         %{sname}-%{pgmajorversion}-rpm-pgsql.patch
 Patch3:         %{sname}-%{pgmajorversion}-conf.patch
 Patch5:         %{sname}-%{pgmajorversion}-var-run-socket.patch
 Patch6:         %{sname}-%{pgmajorversion}-perl-rpath.patch
-Patch7:         llvm_static_linking.patch
 
 BuildRequires:  perl glibc-devel bison flex >= 2.5.31
 BuildRequires:  gcc-c++
@@ -312,6 +311,7 @@ Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 %endif
 Requires:       util-linux
 Requires:       percona-pg-telemetry%{pgmajorversion}
+Requires:       percona-pg_tde%{pgmajorversion}
 # for /sbin/ldconfig
 Requires(post):         glibc
 Requires(postun):       glibc
@@ -538,7 +538,6 @@ benchmarks.
 %patch -P 3 -p0
 %patch -P 5 -p0
 %patch -P 6 -p0
-%patch -P 7 -p1
 
 %{__cp} -p %{SOURCE12} .
 
@@ -582,7 +581,6 @@ export CLANG=%{_bindir}/clang LLVM_CONFIG=%{_bindir}/llvm-config
         --datadir=%{pgbaseinstdir}/share \
         --libdir=%{pgbaseinstdir}/lib \
         --with-lz4 \
-        --with-extra-version=" - Percona Distribution" \
 %if 0%{?rhel} || 0%{?suse_version} >= 1499 || 0%{?fedora}
         --with-zstd \
 %endif
@@ -823,9 +821,6 @@ touch -r %{SOURCE10} %{sname}-%{pgmajorversion}-check-db-dir
 %{__mkdir} -p %{buildroot}%{pgbaseinstdir}/share/man/
 %{__mv} doc/src/sgml/man1 doc/src/sgml/man3 doc/src/sgml/man7 %{buildroot}%{pgbaseinstdir}/share/man/
 %{__rm} -rf %{buildroot}%{_docdir}/pgsql
-
-# These file(s) should not be packaged:
-%{__rm} %{buildroot}%{pgbaseinstdir}/lib/libpgfeutils.a
 
 # initialize file lists
 %{__cp} /dev/null main.lst
@@ -1313,6 +1308,7 @@ fi
 %{pgbaseinstdir}/lib/pgxs/*
 %{pgbaseinstdir}/lib/pkgconfig/*
 %{pgbaseinstdir}/share/man/man1/ecpg.*
+%{pgbaseinstdir}/lib/libpgfeutils.a
 
 %if %llvm
 %files llvmjit
