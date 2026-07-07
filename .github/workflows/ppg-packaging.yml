@@ -66,7 +66,7 @@ jobs:
      - name: Set PG_MAJOR
        id: set-pgMajor
        run: |
-          if [[ "${{ inputs.packaging-branch }}" == psp* ]]; then
+          if [[ "${{ inputs.packaging-branch }}" == *TDE* ]]; then
             pg_major=16
           else
             pg_major=$(echo "${{ inputs.packaging-branch }}" | grep -oE '[0-9]+\.' | head -1 | tr -d '.')
