@@ -12,7 +12,7 @@ PG_GATHER_VERSION=33
 PG_REPACK_VERSION=1.5.3
 PGAUDIT_VERSION=17.1
 PGAUDIT_SET_USER_VERSION=4.2.0
-PGBACKREST_VERSION=2.59.0
+PGBACKREST_VERSION=2.59.1
 PGPOOL2_VERSION=4.7.2
 PGVECTOR_VERSION=0.8.6
 POSTGIS35_VERSION=3.5
@@ -27,7 +27,7 @@ PKG_GIT_BRANCH=${PG_VERSION}
 PGRPMS_GIT_REPO="https://git.postgresql.org/git/pgrpms.git"
 
 # Raw files URLs
-PKG_RAW_URL="https://raw.githubusercontent.com/percona/postgres-packaging/${PKG_GIT_BRANCH}"
+PKG_RAW_URL="https://raw.githubusercontent.com/Manika-Percona/postgres-packaging/${PKG_GIT_BRANCH}"
 
 # Percona Repos
 YUM_REPO="https://repo.percona.com/yum/percona-release-latest.noarch.rpm"
